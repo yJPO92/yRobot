@@ -1,0 +1,47 @@
+*** yRobot ***
+
+le 27/08/2020: creation à partie de NewCpp.
+                purge git, qq search/replace.
+                commit en v1.0
+===================================================================================================
+le 26/08/2020: v5.0, en C, reécriture yMENU_C avec une structure equiv objet
+                affichage ok mais lourd!!!
+le 25/08/2020: retour en v4.3, puis =>v5.0 pour supprimer objet C++
+                changer objet en struct
+le 17/08/2020: v4.1; v4.2; v4.3; v4.4 impossible de appeler objet C++ depuis prog en C
+                meme en renomanr freertos et main en .cpp
+le 17/08/2020: v4.0; new branch Git pour passer en Free-RTOS
+le 16/08/2020: v3.1; yANALOG_FLT (v3.0) add hysteresis when PV variation
+le 10/08/2020: update doxygen file
+le 09/08/2020: v2.9b; vcubeMx 2.4; ==> commit
+le 05/08/2020: v2.9; vcubeMx 2.4; modif RTC AlarmA pour repetitif interrupt to erase status line
+                init RTC date et heure de compil via fonction inclese ds rtc.c/h et appelé depuis start.cpp
+le 04/08/2020: v2.7; vcubeMx 2.2; ajout RTC et calcul delta secondes pour clear status line
+le 02/08/2020: v2.6; vcubeMx 2.1; ajout interrupt BP et SW du joystick
+                effacement lignes de status = en cours
+le 01/08/2020: v2.2; ajout modif Coef filtre de yANALOG_FLT depuis Node-RED
+le 20/07/2020: v2.0; yMenu devient la class yMENU en C++
+le 20/07/2020: prepare pour Git local, add readme & license.
+le 19/07/2020: modif linker to place data at specific address
+                by carefull between VMA & LMA
+                order given by declaration (order in .ld not working)
+                be carefull if __attribute__ in different file compiled in variant order
+le 18/07/2020: Menu in Node-RED OK
+                ajout trim ds yANALOG_FLT. Ajusted from Node-red (lost on reboot).
+le 14/04/2020: creation d'un menu ds flow.js. Saisie d'un caractere, convertion en integer,
+                envoi de cet entier vers une addresse de variable (merci internet),
+                puis recherche de l'adresse en fonction du tag.
+le 09/07/2020: folder 'NodeRED' pour preparer data vers CubeMonitor
+                attention aux var globales et extern
+                sans oublier 'extern "C"...' dans .h
+                CubeMon.h depend d'un define
+le 07/07/2020: ajout Classe yANALOG_FLT
+                refaire calcul de mise a echelle
+le 06/07/2020: analogs ok apres declaration uint32_t!
+le 05/07/2020: declaration analog VRx & VRy via CubeMX
+                2 analog ADC1 via DMA, 1 seule ok, code start_cpp n'est pas exécuté!
+le 04/07/2020: compil/link OK, debug OK, en boucle ds start_cpp().
+                ajout d'une classe 'TPLT_Class' OK
+le 04/07/2020: Test pjt C++ avec config via STM32CubeMX
+                ajout src/start.cpp comme décrit ds blog TrueStudio
+-------------------------------------------------------

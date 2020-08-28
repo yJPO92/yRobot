@@ -1,0 +1,53 @@
+#
+# file & directory to ignore
+#
+# !=inclure malgre autres regles
+#
+
+# executables
+[Rr]elease/*
+[Dd]ebug/*
+
+# mais garder les exec bin & hex
+!/Release/*.hex
+!/Release/*.bin
+!/Release/*.binary
+!/Debug/*.hex
+!/Debug/*.bin
+!/Debug/*.binary
+
+# Atollic setting
+.settings/
+.code_review_properties
+!.project
+!.cproject
+!.mxproject
+
+# MCU particular files
+# ld modifie pour adresse fixes
+!*.ld
+*.launch
+/startup/
+
+# STMicroelectronic drivers
+# a chacun d'utilser les siens
+# ajout momentanement au versionning
+#/Drivers/
+/Middlewares/
+/Drivers/
+
+# project specifics files (personnal notes & debug helper)
+*.txt
+*.log
+*.png
+*.bat
+
+#mais garder
+!Notes.txt
+!STM-readme-DataLogExtended.txt
+!STM-readme-DataLogTerminal.txt
+
+# me versionner moi-meme
+!.gitignore
+
+# That's all folks!
