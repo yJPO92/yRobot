@@ -4,31 +4,24 @@
 
 # Project Title : yRobot
 
-Experimentation du C++  
-Mixed STM32CubeMX, C, C++
+Draft pour Meccano Robot    
+Mixed STM32CubeMX, FreeRTOS, C
 
 ## STM32CubeMX
 
 Cr&eacute;ation de l'appli.  
 
-## C++
+## Fonctionnalit&eacute;es
 
-To use TrueStudio, it's need to create some .cpp file.  
-Don't forget to include:  
-<pre><code>
-\#ifdef __cplusplus  
-extern "C" {  
-\#endif  
-.....  
-.....  
-\#ifdef __cplusplus  
-}  
-\#endif
-</code></pre>
+BP1 interrupt  
+Jostick VRx, VRy, SWxy  
+
+Menu VT100, display & envoie de commandes  
+STM32CubeMonitor 
 
 ## Authors
 
-* **JPO** - *C++ in TrueStudio*
+* **JPO** - *FreeRTOS, C in TrueStudio*
 
 ## License
 

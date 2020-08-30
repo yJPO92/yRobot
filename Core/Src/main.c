@@ -144,7 +144,9 @@ int main(void)
   MX_USART2_UART_Init();
   MX_ADC1_Init();
   MX_RTC_Init();
+  MX_TIM1_Init();
   MX_TIM2_Init();
+  MX_TIM7_Init();
 
   /* Initialize interrupts */
   MX_NVIC_Init();
@@ -154,10 +156,7 @@ int main(void)
    {
 	 Error_Handler();
    };
-  //HAL_ADC_Start_DMA(&hadc1,(uint32_t *)adcbuf,ADCBUFSIZE);	//done in cpp part
 
-  /* envoi vers la boucle en C++ */
-  // (void) start_cpp();		//moved in a task
   /* USER CODE END 2 */
 
   /* Init scheduler */

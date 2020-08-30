@@ -12,20 +12,6 @@
  *******************************************************************************
  */
 
-////Quelle est la cible?
-//#if defined(STM32F401RE)
-//#pragma message("Compiling for NUCLEAO_F401RE")		//with '-fno-diagnostics-show-caret'
-////Grove_LCD_RGB_Backlight rgbLCD(P0_27, P0_28);     //I2C0 SDA & SCL (I2C @ in ....LCD_RBG...h)
-////----- end F401RE -----
-//#elif defined(STM32L476xx)
-//#pragma message("***************************")
-//#pragma message("Compiling for NUCLEO_L476RG")	//with '-fno-diagnostics-show-caret'
-//#pragma message("***************************\n")
-////Grove_LCD_RGB_Backlight rgbLCD(PB_9, PB_8);     	//I2C1 SDA & SCL (I2C @ in ....LCD_RBG...h)
-////----- end L476RG ------
-//#else
-//#warning "Unknown TARGET"
-//#endif
 
 #include "main.h"
 #include "adc.h"
@@ -48,12 +34,12 @@
 #define NR_VAR_GLO_
 #include "CubeMon.h"
 
-////----- buffer DMA / ADC1
-#define ADCBUFSIZE	2
-uint32_t adcbuf[ADCBUFSIZE];
-uint32_t adc1_value[ADCBUFSIZE];
+//////----- buffer DMA / ADC1
+//#define ADCBUFSIZE	2
+//uint32_t adcbuf[ADCBUFSIZE];
+//uint32_t adc1_value[ADCBUFSIZE];
 //----- pour usart2, gestion interface sur console VT
-extern char aTxBuffer[2048];		//buffer d'emission
+//extern char aTxBuffer[2048];		//buffer d'emission
 extern uint16_t uart2NbCar;	//nb de byte attendu
 extern uint8_t aRxBuffer[3];		//buffer de reception at specific address
 
@@ -80,23 +66,23 @@ static void RTC_AlarmModify(void);
  */
 extern "C" int start_cpp() {
 
-	//--- Activate USART2
-	__HAL_UART_ENABLE_IT(&huart2, UART_IT_RXNE);
+//	//--- Activate USART2
+//	__HAL_UART_ENABLE_IT(&huart2, UART_IT_RXNE);
 
 	//--- reset ecran, message de bienvenue (avec nom prog & version)
-	menuSTM.yMenuClearVT();
-	menuSTM.yMenuWelcome();
-	menuSTM.yMenuDisplay();
-	//--- petit msg en fin d'inits
-	//TODO faire ds yMenu une écriture sur ligne de commande!!
-	snprintf(aTxBuffer, 1024, DECRC "\t=>Inits STM finis, ==> C++");		//trace sur ligne de status
-	HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+//	menuSTM.yMenuClearVT();
+//	menuSTM.yMenuWelcome();
+//	menuSTM.yMenuDisplay();
+//	//--- petit msg en fin d'inits
+//	//TODO faire ds yMenu une écriture sur ligne de commande!!
+//	snprintf(aTxBuffer, 1024, DECRC "\t=>Inits STM finis, ==> C++");		//trace sur ligne de status
+//	HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 
 	//--- init compteur de secondes
 	RTC_MiseAheure();
 
-	//--- start ADC acquisition via DMA
-	HAL_ADC_Start_DMA(&hadc1,(uint32_t *)adcbuf,ADCBUFSIZE);
+//	//--- start ADC acquisition via DMA
+//	HAL_ADC_Start_DMA(&hadc1,(uint32_t *)adcbuf,ADCBUFSIZE);
 
 	while(1) /* Assuming you don't wish to return to main() in main.c */
 	{
@@ -194,70 +180,8 @@ void RTC_AlarmModify(){
  * Callback: BP 1, Keyboard, ADC, RTC_AlarmA
  *------------------------------------------
  */
-/* interrupt methode (via callback function)
- * be careful, interrupt & callback start immediately before end of inits!!!!
- *
- * adcbuf[0]  : PC2, IN3 = VRx
- * adcbuf[1]  : PC3, IN4 = VRy
- */
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
-	if(hadc->Instance == ADC1) {
-		VRx.SetRaw(adcbuf[0]);
-		//VRx.CalulerMesure();
 
-		VRy.SetRaw(adcbuf[1]);
-		//VRy.CalulerMesure();
-	}
-}
 
-/**
-  * @brief  EXTI line detection callback.
-  * @param  GPIO_Pin Specifies the port pin connected to corresponding EXTI line.
-  * @retval None
-  */
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-	/** PC13 (B1 blue button) */
-	if(GPIO_Pin == B1_Pin) {
-		//snprintf(aTxBuffer, 1024, "\n\t--BP1 Interrupt");
-		snprintf(aTxBuffer, 1024, CUP(9,50) "--BP1 Interrupt" DECRC);
-		HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
-		//MU flag detection interrupt, traitement ds le while du main
-		//BP1Detected = 1;
-	}
-
-	/** PB2	GPIO_EXTI2	(Joystick button) */
-	if(GPIO_Pin == SWxy_Pin) {
-		//snprintf(aTxBuffer, 1024, "\n\t--Swxy Interrupt");
-		snprintf(aTxBuffer, 1024, CUP(10,50) "--Swxy Interrupt" DECRC);
-		HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
-		//yMEMS_Env_Sensors_Infos(IKS01A3_STTS751_0);
-	}
-
-	/** autre entree interrupt */
-}
-
-/*
- * USARTs callback
- */
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-	/** USART2 - console interface */
-	if (huart->Instance == USART2) {
-		// interruption en qd le nb de caracteres recu est correct
-		//snprintf(aTxBuffer, 1024, "\tdebug: USART2 cplt callback %c %d %d\r\n", aRxBuffer[0], aRxBuffer[1], aRxBuffer[3]);
-		//HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
-		menuSTM.yMenuGetTouche(aRxBuffer);
-		/* clear reception buffer*/
-		aRxBuffer[0]='\0';
-		aRxBuffer[1]='\0';
-		aRxBuffer[2]='\0';
-
-		//TODO: afficher le nvx choix
-
-	}	//if usart2
-	/* manage an other usart if any! */
-}	//USARTs callback
 
 /**
   * @brief  Alarm A callback.

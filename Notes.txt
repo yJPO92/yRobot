@@ -1,5 +1,8 @@
 *** yRobot ***
 
+le 30/08/2020: ADC1 cadencé par TIM1 (il faut etre en 'Discontinuous Conversion Mode')
+le 29/08/2020: regrouper les interrupts & callbacks ds un .c
+                add get touche ds structure yMENU_t
 le 27/08/2020: creation à partie de NewCpp.
                 purge git, qq search/replace.
                 commit en v1.0

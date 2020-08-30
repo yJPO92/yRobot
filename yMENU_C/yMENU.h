@@ -36,7 +36,19 @@
 #define mmenu1 "\n\
 ----------------------------------\n\
 \n\
- Obsolete!\n\
+ R (ADC1 analog values) \n\
+ T (start toggle LED1 avec time)\n\
+ L (free)\n\
+ S (stop toggle LED1)\n\
+ D (display Real Time)\n\
+ H (display zone)\n\
+ \n\
+ 0-9|a|b (affiche le chiffre)\n\
+ +|- (change de chiffre)\n\
+\n\
+ W (saisie de 2 touches)\n\
+ 0-9 0-9 (affiche les caracteres 10 a 99) \n\
+\n\
  Veuillez utiliser le dashboard\n\
  STM32CubeMonitor / Node-RED\n\
 \n\
@@ -70,14 +82,14 @@ typedef struct yMENU_t {
 	int m_patch;
 	int m_toto;
 
-	//void (*Welcome)(struct yMEMU_t *self);
+	void (*GetTouche)(struct yMENU_t *self);
 	void (*Display)(struct yMENU_t *self);
 	void (*Infos)(struct yMENU_t *self);
 	void (*Init)(struct yMENU_t *self);
 
 } yMENU_t;
 
-//void Welcome_fnc(struct yMEMU_t *self);
+void GetTouche_fnc(struct yMENU_t *self);
 void Display_fnc(struct yMENU_t *self);
 void Infos_fnc(struct yMENU_t *self);
 void Init_fnc(struct yMENU_t *self);

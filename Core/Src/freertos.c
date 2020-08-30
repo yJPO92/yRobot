@@ -62,12 +62,22 @@ char aTxBuffer[2048];			//buffer d'emission
 uint16_t uart2NbCar = 1;		//nb de byte attendu
 uint8_t aRxBuffer[3] __attribute__((section(".myvars")));		//buffer de reception at specific address
 char tmpBuffer[10];		    	//buffer temporaire pour switch/case
+////----- buffer DMA / ADC1
+#define ADCBUFSIZE	2
+uint32_t adcbuf[ADCBUFSIZE];
+uint32_t adc1_value[ADCBUFSIZE];
 
 uint8_t TkToStart = TkNone;		//pour scheduler le démarrage des taches
 
 extern UART_HandleTypeDef huart2;
+extern ADC_HandleTypeDef hadc1;
+extern DMA_HandleTypeDef hdma_adc1;
+extern TIM_HandleTypeDef htim1;
 
 uint16_t WaitInTk;
+
+yMENU_t mnuSTM;
+
 
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
@@ -123,7 +133,6 @@ const osSemaphoreAttr_t semUART_attributes = {
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
-//extern int start_cpp(void);	//passer la main a C++
 
 /* USER CODE END FunctionPrototypes */
 
@@ -344,7 +353,6 @@ void tk_Init_Fnc(void *argument)
 	HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 	osSemaphoreRelease(semUARTHandle);
 
-	yMENU_t mnuSTM;
 	mnuSTM.Init =Init_fnc;	//assigne function
 	mnuSTM.Init(&mnuSTM);	//initialize structure
 	osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
@@ -358,6 +366,14 @@ void tk_Init_Fnc(void *argument)
 	osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
 	HAL_UART_Transmit(&huart2,(uint8_t *) mnuSTM.Buffer, strlen(mnuSTM.Buffer), 5000);
 	osSemaphoreRelease(semUARTHandle);
+
+	//--- start USART2
+	__HAL_UART_ENABLE_IT(&huart2, UART_IT_RXNE);
+	//--- start ADC acquisition via DMA
+	HAL_ADC_Start_DMA(&hadc1,(uint32_t *)adcbuf,ADCBUFSIZE);
+	//--- start TIM1 (ADC1 schedule)
+	//HAL_TIM_Base_Start_IT(&htim1);
+	HAL_TIM_Base_Start(&htim1);
 
 	osDelay(WaitInTk);
 	/* Infinite loop */
@@ -482,6 +498,7 @@ void tk_VTaffiche_Fnc(void *argument)
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
+
 
 #ifdef __cplusplus
 }
