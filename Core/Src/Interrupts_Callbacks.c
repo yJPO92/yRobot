@@ -29,10 +29,26 @@ extern UART_HandleTypeDef huart2;
 extern osSemaphoreId_t semUARTHandle;
 extern ADC_HandleTypeDef hadc1;
 extern DMA_HandleTypeDef hdma_adc1;
+extern TIM_HandleTypeDef htim1;
 
 extern yMENU_t mnuSTM;
 extern uint32_t adcbuf[];
 
+/*
+  * @brief  Initialiser routes les interrupts du projet
+  * @param  none
+  * @retval none
+*/
+void Interrputs_Init(void) {
+	//--- start USART2
+	__HAL_UART_ENABLE_IT(&huart2, UART_IT_RXNE);
+	//--- start ADC acquisition via DMA
+	HAL_ADC_Start_DMA(&hadc1,(uint32_t *)adcbuf,2);
+	//--- start TIM1 (ADC1 schedule)
+	HAL_TIM_Base_Start(&htim1);
+
+	return;
+}
 
 /**
   * @brief  EXTI line detection callback.
@@ -41,7 +57,7 @@ extern uint32_t adcbuf[];
   */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-	/** PC13 (B1 blue button) */
+	/** PC13 GPIO_EXTI15_10 (B1 blue button) */
 	if(GPIO_Pin == B1_Pin) {
 		snprintf(mnuSTM.Buffer, 1024, CUP(9,50) "--BP1 Interrupt" DECRC);
 		osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax

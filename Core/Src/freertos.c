@@ -58,26 +58,23 @@ extern "C" {
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
 //----- pour usart2, gestion interface sur console VT
-char aTxBuffer[2048];			//buffer d'emission
+char aTxBuffer[2048] = {};			//buffer d'emission
 uint16_t uart2NbCar = 1;		//nb de byte attendu
 uint8_t aRxBuffer[3] __attribute__((section(".myvars")));		//buffer de reception at specific address
 char tmpBuffer[10];		    	//buffer temporaire pour switch/case
 ////----- buffer DMA / ADC1
-#define ADCBUFSIZE	2
-uint32_t adcbuf[ADCBUFSIZE];
-uint32_t adc1_value[ADCBUFSIZE];
+uint32_t adcbuf[2];
+uint32_t adc1_value[2];
 
 uint8_t TkToStart = TkNone;		//pour scheduler le démarrage des taches
+uint16_t WaitInTk;
 
 extern UART_HandleTypeDef huart2;
 extern ADC_HandleTypeDef hadc1;
 extern DMA_HandleTypeDef hdma_adc1;
 extern TIM_HandleTypeDef htim1;
 
-uint16_t WaitInTk;
-
 yMENU_t mnuSTM;
-
 
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
@@ -133,6 +130,7 @@ const osSemaphoreAttr_t semUART_attributes = {
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
+extern void Interrputs_Init(void);
 
 /* USER CODE END FunctionPrototypes */
 
@@ -272,9 +270,9 @@ void MX_FREERTOS_Init(void) {
 	osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
 	HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 	osSemaphoreRelease(semUARTHandle);
-	osDelay(pdMS_TO_TICKS(WaitInTk));
 
 	WaitInTk = Wait1s;
+	osDelay(pdMS_TO_TICKS(WaitInTk));
 	TkToStart = TkInit;
   /* USER CODE END RTOS_THREADS */
 
@@ -329,14 +327,14 @@ void tk_Init_Fnc(void *argument)
   /* USER CODE BEGIN tk_Init_Fnc */
 	//-- Is it to me to start?
 	while (TkToStart != TkInit) {
-//		snprintf(aTxBuffer, 1024, DECRC "\n tk_Init\t waiting %d" DECSC, TkToStart);
-//		osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
-//		HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
-//		osSemaphoreRelease(semUARTHandle);
+		snprintf(aTxBuffer, 1024, DECRC "\n tk_Init\t waiting %d" DECSC, TkToStart);
+		osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
+		HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+		osSemaphoreRelease(semUARTHandle);
 		osDelay(pdMS_TO_TICKS(WaitInTk));
 	}	//wait here!
 
-	snprintf(aTxBuffer, 1024, DECRC "\n tk_Init\t initialised\n");
+	snprintf(aTxBuffer, 1024, DECRC "\n tk_Init\t initialised" DECSC);
 	osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
 	HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 	osSemaphoreRelease(semUARTHandle);
@@ -367,13 +365,15 @@ void tk_Init_Fnc(void *argument)
 	HAL_UART_Transmit(&huart2,(uint8_t *) mnuSTM.Buffer, strlen(mnuSTM.Buffer), 5000);
 	osSemaphoreRelease(semUARTHandle);
 
-	//--- start USART2
-	__HAL_UART_ENABLE_IT(&huart2, UART_IT_RXNE);
-	//--- start ADC acquisition via DMA
-	HAL_ADC_Start_DMA(&hadc1,(uint32_t *)adcbuf,ADCBUFSIZE);
-	//--- start TIM1 (ADC1 schedule)
-	//HAL_TIM_Base_Start_IT(&htim1);
-	HAL_TIM_Base_Start(&htim1);
+//	//--- start USART2
+//	__HAL_UART_ENABLE_IT(&huart2, UART_IT_RXNE);
+//	//--- start ADC acquisition via DMA
+//	HAL_ADC_Start_DMA(&hadc1,(uint32_t *)adcbuf,ADCBUFSIZE);
+//	//--- start TIM1 (ADC1 schedule)
+//	//HAL_TIM_Base_Start_IT(&htim1);
+//	HAL_TIM_Base_Start(&htim1);
+	//--- initialize interrupts
+	Interrputs_Init();
 
 	osDelay(WaitInTk);
 	/* Infinite loop */
@@ -488,10 +488,19 @@ void tk_VTaffiche_Fnc(void *argument)
 
 	osDelay(pdMS_TO_TICKS(WaitInTk));
 	TkToStart++;
+	//-- Attendre toutes les tasks
+	while (TkToStart != TkAll) {
+		osDelay(pdMS_TO_TICKS(WaitInTk));
+	}
 	/* Infinite loop */
 	for(;;)
 	{
-		osDelay(pdMS_TO_TICKS(250));
+		osDelay(pdMS_TO_TICKS(3000));
+		mnuSTM.ClearStatusBar(&mnuSTM);	//CLS Bar
+		osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
+		HAL_UART_Transmit(&huart2,(uint8_t *) mnuSTM.Buffer, strlen(mnuSTM.Buffer), 5000);
+		osSemaphoreRelease(semUARTHandle);
+
 	}
   /* USER CODE END tk_VTaffiche_Fnc */
 }

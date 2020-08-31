@@ -49,6 +49,7 @@ void Display_fnc(struct yMENU_t *self) {
 							"\n   " REVERSE " " yPROG  " \n" OFF
 							mmenu1
 							mmenu2  DECSC);	//and save cursor position
+	return;
 }
 
 /*
@@ -60,6 +61,7 @@ void Infos_fnc(struct yMENU_t *self) {
  snprintf(self->Buffer, 1024, DECRC ERASELINE
 		 	 	 	 	"\n Menu version %d.%d (Autre %d)\n" DECSC,
 						self->m_version, self->m_patch, (int)self->m_toto);
+ return;
 }
 
 /*
@@ -73,24 +75,20 @@ void GetTouche_fnc(struct yMENU_t *self) {
 		switch (aRxBuffer[0]) {
 		case 'R': case 'r':		/* ???? */
 			snprintf(self->Buffer, 1024, ERASELINE "\tFrom Node-RED (R) %d     " DECRC, aRxBuffer[0]);
-//			HAL_UART_Transmit(&huart2,(uint8_t *) self->Buffer, strlen(self->Buffer), 5000);
 			break;
 
 		case 48: case 49: case 50:		/* chiffre de 0 a 9 */
 		case 51: case 52: case 53:
 		case 54: case 55: case 56: case 57:
 			snprintf(self->Buffer, 1024, ERASELINE "\tFrom Node-RED (0-9) %d     " DECRC, aRxBuffer[0]);
-//			HAL_UART_Transmit(&huart2,(uint8_t *) self->Buffer, strlen(self->Buffer), 5000);
 			break;
 
 		case 'T': case 't':		/* ???????e */
 			snprintf(self->Buffer, 1024, ERASELINE "\tFrom Node-RED (T) %d     " DECRC, aRxBuffer[0]);
-//			HAL_UART_Transmit(&huart2,(uint8_t *) self->Buffer, strlen(self->Buffer), 5000);
 			break;
 
 		case 'L': case 'l':		/* ?????? */
 			snprintf(self->Buffer, 1024, ERASELINE "\tFrom Node-RED (L) %d     " DECRC, aRxBuffer[0]);
-//			HAL_UART_Transmit(&huart2,(uint8_t *) self->Buffer, strlen(self->Buffer), 5000);
 			break;
 
 ////		case 'E': case 'e':		/* vider la queue de RTOS */
@@ -100,15 +98,18 @@ void GetTouche_fnc(struct yMENU_t *self) {
 //
 		case 'S': case 's':		/* ?????? */
 			snprintf(self->Buffer, 1024, ERASELINE "\tFrom Node-RED (S) %d     " DECRC, aRxBuffer[0]);
-//			HAL_UART_Transmit(&huart2,(uint8_t *) self->Buffer, strlen(self->Buffer), 5000);
 			break;
 
 		case 'I': case 'i':		/* afficher qqs infos sur la classe yMENU) */
 //			yMenuInfos();
 			break;
 
-		case 'C': case 'c':		/* Clear screen */
-//			yMenuClearVT();
+		case 'C': case 'c':		/* Clear Status Bar & +++ */
+			snprintf(self->Buffer, 1024, CUP(9,50) ERASELINE
+					  	  	  	  	  	 CUP(10,50) ERASELINE
+										 CUP(11,50) ERASELINE
+									     DECRC ERASELINE
+									     DECRC );
 			break;
 
 		case 'M': case 'm':		/* Display menu */
@@ -117,24 +118,20 @@ void GetTouche_fnc(struct yMENU_t *self) {
 
 		case 'X': case 'x':		/* adjust VRx Trim */
 //			snprintf(self->Buffer, 1024, ERASELINE "\tFrom Node-RED (X) %d; VRx trim %2.1f" ERASELINE DECRC, aRxBuffer[0], ymx_VRx_trim);
-//			HAL_UART_Transmit(&huart2,(uint8_t *) self->Buffer, strlen(self->Buffer), 5000);
 			break;
 
 		case 'Y': case 'y':		/* adjust VRy Trim */
 //			snprintf(self->Buffer, 1024, ERASELINE "\tFrom Node-RED (Y) %d; VRy trim %2.1f" ERASELINE DECRC, aRxBuffer[0], ymx_VRy_trim);
-//			HAL_UART_Transmit(&huart2,(uint8_t *) self->Buffer, strlen(self->Buffer), 5000);
 			break;
 
 //		case 'h': case 'H':		/* affiche cadre pour horloge */
 //			snprintf(self->Buffer, 1024, screen1 DECRC);
-//			HAL_UART_Transmit(&huart2,(uint8_t *) self->Buffer, strlen(self->Buffer), 5000);
 //			break;
 //
 //		case 'W': case 'w':		/* passage en modee 2 touches */
 //			// x ? y : z // y if x is true (nonzero), else z
 //			(uart2NbCar == 1) ? (uart2NbCar = 2) : (uart2NbCar = 1);
 //			snprintf(self->Buffer, 1024, "\tuart2 NbCar %d" DECRC, uart2NbCar);
-//			HAL_UART_Transmit(&huart2,(uint8_t *) self->Buffer, strlen(self->Buffer), 5000);
 //			break;
 //
 //		case 'Q': case 'q':		/* Quit, shutdown */
@@ -143,13 +140,13 @@ void GetTouche_fnc(struct yMENU_t *self) {
 //
 		default:				/* Cde erronée */
 			snprintf(self->Buffer, 1024, "\tCde erronée! (%d)" ERASELINE DECRC, aRxBuffer[0]);
-//			HAL_UART_Transmit(&huart2,(uint8_t *) self->Buffer, strlen(self->Buffer), 5000);
 			break;
 		}	//switch
 	}	//if flag
 	else {		/* on attend 2 touches */
 		//not used
 	}	//else flag
+	return;
 }
 
 
@@ -158,19 +155,21 @@ void GetTouche_fnc(struct yMENU_t *self) {
 //	HAL_UART_Transmit(&huart2,(uint8_t *) self->Buffer, strlen(self->Buffer), 5000);
 //	return;
 //}
-//
-//void yMENU::yMenuClearStatusBar(void) {
-//	//erase fin de ligne de trace du BP1 puis go to status line
-//	//erase fin de ligne de trace du SWxy puis go to status line
-//	//erase status line
-//	snprintf(self->Buffer, 1024, CUP(9,50) ERASELINE
-//							  CUP(10,50) ERASELINE
-//							  DECRC ERASELINE
-//							  DECRC );
-//	HAL_UART_Transmit(&huart2,(uint8_t *) self->Buffer, strlen(self->Buffer), 5000);
-//	return;
-//}
-//
+
+void ClearStatusBar_fnc(struct yMENU_t *self) {
+	//erase trace du BP1 jusqu'a fin de ligne
+	//erase trace du SWxy  jusqu'a fin de ligne
+	//erase trace ADC  jusqu'a fin de ligne
+	//puis go to status line
+	//erase status line
+	snprintf(self->Buffer, 1024, CUP(9,50) ERASELINE
+			  	  	  	  	  	 CUP(10,50) ERASELINE
+								 CUP(11,50) ERASELINE
+							     DECRC ERASELINE
+							     DECRC );
+	return;
+}
+
 
 /*
   * @brief  Initialiser la structure
@@ -194,6 +193,9 @@ void Init_fnc(struct yMENU_t *self)
 	self->GetTouche = GetTouche_fnc;
 	self->Display = Display_fnc;
 	self->Infos = Infos_fnc;
+	self->ClearStatusBar = ClearStatusBar_fnc;
+
+	return;
 }
 
 /*

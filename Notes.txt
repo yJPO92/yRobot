@@ -1,5 +1,6 @@
 *** yRobot ***
 
+le 30/08/2020: v1.1a: clearstatusbar by VT_affiche task
 le 30/08/2020: ADC1 cadencé par TIM1 (il faut etre en 'Discontinuous Conversion Mode')
 le 29/08/2020: regrouper les interrupts & callbacks ds un .c
                 add get touche ds structure yMENU_t

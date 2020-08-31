@@ -51,8 +51,11 @@ enum yTkOrder {
 	TkNone = 0, TkInit, TkVTaffiche, TkCheckVR, TkProcess, TkDefault, TkAll,
 };
 
+/* */
 const uint16_t Wait1s = 1000U;		//1sec
 const uint16_t Wait5s = 5000U;		//5sec
+
+
 
 // not used -------------------------------------------------------
 // not used -------------------------------------------------------

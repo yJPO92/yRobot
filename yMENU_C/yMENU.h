@@ -86,6 +86,8 @@ typedef struct yMENU_t {
 	void (*Display)(struct yMENU_t *self);
 	void (*Infos)(struct yMENU_t *self);
 	void (*Init)(struct yMENU_t *self);
+	void (*ClearStatusBar)(struct yMENU_t *self);
+
 
 } yMENU_t;
 
@@ -93,6 +95,7 @@ void GetTouche_fnc(struct yMENU_t *self);
 void Display_fnc(struct yMENU_t *self);
 void Infos_fnc(struct yMENU_t *self);
 void Init_fnc(struct yMENU_t *self);
+void ClearStatusBar_fnc(struct yMENU_t *self);
 
 /*--------------------------------------
  * Fonctions/methode applicables au Menu
