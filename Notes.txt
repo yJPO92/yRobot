@@ -1,5 +1,8 @@
 *** yRobot ***
 
+le 01/09/2020: v1.2a: RTC alarmA ==> clear status & traces
+                organise s/fnc RTC en rtc.c & .h
+le 30/08/2020: v1.2: Add RTC & AlarmA
 le 30/08/2020: v1.1a: clearstatusbar by VT_affiche task
 le 30/08/2020: ADC1 cadencé par TIM1 (il faut etre en 'Discontinuous Conversion Mode')
 le 29/08/2020: regrouper les interrupts & callbacks ds un .c

@@ -84,8 +84,8 @@ void Error_Handler(void);
 #define SWO_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 #define yPROG "*** yRobot ***"
-#define yVER  "V1.1a"
-#define yDATE "xx-Aout-2020"
+#define yVER  "V1.2a"
+#define yDATE "xx-Sept-2020"
 //#define yDBG_tk 1        //debug display on terminal (ou commenter ligne)
 
 

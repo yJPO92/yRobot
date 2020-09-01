@@ -18,6 +18,7 @@
 #include "task.h"
 #include "main.h"
 #include "cmsis_os.h"
+#include "rtc.h"
 //#include <stdio.h>
 //#include <string.h>
 //#include <math.h>
@@ -126,5 +127,19 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
 	}
 }
 
+/**
+  * @brief  Alarm A callback.
+  * @param  hrtc RTC handle
+  * @retval None
+  */
+void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
+{
+	//---reveillé par RTC AlarmA
+	snprintf(mnuSTM.Buffer, 1024, CUP(15,50) "RTC Alarm A flag" DECRC);
+	osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
+	HAL_UART_Transmit(&huart2,(uint8_t *) mnuSTM.Buffer, strlen(mnuSTM.Buffer), 5000);
+	osSemaphoreRelease(semUARTHandle);
+	RTC_AlarmA_flag = 1;
+}
 
 //That's all folks!!

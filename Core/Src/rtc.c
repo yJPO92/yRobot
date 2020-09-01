@@ -21,6 +21,8 @@
 #include "rtc.h"
 
 /* USER CODE BEGIN 0 */
+RTC_AlarmTypeDef sAlarm = {0};
+uint8_t RTC_AlarmA_flag = 0;
 
 /* USER CODE END 0 */
 
@@ -31,7 +33,6 @@ void MX_RTC_Init(void)
 {
   RTC_TimeTypeDef sTime = {0};
   RTC_DateTypeDef sDate = {0};
-  RTC_AlarmTypeDef sAlarm = {0};
 
   /** Initialize RTC Only 
   */
@@ -140,7 +141,7 @@ void RTC_MiseAheure(void)
 	   *  init RTC with the compilation date & time
 	   */
 	  RTC_TimeTypeDef sTime = {0};
-	  RTC_DateTypeDef sDate = {0};
+	  RTC_DateTypeDef sDate = {0,0,0,20};
 	  //----- __TIME__ compil time is a string
 	  uint8_t conv2d(const char* p) {
 		  uint8_t v = 0;
@@ -175,6 +176,31 @@ void RTC_MiseAheure(void)
 	    Error_Handler();
 	  }
 }
+
+/*
+  * @brief  modifier le setup de RTC_AlarmA, ajouter qq seconds en BCD
+  * @param  none
+  * @retval status
+*/
+void RTC_AlarmModify(){
+	sAlarm.Alarm = RTC_ALARM_A;
+	//sAlarm.AlarmTime.Hours = 0x12;		//HH:MN peu importe
+	//sAlarm.AlarmTime.Minutes = 0x1;
+	sAlarm.AlarmTime.Seconds += 0x04;		//add 4 seconds en BCD
+	if ((sAlarm.AlarmTime.Seconds & 0x000F) > 0x9) { sAlarm.AlarmTime.Seconds += 0x6; }	//check & correct over 9
+	if (sAlarm.AlarmTime.Seconds >= 0x59) { sAlarm.AlarmTime.Seconds = 0x01; }		//check & reset after 1 minute
+	sAlarm.AlarmTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
+	sAlarm.AlarmTime.StoreOperation = RTC_STOREOPERATION_RESET;
+	sAlarm.AlarmMask = RTC_ALARMMASK_DATEWEEKDAY|RTC_ALARMMASK_HOURS|RTC_ALARMMASK_MINUTES;
+	sAlarm.AlarmSubSecondMask = RTC_ALARMSUBSECONDMASK_ALL;
+	sAlarm.AlarmDateWeekDaySel = RTC_ALARMDATEWEEKDAYSEL_DATE;
+	sAlarm.AlarmDateWeekDay = 0x1;
+
+	HAL_RTC_SetAlarm_IT(&hrtc, &sAlarm, RTC_FORMAT_BCD);		//activate interrupt RTC AlarmA
+
+	RTC_AlarmA_flag = 0;	//reset flag
+}
+
 
 /* USER CODE END 1 */
 

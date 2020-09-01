@@ -105,10 +105,11 @@ void GetTouche_fnc(struct yMENU_t *self) {
 			break;
 
 		case 'C': case 'c':		/* Clear Status Bar & +++ */
-			snprintf(self->Buffer, 1024, CUP(9,50) ERASELINE
-					  	  	  	  	  	 CUP(10,50) ERASELINE
-										 CUP(11,50) ERASELINE
-									     DECRC ERASELINE
+			snprintf(self->Buffer, 1024, CUP(9,50) ERASELINE		/*BP1*/
+					  	  	  	  	  	 CUP(10,50) ERASELINE		/*SWxy*/
+										 /*CUP(11,50) ERASELINE*/	/*ADC1*/
+										 CUP(15,50) ERASELINE		/*AlarmA*/
+									     DECRC ERASELINE			/*Status line*/
 									     DECRC );
 			break;
 
@@ -162,10 +163,11 @@ void ClearStatusBar_fnc(struct yMENU_t *self) {
 	//erase trace ADC  jusqu'a fin de ligne
 	//puis go to status line
 	//erase status line
-	snprintf(self->Buffer, 1024, CUP(9,50) ERASELINE
-			  	  	  	  	  	 CUP(10,50) ERASELINE
-								 CUP(11,50) ERASELINE
-							     DECRC ERASELINE
+	snprintf(self->Buffer, 1024, CUP(9,50) ERASELINE		/*BP1*/
+			  	  	  	  	  	 CUP(10,50) ERASELINE		/*SWxy*/
+								 /*CUP(11,50) ERASELINE*/	/*ADC1*/
+								 CUP(15,50) ERASELINE		/*AlarmA*/
+							     DECRC ERASELINE			/*Status line*/
 							     DECRC );
 	return;
 }

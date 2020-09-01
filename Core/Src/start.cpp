@@ -40,26 +40,26 @@
 //uint32_t adc1_value[ADCBUFSIZE];
 //----- pour usart2, gestion interface sur console VT
 //extern char aTxBuffer[2048];		//buffer d'emission
-extern uint16_t uart2NbCar;	//nb de byte attendu
-extern uint8_t aRxBuffer[3];		//buffer de reception at specific address
+//extern uint16_t uart2NbCar;	//nb de byte attendu
+//extern uint8_t aRxBuffer[3];		//buffer de reception at specific address
 
-/* Real Time Clock */
-RTC_HandleTypeDef hrtc;
-RTC_TimeTypeDef myTime;
-RTC_DateTypeDef myDate;
-RTC_AlarmTypeDef sAlarm = {0};
-uint8_t RTC_AlarmA_flag = 0;
+///* Real Time Clock */
+//RTC_HandleTypeDef hrtc;
+//RTC_TimeTypeDef myTime;
+//RTC_DateTypeDef myDate;
+//RTC_AlarmTypeDef sAlarm = {0};
+//uint8_t RTC_AlarmA_flag = 0;
 
 /* cree objets entree analog */
-yANALOG_FLT VRx(&adcbuf[0],-100.0,100.0,0.3);
-yANALOG_FLT VRy(&adcbuf[1],-100.0,100.0,0.3);
-
-/* class pour menu */
-yMENU menuSTM;
+//yANALOG_FLT VRx(&adcbuf[0],-100.0,100.0,0.3);
+//yANALOG_FLT VRy(&adcbuf[1],-100.0,100.0,0.3);
+//
+///* class pour menu */
+//yMENU menuSTM;
 
 
 /* Private function prototypes */
-static void RTC_AlarmModify(void);
+//static void RTC_AlarmModify(void);
 
 /*
  * Starting point for all C++ code
@@ -79,17 +79,17 @@ extern "C" int start_cpp() {
 //	HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 
 	//--- init compteur de secondes
-	RTC_MiseAheure();
+//	RTC_MiseAheure();
 
 //	//--- start ADC acquisition via DMA
 //	HAL_ADC_Start_DMA(&hadc1,(uint32_t *)adcbuf,ADCBUFSIZE);
 
 	while(1) /* Assuming you don't wish to return to main() in main.c */
 	{
-		HAL_GPIO_TogglePin(LD2_GPIO_Port,LD2_Pin);
+//		HAL_GPIO_TogglePin(LD2_GPIO_Port,LD2_Pin);
 		//--- debug Joystick
-		snprintf(aTxBuffer, 1024, CUP(5,50) "VRx %4d " CUP(5,60) "VRy %4d " DECRC, (int)adcbuf[0], (int)adcbuf[1]);
-		HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+//		snprintf(aTxBuffer, 1024, CUP(5,50) "VRx %4d " CUP(5,60) "VRy %4d " DECRC, (int)adcbuf[0], (int)adcbuf[1]);
+//		HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 		//--- afficher les objets
 		snprintf(aTxBuffer, 1024, CUP(7,50) "VRx %5.2f " CUP(7,60) "VRy %5.2f " DECRC, VRx.GetPV(), VRy.GetPV());
 		HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
@@ -121,24 +121,24 @@ extern "C" int start_cpp() {
 			aRxBuffer[2] = aRxBuffer[0];			//memoriser la cde pour ne l'appliquer qu'une seule fois!
 		}
 
-		//--- get/set data for STM32CubeMonitor
-		yCopy2CubeMonitor(1U);		//set data
-		yCopy2CubeMonitor(0U);		//get data
+//		//--- get/set data for STM32CubeMonitor
+//		yCopy2CubeMonitor(1U);		//set data
+//		yCopy2CubeMonitor(0U);		//get data
 
-		//--- Effacer lignes status toutes les x secondes
-		HAL_RTC_GetTime(&hrtc, &myTime, RTC_FORMAT_BIN);
-		HAL_RTC_GetDate(&hrtc, &myDate, RTC_FORMAT_BIN);	//need to read also the date!!!
-
-		//--- afficher date & heure ds zone encadrée et mettre curseur sur ligne status
-		snprintf(aTxBuffer, 1024, CUP(12,60) "%02d-%02d-%02d" CUP(13,60) "%02d:%02d:%02d" DECRC,
-									  myDate.Date, myDate.Month, myDate.Year,
-									  myTime.Hours, myTime.Minutes, myTime.Seconds);
-		HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+//		//--- Effacer lignes status toutes les x secondes
+//		HAL_RTC_GetTime(&hrtc, &myTime, RTC_FORMAT_BIN);
+//		HAL_RTC_GetDate(&hrtc, &myDate, RTC_FORMAT_BIN);	//need to read also the date!!!
+//
+//		//--- afficher date & heure ds zone encadrée et mettre curseur sur ligne status
+//		snprintf(aTxBuffer, 1024, CUP(12,60) "%02d-%02d-%02d" CUP(13,60) "%02d:%02d:%02d" DECRC,
+//									  myDate.Date, myDate.Month, myDate.Year,
+//									  myTime.Hours, myTime.Minutes, myTime.Seconds);
+//		HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 
 		//--- sur interrupt RTC Alarm A, clear status line
-		if (RTC_AlarmA_flag == 1) {
-			menuSTM.yMenuClearStatusBar();
-			RTC_AlarmModify();
+//		if (RTC_AlarmA_flag == 1) {
+//			menuSTM.yMenuClearStatusBar();
+//			RTC_AlarmModify();
 		}
 
 		//---  Attendre un peu
@@ -151,30 +151,30 @@ extern "C" int start_cpp() {
  * ---------------------------
  */
 
-/*
-  * @brief  modifier le setup de RTC_AlarmA, ajouter qq seconds en BCD
-  * @param  none
-  * @retval status
-*/
-void RTC_AlarmModify(){
-
-	sAlarm.Alarm = RTC_ALARM_A;
-	//sAlarm.AlarmTime.Hours = 0x12;		//HH:MN peu importe
-	//sAlarm.AlarmTime.Minutes = 0x1;
-	sAlarm.AlarmTime.Seconds += 0x04;		//add 4 seconds en BCD
-	if ((sAlarm.AlarmTime.Seconds & 0x000F) > 0x9) { sAlarm.AlarmTime.Seconds += 0x6; }	//check & correct over 9
-	if (sAlarm.AlarmTime.Seconds >= 0x59) { sAlarm.AlarmTime.Seconds = 0x01; }		//check & reset after 1 minute
-	sAlarm.AlarmTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
-	sAlarm.AlarmTime.StoreOperation = RTC_STOREOPERATION_RESET;
-	sAlarm.AlarmMask = RTC_ALARMMASK_DATEWEEKDAY|RTC_ALARMMASK_HOURS|RTC_ALARMMASK_MINUTES;
-	sAlarm.AlarmSubSecondMask = RTC_ALARMSUBSECONDMASK_ALL;
-	sAlarm.AlarmDateWeekDaySel = RTC_ALARMDATEWEEKDAYSEL_DATE;
-	sAlarm.AlarmDateWeekDay = 0x1;
-
-	HAL_RTC_SetAlarm_IT(&hrtc, &sAlarm, RTC_FORMAT_BCD);		//activate interrupt RTC AlarmA
-
-	RTC_AlarmA_flag = 0;	//reset flag
-	}
+///*
+//  * @brief  modifier le setup de RTC_AlarmA, ajouter qq seconds en BCD
+//  * @param  none
+//  * @retval status
+//*/
+//void RTC_AlarmModify(){
+//
+//	sAlarm.Alarm = RTC_ALARM_A;
+//	//sAlarm.AlarmTime.Hours = 0x12;		//HH:MN peu importe
+//	//sAlarm.AlarmTime.Minutes = 0x1;
+//	sAlarm.AlarmTime.Seconds += 0x04;		//add 4 seconds en BCD
+//	if ((sAlarm.AlarmTime.Seconds & 0x000F) > 0x9) { sAlarm.AlarmTime.Seconds += 0x6; }	//check & correct over 9
+//	if (sAlarm.AlarmTime.Seconds >= 0x59) { sAlarm.AlarmTime.Seconds = 0x01; }		//check & reset after 1 minute
+//	sAlarm.AlarmTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
+//	sAlarm.AlarmTime.StoreOperation = RTC_STOREOPERATION_RESET;
+//	sAlarm.AlarmMask = RTC_ALARMMASK_DATEWEEKDAY|RTC_ALARMMASK_HOURS|RTC_ALARMMASK_MINUTES;
+//	sAlarm.AlarmSubSecondMask = RTC_ALARMSUBSECONDMASK_ALL;
+//	sAlarm.AlarmDateWeekDaySel = RTC_ALARMDATEWEEKDAYSEL_DATE;
+//	sAlarm.AlarmDateWeekDay = 0x1;
+//
+//	HAL_RTC_SetAlarm_IT(&hrtc, &sAlarm, RTC_FORMAT_BCD);		//activate interrupt RTC AlarmA
+//
+//	RTC_AlarmA_flag = 0;	//reset flag
+//	}
 
 /*------------------------------------------
  * Callback: BP 1, Keyboard, ADC, RTC_AlarmA
@@ -183,18 +183,18 @@ void RTC_AlarmModify(){
 
 
 
-/**
-  * @brief  Alarm A callback.
-  * @param  hrtc RTC handle
-  * @retval None
-  */
-void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
-{
-	//---reveillé par RTC AlarmA
-	snprintf(aTxBuffer, 1024, CUP(15,50) "RTC Alarm A flag" DECRC);
-	HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
-	RTC_AlarmA_flag = 1;
-}
+///**
+//  * @brief  Alarm A callback.
+//  * @param  hrtc RTC handle
+//  * @retval None
+//  */
+//void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
+//{
+//	//---reveillé par RTC AlarmA
+//	snprintf(aTxBuffer, 1024, CUP(15,50) "RTC Alarm A flag" DECRC);
+//	HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+//	RTC_AlarmA_flag = 1;
+//}
 
 
 //That's all folks!!

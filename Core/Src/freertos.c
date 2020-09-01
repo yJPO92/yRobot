@@ -34,9 +34,13 @@ extern "C" {
 #include <stdio.h>
 #include <string.h>
 //#include <math.h>
+#include "rtc.h"
 #include "yTask.h"
 #include "VT100.h"
 #include "yMENU.h"
+
+#define NR_VAR_GLO_
+#include "CubeMon.h"
 
 /* USER CODE END Includes */
 
@@ -58,16 +62,20 @@ extern "C" {
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
 //----- pour usart2, gestion interface sur console VT
-char aTxBuffer[2048] = {};			//buffer d'emission
+char aTxBuffer[2048] = {};		//buffer d'emission
 uint16_t uart2NbCar = 1;		//nb de byte attendu
 uint8_t aRxBuffer[3] __attribute__((section(".myvars")));		//buffer de reception at specific address
 char tmpBuffer[10];		    	//buffer temporaire pour switch/case
-////----- buffer DMA / ADC1
+//----- buffer DMA / ADC1
 uint32_t adcbuf[2];
 uint32_t adc1_value[2];
 
 uint8_t TkToStart = TkNone;		//pour scheduler le démarrage des taches
 uint16_t WaitInTk;
+
+/* Real Time Clock */
+RTC_TimeTypeDef myTime;
+RTC_DateTypeDef myDate;
 
 extern UART_HandleTypeDef huart2;
 extern ADC_HandleTypeDef hadc1;
@@ -284,6 +292,7 @@ void MX_FREERTOS_Init(void) {
  * @param  argument: Not used
  * @retval None
  */
+//yDOC: Task default
 /* USER CODE END Header_StartDefaultTask */
 void StartDefaultTask(void *argument)
 {
@@ -305,12 +314,30 @@ void StartDefaultTask(void *argument)
 	osDelay(pdMS_TO_TICKS(WaitInTk));
 	TkToStart++;
 	osDelay(pdMS_TO_TICKS(5000));
-	osThreadTerminate(defaultTaskHandle);
+	//osThreadTerminate(defaultTaskHandle);
 	/* Infinite loop */
 	for(;;)
 	{
-		//start_cpp();
 		osDelay(pdMS_TO_TICKS(250));
+
+		/* toggle LD2 */
+		HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+
+		//--- Récupérer date & heure
+		HAL_RTC_GetTime(&hrtc, &myTime, RTC_FORMAT_BIN);
+		HAL_RTC_GetDate(&hrtc, &myDate, RTC_FORMAT_BIN);	//need to read also the date!!!
+		//--- afficher date & heure ds zone encadrée et mettre curseur sur ligne status
+		snprintf(aTxBuffer, 1024, CUP(12,60) "%02d-%02d-%02d" CUP(13,60) "%02d:%02d:%02d" DECRC,
+									  myDate.Date, myDate.Month, myDate.Year,
+									  myTime.Hours, myTime.Minutes, myTime.Seconds);
+		osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
+		HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+		osSemaphoreRelease(semUARTHandle);
+
+		//--- get/set data for STM32CubeMonitor
+		yCopy2CubeMonitor(1U);		//set data
+		yCopy2CubeMonitor(0U);		//get data
+
 	}
   /* USER CODE END StartDefaultTask */
 }
@@ -321,6 +348,7 @@ void StartDefaultTask(void *argument)
  * @param argument: Not used
  * @retval None
  */
+//yDOC task Init
 /* USER CODE END Header_tk_Init_Fnc */
 void tk_Init_Fnc(void *argument)
 {
@@ -365,13 +393,8 @@ void tk_Init_Fnc(void *argument)
 	HAL_UART_Transmit(&huart2,(uint8_t *) mnuSTM.Buffer, strlen(mnuSTM.Buffer), 5000);
 	osSemaphoreRelease(semUARTHandle);
 
-//	//--- start USART2
-//	__HAL_UART_ENABLE_IT(&huart2, UART_IT_RXNE);
-//	//--- start ADC acquisition via DMA
-//	HAL_ADC_Start_DMA(&hadc1,(uint32_t *)adcbuf,ADCBUFSIZE);
-//	//--- start TIM1 (ADC1 schedule)
-//	//HAL_TIM_Base_Start_IT(&htim1);
-//	HAL_TIM_Base_Start(&htim1);
+	//--- Mise a heure RTC
+	RTC_MiseAheure();
 	//--- initialize interrupts
 	Interrputs_Init();
 
@@ -395,6 +418,7 @@ void tk_Init_Fnc(void *argument)
  * @param argument: Not used
  * @retval None
  */
+//yDOC task CheckVR
 /* USER CODE END Header_tk_CheckVR_Fnc */
 void tk_CheckVR_Fnc(void *argument)
 {
@@ -432,6 +456,7 @@ void tk_CheckVR_Fnc(void *argument)
  * @param argument: Not used
  * @retval None
  */
+//yDOC task Process
 /* USER CODE END Header_tk_Process_Fnc */
 void tk_Process_Fnc(void *argument)
 {
@@ -455,8 +480,6 @@ void tk_Process_Fnc(void *argument)
 	/* Infinite loop */
 	for(;;)
 	{
-		/* toggle LD2 */
-		HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 		osDelay(pdMS_TO_TICKS(250));
 	}
   /* USER CODE END tk_Process_Fnc */
@@ -468,6 +491,7 @@ void tk_Process_Fnc(void *argument)
  * @param argument: Not used
  * @retval None
  */
+//yDOC task VT Affiche
 /* USER CODE END Header_tk_VTaffiche_Fnc */
 void tk_VTaffiche_Fnc(void *argument)
 {
@@ -495,11 +519,17 @@ void tk_VTaffiche_Fnc(void *argument)
 	/* Infinite loop */
 	for(;;)
 	{
-		osDelay(pdMS_TO_TICKS(3000));
-		mnuSTM.ClearStatusBar(&mnuSTM);	//CLS Bar
-		osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
-		HAL_UART_Transmit(&huart2,(uint8_t *) mnuSTM.Buffer, strlen(mnuSTM.Buffer), 5000);
-		osSemaphoreRelease(semUARTHandle);
+		osDelay(pdMS_TO_TICKS(Wait1s));
+		//--- Clear Status Bar & traces
+		if (RTC_AlarmA_flag == 1) {
+			mnuSTM.ClearStatusBar(&mnuSTM);	//CLS Bar
+			osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
+			HAL_UART_Transmit(&huart2,(uint8_t *) mnuSTM.Buffer, strlen(mnuSTM.Buffer), 5000);
+			osSemaphoreRelease(semUARTHandle);
+			RTC_AlarmModify();	//relancer alarme ds qq sec
+		}
+
+
 
 	}
   /* USER CODE END tk_VTaffiche_Fnc */

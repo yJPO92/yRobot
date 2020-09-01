@@ -51,6 +51,7 @@ extern "C" {
 #elif defined(STM32L476xx)
 #pragma message("***************************")
 #pragma message("Compiling for NUCLEO_L476RG")		//with '-fno-diagnostics-show-caret'
+#pragma message("le " __STR1__(__DATE__)" "__STR1__(__TIME__))
 #pragma message("---------------------------")
 #pragma message("program " __STR1__(yPROG))
 #pragma message("version " __STR1__(yVER))

@@ -24,7 +24,10 @@
 */
 void yCopy2CubeMonitor(uint8_t rw){
 	if (rw == 1) {		//write data to Node-RED
-//		ymx_VRx_Raw = VRx.GetRaw();
+		ymx_VRx_Raw = (uint32_t) adcbuf[0];
+		ymx_VRy_Raw = (uint32_t) adcbuf[1];
+
+//		ymx_VRx_Raw = VRx.GetRaw()
 //		ymx_VRx_PV = VRx.m_PV;
 
 //		ymx_VRy_Raw = VRy.GetRaw();

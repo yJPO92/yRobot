@@ -48,8 +48,13 @@
  //et en 'extern" necessary variable
 // extern yANALOG_FLT VRx;
 // extern yANALOG_FLT VRy;
+extern uint32_t adcbuf[2];
 
  #else		//for others .c/.cpp
+ extern uint32_t ymx_VRx_Raw;
+ extern uint32_t ymx_VRy_Raw;
+ extern uint32_t adcbuf[2];
+
  extern float ymx_VRx_trim;
  extern float ymx_VRy_trim;
  extern float ymx_Coef;

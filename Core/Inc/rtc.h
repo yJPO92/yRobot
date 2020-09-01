@@ -33,6 +33,8 @@
 extern RTC_HandleTypeDef hrtc;
 
 /* USER CODE BEGIN Private defines */
+extern RTC_AlarmTypeDef sAlarm;
+extern uint8_t RTC_AlarmA_flag;
 
 /* USER CODE END Private defines */
 
@@ -40,6 +42,7 @@ void MX_RTC_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 void RTC_MiseAheure(void);
+void RTC_AlarmModify(void);
 
 /* USER CODE END Prototypes */
 
