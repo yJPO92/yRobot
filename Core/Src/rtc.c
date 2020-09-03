@@ -33,6 +33,7 @@ void MX_RTC_Init(void)
 {
   RTC_TimeTypeDef sTime = {0};
   RTC_DateTypeDef sDate = {0};
+  RTC_AlarmTypeDef sAlarm = {0};
 
   /** Initialize RTC Only 
   */
@@ -57,7 +58,7 @@ void MX_RTC_Init(void)
   */
   sTime.Hours = 0x12;
   sTime.Minutes = 0x0;
-  sTime.Seconds = 0x0;
+  sTime.Seconds = 0x45;
   sTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
   sTime.StoreOperation = RTC_STOREOPERATION_SET;
   if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BCD) != HAL_OK)

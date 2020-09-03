@@ -1,5 +1,7 @@
 *** yRobot ***
 
+le 02/09/2020: v1.3: qVTaffiche for tk_VTaffiche
+                Hard Fault if float in snprintf => modif syscall.c & .ld
 le 01/09/2020: v1.2a: RTC alarmA ==> clear status & traces
                 organise s/fnc RTC en rtc.c & .h
 le 30/08/2020: v1.2: Add RTC & AlarmA

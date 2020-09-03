@@ -38,6 +38,7 @@ extern "C" {
 #include "yTask.h"
 #include "VT100.h"
 #include "yMENU.h"
+#include "yANALOG.h"
 
 #define NR_VAR_GLO_
 #include "CubeMon.h"
@@ -82,7 +83,11 @@ extern ADC_HandleTypeDef hadc1;
 extern DMA_HandleTypeDef hdma_adc1;
 extern TIM_HandleTypeDef htim1;
 
-yMENU_t mnuSTM;
+yMENU_t mnuSTM;		// pour Menu VT100
+yANALOG VRx, VRy;	// pour Joystick
+
+/* objet d'echange d'affichage via la queue */
+VTbuff_t VTbuffer = { .src = 0, .VTbuff = "...\0" };
 
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
@@ -299,12 +304,8 @@ void StartDefaultTask(void *argument)
   /* USER CODE BEGIN StartDefaultTask */
 	//-- Is it to me to start?
 	while (TkToStart != TkDefault) {
-//		snprintf(aTxBuffer, 1024, DECRC "\n tk_Default\t waiting %d" DECSC, TkToStart);
-//		osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
-//		HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
-//		osSemaphoreRelease(semUARTHandle);
 		osDelay(pdMS_TO_TICKS(WaitInTk));
-	}	//wait here!
+	}
 
 	snprintf(aTxBuffer, 1024, DECRC "\n tk_Default\t initialised" DECSC);
 	osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
@@ -425,13 +426,9 @@ void tk_CheckVR_Fnc(void *argument)
   /* USER CODE BEGIN tk_CheckVR_Fnc */
 	//-- Is it to me to start?
 	while (TkToStart != TkCheckVR) {
-//		snprintf(aTxBuffer, 1024, DECRC "\n tk_CheckVR\t waiting %d" DECSC, TkToStart);
-//		osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
-//		HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
-//		osSemaphoreRelease(semUARTHandle);
 		osDelay(pdMS_TO_TICKS(WaitInTk));
-	}	//wait here!
-
+	}
+	//-- start & init task
 	snprintf(aTxBuffer, 1024, DECRC "\n tk_CheckVR\t initialised" DECSC);
 	osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
 	HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
@@ -439,14 +436,28 @@ void tk_CheckVR_Fnc(void *argument)
 
 	TkToStart++;
 	/* cree objets entree analog */
+	yANALOG_Init(&VRx);
+	yANALOG_Init(&VRy);
 
-	//-- attendre encore un peu!
-	osDelay(pdMS_TO_TICKS(WaitInTk));
+	//-- attendre les autres taches
+	while (TkToStart != TkAll) {		//wait here!
+		osDelay(pdMS_TO_TICKS(WaitInTk));
+	}
+//	osDelay(pdMS_TO_TICKS(WaitInTk));
 	/* Infinite loop */
 	for(;;)
 	{
 		osDelay(pdMS_TO_TICKS(250));
-	}
+		yANALOG_CalulerPV(&VRx);
+		yANALOG_CalulerPV(&VRy);
+
+		VTbuffer.src = SrcVRx;
+//		snprintf(VTbuffer.VTbuff, 50, CUP(14,50) "--VR : %f \t %f" DECRC, 10.2, -55.55);		//TODO check 'IMPRECISERR'
+		snprintf(VTbuffer.VTbuff, 50, CUP(14,50) "--VR : %f \t %f" DECRC, yANALOG_GetPV(&VRx), yANALOG_GetPV(&VRy));		//TODO check 'IMPRECISERR'
+//		snprintf(VTbuffer.VTbuff, 50, CUP(14,50) "--VR : XX \t YY" DECRC);		//no 'IMPRECISERR'
+		osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);	//envoi vers task afficahge
+
+}
   /* USER CODE END tk_CheckVR_Fnc */
 }
 
@@ -463,12 +474,8 @@ void tk_Process_Fnc(void *argument)
   /* USER CODE BEGIN tk_Process_Fnc */
 	//-- Is it to me to start?
 	while (TkToStart != TkProcess) {
-//		snprintf(aTxBuffer, 1024, DECRC "\n tk_Process\t waiting %d" DECSC, TkToStart);
-//		osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
-//		HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
-//		osSemaphoreRelease(semUARTHandle);
 		osDelay(pdMS_TO_TICKS(WaitInTk));
-	} //wait here!
+	}
 
 	snprintf(aTxBuffer, 1024, DECRC "\n tk_Process\t initialised" DECSC);
 	osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
@@ -496,14 +503,12 @@ void tk_Process_Fnc(void *argument)
 void tk_VTaffiche_Fnc(void *argument)
 {
   /* USER CODE BEGIN tk_VTaffiche_Fnc */
+	VTbuff_t BuffAff;
+	osStatus_t status;
 	//-- Is it to me to start?
 	while (TkToStart != TkVTaffiche) {
-//		snprintf(aTxBuffer, 1024, DECRC "\n tk_VTaffiche\t waiting %d" DECSC, TkToStart);
-//		osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
-//		HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
-//		osSemaphoreRelease(semUARTHandle);
 		osDelay(pdMS_TO_TICKS(WaitInTk));
-	} //wait here!
+	}
 
 	snprintf(aTxBuffer, 1024, DECRC "\n tk_VTaffiche\t initialised" DECSC);
 	osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
@@ -512,14 +517,27 @@ void tk_VTaffiche_Fnc(void *argument)
 
 	osDelay(pdMS_TO_TICKS(WaitInTk));
 	TkToStart++;
-	//-- Attendre toutes les tasks
-	while (TkToStart != TkAll) {
-		osDelay(pdMS_TO_TICKS(WaitInTk));
-	}
+//	//-- Attendre toutes les tasks
+//	while (TkToStart != TkAll) {
+//		osDelay(pdMS_TO_TICKS(WaitInTk));
+//	}
 	/* Infinite loop */
 	for(;;)
 	{
-		osDelay(pdMS_TO_TICKS(Wait1s));
+		status = osMessageQueueGet(qVTafficheHandle, &BuffAff, NULL, portMAX_DELAY);	//wait for message
+		if (status == osOK) {
+			snprintf(aTxBuffer, 512, DECRC "%s" ERASELINE, BuffAff.VTbuff);
+		} else {
+			snprintf(aTxBuffer, 512, DECRC "Queue empty" DECRC);
+		}
+		//yDOC: ici il faut bien ecrire via l'UART!!!
+		osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);
+		HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+		osSemaphoreRelease(semUARTHandle);
+		//yRazBuff((uint8_t *)&aTxBuffer, 1024);
+		__NOP();
+
+//		osDelay(pdMS_TO_TICKS(Wait1s));
 		//--- Clear Status Bar & traces
 		if (RTC_AlarmA_flag == 1) {
 			mnuSTM.ClearStatusBar(&mnuSTM);	//CLS Bar

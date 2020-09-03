@@ -25,6 +25,7 @@
 //#include "yTask.h"
 #include "VT100.h"
 #include "yMENU.h"
+#include "yANALOG.h"
 
 extern UART_HandleTypeDef huart2;
 extern osSemaphoreId_t semUARTHandle;
@@ -34,6 +35,7 @@ extern TIM_HandleTypeDef htim1;
 
 extern yMENU_t mnuSTM;
 extern uint32_t adcbuf[];
+extern yANALOG VRx, VRy;
 
 /*
   * @brief  Initialiser routes les interrupts du projet
@@ -119,6 +121,9 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
 		HAL_UART_Transmit(&huart2,(uint8_t *) mnuSTM.Buffer, strlen(mnuSTM.Buffer), 5000);
 		osSemaphoreRelease(semUARTHandle);
 
+		VRx.Raw = adcbuf[0];
+		VRy.Raw = adcbuf[1];
+
 		//VRx.SetRaw(adcbuf[0]);
 		//VRx.CalulerMesure();
 
@@ -135,7 +140,7 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
 void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 {
 	//---reveillé par RTC AlarmA
-	snprintf(mnuSTM.Buffer, 1024, CUP(15,50) "RTC Alarm A flag" DECRC);
+	snprintf(mnuSTM.Buffer, 1024, CUP(7,50) "RTC Alarm A flag" DECRC);
 	osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
 	HAL_UART_Transmit(&huart2,(uint8_t *) mnuSTM.Buffer, strlen(mnuSTM.Buffer), 5000);
 	osSemaphoreRelease(semUARTHandle);

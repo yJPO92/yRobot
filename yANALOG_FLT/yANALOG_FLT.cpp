@@ -105,7 +105,6 @@ float yANALOG_FLT::GetPV()
   */
  void yANALOG_FLT::AdjustTrim(float trim)
  {
-	 //TODO verifier limites!
 	 this->m_Trim = trim;
  }
 

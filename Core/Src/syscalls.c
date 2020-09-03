@@ -114,9 +114,37 @@ __attribute__((weak)) int _write(int file, char *ptr, int len)
 	return len;
 }
 
-caddr_t _sbrk(int incr)
-{
+//original
+//caddr_t _sbrk(int incr)
+//{
+//	extern char end asm("end");
+//	static char *heap_end;
+//	char *prev_heap_end;
+//
+//	if (heap_end == 0)
+//		heap_end = &end;
+//
+//	prev_heap_end = heap_end;
+//	if (heap_end + incr > stack_ptr)
+//	{
+////		write(1, "Heap and stack collision\n", 25);
+////		abort();
+//		errno = ENOMEM;
+//		return (caddr_t) -1;
+//	}
+//
+//	heap_end += incr;
+//
+//	return (caddr_t) prev_heap_end;
+//}
+
+/*
+ * snprintf error with float
+ * https://www.openstm32.org/forumthread353#threadId354
+ */
+caddr_t _sbrk(int incr) {
 	extern char end asm("end");
+	extern char _min_heap_end asm("_min_heap_end");
 	static char *heap_end;
 	char *prev_heap_end;
 
@@ -124,16 +152,15 @@ caddr_t _sbrk(int incr)
 		heap_end = &end;
 
 	prev_heap_end = heap_end;
-	if (heap_end + incr > stack_ptr)
-	{
-//		write(1, "Heap and stack collision\n", 25);
-//		abort();
-		errno = ENOMEM;
-		return (caddr_t) -1;
+	if (prev_heap_end + incr > &_min_heap_end) {
+		if (heap_end + incr > stack_ptr) {
+			// write(1, “Heap and stack collision\n”, 25);
+			// abort();
+			errno = ENOMEM;
+			return (caddr_t) -1;
+		}
 	}
-
 	heap_end += incr;
-
 	return (caddr_t) prev_heap_end;
 }
 

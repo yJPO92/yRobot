@@ -201,6 +201,7 @@ SECTIONS
     PROVIDE ( end = . );
     PROVIDE ( _end = . );
     . = . + _Min_Heap_Size;
+ PROVIDE ( _min_heap_end = . );     /*JPO added in case of snprintf error*/
     . = . + _Min_Stack_Size;
     . = ALIGN(4);
   } >RAM
