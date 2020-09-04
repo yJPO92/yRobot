@@ -33,7 +33,7 @@ typedef struct {
 
 /* Nommer les sources des messages ds les queues */
 typedef enum {
-  SrcNone = 0, SrcBP1 = 1, SrcSWxy = 2, SrcVRx = 5, SrcVRy = 6, SrcKbd = 11,
+  SrcNone = 0, SrcBP1 = 1, SrcSWxy = 2, SrcVRx = 5, SrcVRy = 6, SrcVRxy= 7, SrcKbd = 11, SrcTk = 20,
 } ySource;
 
 /* Nommer les destinations des messages ds les queues */
@@ -52,8 +52,8 @@ typedef enum  {
 } yTkOrder;
 
 /* differents wait time for tasks */
-const uint16_t Wait1s = 1000U;		//1sec
-const uint16_t Wait5s = 5000U;		//5sec
+#define Wait1s 1000U		//1sec
+#define Wait5s 5000U		//5sec
 
 
 #endif /* INC_YTASK_H_ */

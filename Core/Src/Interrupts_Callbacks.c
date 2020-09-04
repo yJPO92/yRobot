@@ -22,7 +22,7 @@
 //#include <stdio.h>
 //#include <string.h>
 //#include <math.h>
-//#include "yTask.h"
+#include "yTask.h"
 #include "VT100.h"
 #include "yMENU.h"
 #include "yANALOG.h"
@@ -32,10 +32,14 @@ extern osSemaphoreId_t semUARTHandle;
 extern ADC_HandleTypeDef hadc1;
 extern DMA_HandleTypeDef hdma_adc1;
 extern TIM_HandleTypeDef htim1;
+extern osTimerId_t t1sHandle;
+extern osMessageQueueId_t qVTafficheHandle;
 
+extern VTbuff_t VTbuffer;
 extern yMENU_t mnuSTM;
 extern uint32_t adcbuf[];
 extern yANALOG VRx, VRy;
+extern uint8_t aRxBuffer[];
 
 /*
   * @brief  Initialiser routes les interrupts du projet
@@ -49,6 +53,9 @@ void Interrputs_Init(void) {
 	HAL_ADC_Start_DMA(&hadc1,(uint32_t *)adcbuf,2);
 	//--- start TIM1 (ADC1 schedule)
 	HAL_TIM_Base_Start(&htim1);
+	//--- t1s timer set period & start
+	osTimerStart(t1sHandle, pdMS_TO_TICKS(200));
+
 
 	return;
 }
@@ -62,7 +69,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	/** PC13 GPIO_EXTI15_10 (B1 blue button) */
 	if(GPIO_Pin == B1_Pin) {
-		snprintf(mnuSTM.Buffer, 1024, CUP(9,50) "--BP1 Interrupt" DECRC);
+		snprintf(mnuSTM.Buffer, 1024, CUP(9,50) "--BP1 Interrupt");
 		osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
 		HAL_UART_Transmit(&huart2,(uint8_t *) mnuSTM.Buffer, strlen(mnuSTM.Buffer), 5000);
 		osSemaphoreRelease(semUARTHandle);
@@ -72,7 +79,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
 	/** PB2	GPIO_EXTI2	(Joystick button) */
 	if(GPIO_Pin == SWxy_Pin) {
-		snprintf(mnuSTM.Buffer, 1024, CUP(10,50) "--Swxy Interrupt" DECRC);
+		snprintf(mnuSTM.Buffer, 1024, CUP(10,50) "--Swxy Interrupt");
 		osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
 		HAL_UART_Transmit(&huart2,(uint8_t *) mnuSTM.Buffer, strlen(mnuSTM.Buffer), 5000);
 		osSemaphoreRelease(semUARTHandle);
@@ -116,7 +123,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
 	if(hadc->Instance == ADC1) {
 		//debug
-		snprintf(mnuSTM.Buffer, 1024, CUP(11,50) "--ADC1 : %4d \t %4d" DECRC, (int)adcbuf[0], (int)adcbuf[1]);
+		snprintf(mnuSTM.Buffer, 1024, CUP(11,50) "--ADC1 : %4d \t %4d", (int)adcbuf[0], (int)adcbuf[1]);
 		osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
 		HAL_UART_Transmit(&huart2,(uint8_t *) mnuSTM.Buffer, strlen(mnuSTM.Buffer), 5000);
 		osSemaphoreRelease(semUARTHandle);
@@ -140,11 +147,33 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
 void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 {
 	//---reveillé par RTC AlarmA
-	snprintf(mnuSTM.Buffer, 1024, CUP(7,50) "RTC Alarm A flag" DECRC);
+	snprintf(mnuSTM.Buffer, 1024, CUP(7,50) "RTC Alarm A flag");
 	osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
 	HAL_UART_Transmit(&huart2,(uint8_t *) mnuSTM.Buffer, strlen(mnuSTM.Buffer), 5000);
 	osSemaphoreRelease(semUARTHandle);
 	RTC_AlarmA_flag = 1;
+}
+
+/* t1s_Callback function */
+/*
+  * @brief  FreeRTOS timer t1s_Callback function
+  * @param
+  * @retval status
+*/
+void t1s_Callback(void *argument)
+{
+  /* USER CODE BEGIN t1s_Callback */
+	//debug/test timer
+	VTbuffer.src = SrcNone;
+	snprintf(VTbuffer.VTbuff, 50, DECRC "\t--FreeRTOS timer 1s");
+	osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);	//envoi vers task afficahge
+	//--- gestion menu STM32Monitor
+	if (aRxBuffer[0] != aRxBuffer[2]) {
+		//mnuSTM.Buffer[0] = aRxBuffer[0];
+		mnuSTM.GetTouche(&mnuSTM);
+		aRxBuffer[2] = aRxBuffer[0];		//memoriser la cde pour ne l'appliquer qu'une seule fois!
+	}
+  /* USER CODE END t1s_Callback */
 }
 
 //That's all folks!!

@@ -45,8 +45,7 @@
 
 #mais garder
 !Notes.txt
-!STM-readme-DataLogExtended.txt
-!STM-readme-DataLogTerminal.txt
+!*.pdf
 
 # me versionner moi-meme
 !.gitignore

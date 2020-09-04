@@ -21,46 +21,55 @@
 #ifndef CUBEMON_H_
 #define CUBEMON_H_
 
-#ifdef __cplusplus
- extern "C" {
-#endif
+//#ifdef __cplusplus
+// extern "C" {
+//#endif
+
+#include "yANALOG.h"
 
 /* Variables pour Mode-RED/STM32CubeMonitor */
-#ifndef NR_VAR_GLO_		//for CubeMon.cpp
+#ifndef NR_VAR_GLO_		//for CubeMon.c
  #define NR_VAR_GLO_
- //declarer variables globales pour Node-RED
- uint32_t ymx_VRx_Raw = 0;
- uint32_t ymx_VRy_Raw = 0;
  // at specific range address
  // order given by following declaration (order in .ld nor working)
+ float ymx_Coef  __attribute__((section(".myvars"))) = 1.0;
+
  float ymx_VRx_PV __attribute__((section(".myvars"))) = 0.0;
+ uint32_t ymx_VRx_Raw __attribute__((section(".myvars"))) = 0;
+ uint8_t ymx_VRx_Ri __attribute__((section(".myvars"))) = 0;
+ uint8_t ymx_VRx_Ro __attribute__((section(".myvars"))) = 0;
  float ymx_VRx_trim  __attribute__((section(".myvars"))) = 0.0;
 
  float ymx_VRy_PV __attribute__((section(".myvars"))) = 0.0;
- float ymx_VRy_trim  __attribute__((section(".myvars"))) = 0.0;
- float ymx_VRy_HystP __attribute__((section(".myvars"))) = 0.0;
- float ymx_VRy_HystM __attribute__((section(".myvars"))) = 0.0;
+ uint32_t ymx_VRy_Raw __attribute__((section(".myvars"))) = 0;
  uint8_t ymx_VRy_Ri __attribute__((section(".myvars"))) = 0;
  uint8_t ymx_VRy_Ro __attribute__((section(".myvars"))) = 0;
-
- float ymx_Coef  __attribute__((section(".myvars"))) = 1.0;
+ float ymx_VRy_trim  __attribute__((section(".myvars"))) = 0.0;
 
  //et en 'extern" necessary variable
-// extern yANALOG_FLT VRx;
-// extern yANALOG_FLT VRy;
-extern uint32_t adcbuf[2];
-
- #else		//for others .c/.cpp
- extern uint32_t ymx_VRx_Raw;
- extern uint32_t ymx_VRy_Raw;
+ extern yANALOG VRx;
+ extern yANALOG VRy;
  extern uint32_t adcbuf[2];
 
- extern float ymx_VRx_trim;
- extern float ymx_VRy_trim;
+ #else		//for others .c
  extern float ymx_Coef;
 
- //extern yANALOG_FLT VRx;
- //extern yANALOG_FLT VRy;
+ extern float ymx_VRx_PV;
+ extern uint32_t ymx_VRx_Raw;
+ extern uint8_t ymx_VRx_Ri;
+ extern uint8_t ymx_VRx_Ro;
+ extern float ymx_VRx_trim;
+
+ extern float ymx_VRy_PV;
+ extern uint32_t ymx_VRy_Raw;
+ extern uint8_t ymx_VRy_Ri;
+ extern uint8_t ymx_VRy_Ro;
+ extern float ymx_VRy_trim;
+
+  extern uint32_t adcbuf[2];
+
+extern yANALOG VRx;
+extern yANALOG VRy;
 #endif
 
 /* define functions for corresponding and others .c files */
@@ -72,9 +81,9 @@ extern uint32_t adcbuf[2];
 */
  void yCopy2CubeMonitor(uint8_t rw);
 
-#ifdef __cplusplus
-}
-#endif
-
+//#ifdef __cplusplus
+//}
+//#endif
+//
 #endif /* CUBEMON_H_ */
 //That's all folks!!

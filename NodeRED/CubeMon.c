@@ -12,7 +12,6 @@
  *******************************************************************************
  */
 #include "main.h"
-//#include "yANALOG_FLT.h"
 #undef NR_VAR_GLO_
 #include "CubeMon.h"
 
@@ -24,20 +23,29 @@
 */
 void yCopy2CubeMonitor(uint8_t rw){
 	if (rw == 1) {		//write data to Node-RED
-		ymx_VRx_Raw = (uint32_t) adcbuf[0];
-		ymx_VRy_Raw = (uint32_t) adcbuf[1];
+//		ymx_VRx_Raw = (uint32_t) adcbuf[0];
+//		ymx_VRy_Raw = (uint32_t) adcbuf[1];
 
-//		ymx_VRx_Raw = VRx.GetRaw()
-//		ymx_VRx_PV = VRx.m_PV;
+		ymx_VRx_PV = VRx.PV;
+		ymx_VRx_Raw = VRx.Raw;
+		ymx_VRx_Ri = VRx.Ri;
+		ymx_VRx_Ro = VRx.Ro;
+		ymx_VRx_trim = VRx.Trim;
 
-//		ymx_VRy_Raw = VRy.GetRaw();
-//		ymx_VRy_PV = VRy.m_PV;
-//		ymx_VRy_HystP = VRy.m_PVmemo + VRy.GetHysteresis();
-//		ymx_VRy_HystM = VRy.m_PVmemo - VRy.GetHysteresis();
-//		ymx_VRy_Ro = (uint8_t) VRy.m_Ro * 10;
+
+		ymx_VRy_PV = VRy.PV;
+		ymx_VRy_Raw = VRy.Raw;
+		ymx_VRy_Ri = VRy.Ri;
+		ymx_VRy_Ro = VRy.Ro;
+		ymx_VRy_trim = VRy.Trim;
+
+		//ymx_VRy_HystP = VRy.PVmemo + VRy.Hysteresis;
+		//ymx_VRy_HystM = VRy.PVmemo - VRy.Hysteresis;
+
 	} else {	//read data from Node-red
-		//TODO
-//		VRy.m_Ri = ymx_VRy_Ri;
+		//VRy.m_Ri = ymx_VRy_Ri;
+		VRx.Coef_Filtre = ymx_Coef;
+		VRy.Coef_Filtre = ymx_Coef;
 	}
 }
 

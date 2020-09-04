@@ -58,7 +58,7 @@ void MX_RTC_Init(void)
   */
   sTime.Hours = 0x12;
   sTime.Minutes = 0x0;
-  sTime.Seconds = 0x45;
+  sTime.Seconds = 0x0;
   sTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
   sTime.StoreOperation = RTC_STOREOPERATION_SET;
   if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BCD) != HAL_OK)
@@ -78,7 +78,7 @@ void MX_RTC_Init(void)
   */
   sAlarm.AlarmTime.Hours = 0x12;
   sAlarm.AlarmTime.Minutes = 0x12;
-  sAlarm.AlarmTime.Seconds = 0x3;
+  sAlarm.AlarmTime.Seconds = 0x1;
   sAlarm.AlarmTime.SubSeconds = 0x0;
   sAlarm.AlarmTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
   sAlarm.AlarmTime.StoreOperation = RTC_STOREOPERATION_SET;

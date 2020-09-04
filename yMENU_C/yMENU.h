@@ -66,12 +66,12 @@
 
 /* Dessine une boite a droite de l'écran */
 #define screen1 "\
-\x1B[10;50H       Horloge de Jean92\
-\x1B[11;50H+---------+---------+---------+\
-\x1B[12;50H|          jj-mm-aa           |\
-\x1B[13;50H|          hh:mm:ss           |\
-\x1B[14;50H+-----------------------------+\
-\x1B[15;50H"
+\x1B[2;50H       Horloge de Jean92\
+\x1B[3;50H+---------+---------+---------+\
+\x1B[4;50H|          jj-mm-aa           |\
+\x1B[5;50H|          hh:mm:ss           |\
+\x1B[6;50H+-----------------------------+\
+\x1B[7;50H"
 
 /*---------------------------------------------
  *  Structure d'acceuil du menu et ses methodes

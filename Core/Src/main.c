@@ -23,9 +23,9 @@
   ******************************************************************************
   */
 /* !! main genere by STM32Cube */
-#ifdef __cplusplus
-extern "C" {
-#endif
+//#ifdef __cplusplus
+//extern "C" {
+//#endif
 
 /* USER CODE END Header */
 

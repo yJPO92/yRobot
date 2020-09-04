@@ -91,16 +91,16 @@ extern "C" int start_cpp() {
 //		snprintf(aTxBuffer, 1024, CUP(5,50) "VRx %4d " CUP(5,60) "VRy %4d " DECRC, (int)adcbuf[0], (int)adcbuf[1]);
 //		HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 		//--- afficher les objets
-		snprintf(aTxBuffer, 1024, CUP(7,50) "VRx %5.2f " CUP(7,60) "VRy %5.2f " DECRC, VRx.GetPV(), VRy.GetPV());
-		HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+//		snprintf(aTxBuffer, 1024, CUP(7,50) "VRx %5.2f " CUP(7,60) "VRy %5.2f " DECRC, VRx.GetPV(), VRy.GetPV());
+//		HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 
-		//--- adjust Trim ds zone -10/+10
-		if ((ymx_VRx_trim >= -10.0) && (ymx_VRx_trim <= 10.0)) {
-			VRx.AdjustTrim(ymx_VRx_trim);
-		}
-		if ((ymx_VRy_trim >= -10.0) && (ymx_VRy_trim <= 10.0)) {
-			VRy.AdjustTrim(ymx_VRy_trim);
-		}
+//		//--- adjust Trim ds zone -10/+10
+//		if ((ymx_VRx_trim >= -10.0) && (ymx_VRx_trim <= 10.0)) {
+//			VRx.AdjustTrim(ymx_VRx_trim);
+//		}
+//		if ((ymx_VRy_trim >= -10.0) && (ymx_VRy_trim <= 10.0)) {
+//			VRy.AdjustTrim(ymx_VRy_trim);
+//		}
 
 		//--- maj Filtre 0/1
 		if ((ymx_Coef > 0.0) && (ymx_Coef <= 1.0)) {
@@ -108,18 +108,18 @@ extern "C" int start_cpp() {
 			VRy.majFiltre(ymx_Coef);
 		}
 
-		//--- calculer objets
-		VRx.CalulerMesure();
-		VRy.CalulerMesure();
-		//--
-		VRx.Exec();
-		VRy.Exec();
+//		//--- calculer objets
+//		VRx.CalulerMesure();
+//		VRy.CalulerMesure();
+//		//--
+//		VRx.Exec();
+//		VRy.Exec();
 
-		//--- gestion menu STM32Monitor
-		if (aRxBuffer[0] != aRxBuffer[2]) {
-			menuSTM.yMenuGetTouche(aRxBuffer);		//menu VT (buffer usart)
-			aRxBuffer[2] = aRxBuffer[0];			//memoriser la cde pour ne l'appliquer qu'une seule fois!
-		}
+//		//--- gestion menu STM32Monitor
+//		if (aRxBuffer[0] != aRxBuffer[2]) {
+//			menuSTM.yMenuGetTouche(aRxBuffer);		//menu VT (buffer usart)
+//			aRxBuffer[2] = aRxBuffer[0];			//memoriser la cde pour ne l'appliquer qu'une seule fois!
+//		}
 
 //		//--- get/set data for STM32CubeMonitor
 //		yCopy2CubeMonitor(1U);		//set data

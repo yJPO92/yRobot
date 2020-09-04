@@ -161,16 +161,17 @@
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
 		<project id="NewCpp.com.atollic.truestudio.exe.731598980" name="Executable" projectType="com.atollic.truestudio.exe" />
 	</storageModule>
-	<storageModule moduleId="refreshScope" />
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Debug">
+			<resource resourceType="PROJECT" workspacePath="yRobot" />
+		</configuration>
+	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets" />
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders" />
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="" />
 		<scannerConfigBuildInfo instanceId="com.atollic.truestudio.exe.debug.1873660090;com.atollic.truestudio.exe.debug.1873660090.;com.atollic.truestudio.exe.debug.toolchain.gcc.1338844559;com.atollic.truestudio.gcc.input.593909247">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.atollic.truestudio.mbs.ARMToolsPerProjectProfileC" />
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="com.atollic.truestudio.exe.debug.1873660090;com.atollic.truestudio.exe.debug.1873660090.;com.atollic.truestudio.exe.debug.toolchain.gpp.1958748028;com.atollic.truestudio.gpp.input.2113742097">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.atollic.truestudio.mbs.ARMToolsPerProjectProfileCPP" />
+			<autodiscovery enabled="false" problemReportingEnabled="false" selectedProfileId="com.atollic.truestudio.mbs.ARMToolsPerProjectProfileC" />
 		</scannerConfigBuildInfo>
 	</storageModule>
 </cproject>

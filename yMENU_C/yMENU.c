@@ -74,21 +74,21 @@ void GetTouche_fnc(struct yMENU_t *self) {
 	if(uart2NbCar == 1) {		/* on attend 1 seule touche */
 		switch (aRxBuffer[0]) {
 		case 'R': case 'r':		/* ???? */
-			snprintf(self->Buffer, 1024, ERASELINE "\tFrom Node-RED (R) %d     " DECRC, aRxBuffer[0]);
+			snprintf(self->Buffer, 1024, DECRC ERASELINE "\tFrom Node-RED (R) %d     ", aRxBuffer[0]);
 			break;
 
 		case 48: case 49: case 50:		/* chiffre de 0 a 9 */
 		case 51: case 52: case 53:
 		case 54: case 55: case 56: case 57:
-			snprintf(self->Buffer, 1024, ERASELINE "\tFrom Node-RED (0-9) %d     " DECRC, aRxBuffer[0]);
+			snprintf(self->Buffer, 1024, DECRC ERASELINE "\tFrom Node-RED (0-9) %d     ", aRxBuffer[0]);
 			break;
 
 		case 'T': case 't':		/* ???????e */
-			snprintf(self->Buffer, 1024, ERASELINE "\tFrom Node-RED (T) %d     " DECRC, aRxBuffer[0]);
+			snprintf(self->Buffer, 1024, DECRC ERASELINE "\tFrom Node-RED (T) %d     ", aRxBuffer[0]);
 			break;
 
 		case 'L': case 'l':		/* ?????? */
-			snprintf(self->Buffer, 1024, ERASELINE "\tFrom Node-RED (L) %d     " DECRC, aRxBuffer[0]);
+			snprintf(self->Buffer, 1024, DECRC ERASELINE "\tFrom Node-RED (L) %d     ", aRxBuffer[0]);
 			break;
 
 ////		case 'E': case 'e':		/* vider la queue de RTOS */
@@ -97,7 +97,7 @@ void GetTouche_fnc(struct yMENU_t *self) {
 ////			break;
 //
 		case 'S': case 's':		/* ?????? */
-			snprintf(self->Buffer, 1024, ERASELINE "\tFrom Node-RED (S) %d     " DECRC, aRxBuffer[0]);
+			snprintf(self->Buffer, 1024, DECRC ERASELINE "\tFrom Node-RED (S) %d     ", aRxBuffer[0]);
 			break;
 
 		case 'I': case 'i':		/* afficher qqs infos sur la classe yMENU) */
@@ -125,10 +125,10 @@ void GetTouche_fnc(struct yMENU_t *self) {
 //			snprintf(self->Buffer, 1024, ERASELINE "\tFrom Node-RED (Y) %d; VRy trim %2.1f" ERASELINE DECRC, aRxBuffer[0], ymx_VRy_trim);
 			break;
 
-//		case 'h': case 'H':		/* affiche cadre pour horloge */
-//			snprintf(self->Buffer, 1024, screen1 DECRC);
-//			break;
-//
+		case 'h': case 'H':		/* affiche cadre pour horloge */
+			snprintf(self->Buffer, 1024, screen1);
+			break;
+
 //		case 'W': case 'w':		/* passage en modee 2 touches */
 //			// x ? y : z // y if x is true (nonzero), else z
 //			(uart2NbCar == 1) ? (uart2NbCar = 2) : (uart2NbCar = 1);
@@ -140,7 +140,7 @@ void GetTouche_fnc(struct yMENU_t *self) {
 //			break;
 //
 		default:				/* Cde erronée */
-			snprintf(self->Buffer, 1024, "\tCde erronée! (%d)" ERASELINE DECRC, aRxBuffer[0]);
+			snprintf(self->Buffer, 1024, DECRC "\tCde erronée! (%d)" ERASELINE, aRxBuffer[0]);
 			break;
 		}	//switch
 	}	//if flag
@@ -163,12 +163,13 @@ void ClearStatusBar_fnc(struct yMENU_t *self) {
 	//erase trace ADC  jusqu'a fin de ligne
 	//puis go to status line
 	//erase status line
-	snprintf(self->Buffer, 1024, CUP(9,50) ERASELINE		/*BP1*/
-			  	  	  	  	  	 CUP(10,50) ERASELINE		/*SWxy*/
-								 /*CUP(11,50) ERASELINE*/	/*ADC1*/
-								 CUP(7,50) ERASELINE		/*AlarmA*/
-							     DECRC ERASELINE			/*Status line*/
-							     DECRC );
+	snprintf(self->Buffer, 1024,
+							CUP(7,50) ERASELINE		/*AlarmA*/
+							CUP(9,50) ERASELINE		/*BP1*/
+							CUP(10,50) ERASELINE	/*SWxy*/
+							/*CUP(11,50) ERASELINE*/	/*ADC1*/
+							DECRC ERASELINE			/*Status line*/
+							DECRC );
 	return;
 }
 

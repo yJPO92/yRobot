@@ -1,5 +1,7 @@
 *** yRobot ***
 
+le 04/08/2020: v1.5 (mx 5.): ajout freeRtos timer, CubeMonitor Menu error
+le 04/09/2020: v1.4: yANALOG no deadband, CubeMon & .ld new exchange list
 le 02/09/2020: v1.3: qVTaffiche for tk_VTaffiche
                 Hard Fault if float in snprintf => modif syscall.c & .ld
 le 01/09/2020: v1.2a: RTC alarmA ==> clear status & traces

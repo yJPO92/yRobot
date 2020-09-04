@@ -160,15 +160,17 @@ SECTIONS
     . = ALIGN(4);
     _smyvars = .;       /* create global symbol at myvars start */
     KEEP(*(.myvars.aRxBuffer))
-    KEEP(*(.myvars.ymx_VRx_PV))
-    KEEP(*(.myvars.ymx_VRy_PV))
     KEEP(*(.myvars.ymx_Coef))
-    KEEP(*(.myvars.ymx_VRy_trim))
+    KEEP(*(.myvars.ymx_VRx_PV))
+    KEEP(*(.myvars.ymx_VRx_Raw))
+    KEEP(*(.myvars.ymx_VRx_Ri))
+    KEEP(*(.myvars.ymx_VRx_Ro))
     KEEP(*(.myvars.ymx_VRx_trim))
-    KEEP(*(.myvars.ymx_VRy_HystP))
-    KEEP(*(.myvars.ymx_VRy_HystM))
+    KEEP(*(.myvars.ymx_VRy_PV))
+    KEEP(*(.myvars.ymx_VRy_Raw))
     KEEP(*(.myvars.ymx_VRy_Ri))
     KEEP(*(.myvars.ymx_VRy_Ro))
+    KEEP(*(.myvars.ymx_VRy_trim))
     /* KEEP(SORT_BY_NAME(*) */
     ;
     /* *(.myvars); */

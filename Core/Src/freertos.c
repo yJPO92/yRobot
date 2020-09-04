@@ -16,11 +16,6 @@
  *
  ******************************************************************************
  */
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
@@ -135,6 +130,11 @@ osMessageQueueId_t qVTafficheHandle;
 const osMessageQueueAttr_t qVTaffiche_attributes = {
   .name = "qVTaffiche"
 };
+/* Definitions for t1s */
+osTimerId_t t1sHandle;
+const osTimerAttr_t t1s_attributes = {
+  .name = "t1s"
+};
 /* Definitions for semUART */
 osSemaphoreId_t semUARTHandle;
 const osSemaphoreAttr_t semUART_attributes = {
@@ -152,6 +152,7 @@ void tk_Init_Fnc(void *argument);
 void tk_CheckVR_Fnc(void *argument);
 void tk_Process_Fnc(void *argument);
 void tk_VTaffiche_Fnc(void *argument);
+void t1s_Callback(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -244,8 +245,13 @@ void MX_FREERTOS_Init(void) {
 	/* add semaphores, ... */
   /* USER CODE END RTOS_SEMAPHORES */
 
+  /* Create the timer(s) */
+  /* creation of t1s */
+  t1sHandle = osTimerNew(t1s_Callback, osTimerPeriodic, NULL, &t1s_attributes);
+
   /* USER CODE BEGIN RTOS_TIMERS */
 	/* start timers, add new ones, ... */
+
   /* USER CODE END RTOS_TIMERS */
 
   /* Create the queue(s) */
@@ -297,7 +303,7 @@ void MX_FREERTOS_Init(void) {
  * @param  argument: Not used
  * @retval None
  */
-//yDOC: Task default
+//yDOC: task default
 /* USER CODE END Header_StartDefaultTask */
 void StartDefaultTask(void *argument)
 {
@@ -314,7 +320,7 @@ void StartDefaultTask(void *argument)
 
 	osDelay(pdMS_TO_TICKS(WaitInTk));
 	TkToStart++;
-	osDelay(pdMS_TO_TICKS(5000));
+	osDelay(pdMS_TO_TICKS(WaitInTk));
 	//osThreadTerminate(defaultTaskHandle);
 	/* Infinite loop */
 	for(;;)
@@ -328,12 +334,20 @@ void StartDefaultTask(void *argument)
 		HAL_RTC_GetTime(&hrtc, &myTime, RTC_FORMAT_BIN);
 		HAL_RTC_GetDate(&hrtc, &myDate, RTC_FORMAT_BIN);	//need to read also the date!!!
 		//--- afficher date & heure ds zone encadrée et mettre curseur sur ligne status
-		snprintf(aTxBuffer, 1024, CUP(12,60) "%02d-%02d-%02d" CUP(13,60) "%02d:%02d:%02d" DECRC,
-									  myDate.Date, myDate.Month, myDate.Year,
-									  myTime.Hours, myTime.Minutes, myTime.Seconds);
-		osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
-		HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
-		osSemaphoreRelease(semUARTHandle);
+		VTbuffer.src = SrcTk;
+		snprintf(VTbuffer.VTbuff, 50, CUP(4,61) "%02d-%02d-%02d" CUP(5,61) "%02d:%02d:%02d",
+									myDate.Date, myDate.Month, myDate.Year,
+									myTime.Hours, myTime.Minutes, myTime.Seconds);
+		osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);	//envoi vers task afficahge
+
+		//--- Clear Status Bar & traces
+		if (RTC_AlarmA_flag == 1) {
+			mnuSTM.ClearStatusBar(&mnuSTM);	//CLS Bar
+			VTbuffer.src = SrcTk;
+			snprintf(VTbuffer.VTbuff, 50, "%s", mnuSTM.Buffer);
+			osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);	//envoi vers task afficahge
+			RTC_AlarmModify();	//relancer alarme ds qq sec
+		}
 
 		//--- get/set data for STM32CubeMonitor
 		yCopy2CubeMonitor(1U);		//set data
@@ -380,6 +394,7 @@ void tk_Init_Fnc(void *argument)
 	HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 	osSemaphoreRelease(semUARTHandle);
 
+	/* Initialize menu structure & Message de Bienvenue*/
 	mnuSTM.Init =Init_fnc;	//assigne function
 	mnuSTM.Init(&mnuSTM);	//initialize structure
 	osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
@@ -437,7 +452,9 @@ void tk_CheckVR_Fnc(void *argument)
 	TkToStart++;
 	/* cree objets entree analog */
 	yANALOG_Init(&VRx);
+	VRx.Trim = 6.30;
 	yANALOG_Init(&VRy);
+	VRy.Trim = 3.90;
 
 	//-- attendre les autres taches
 	while (TkToStart != TkAll) {		//wait here!
@@ -452,9 +469,7 @@ void tk_CheckVR_Fnc(void *argument)
 		yANALOG_CalulerPV(&VRy);
 
 		VTbuffer.src = SrcVRx;
-//		snprintf(VTbuffer.VTbuff, 50, CUP(14,50) "--VR : %f \t %f" DECRC, 10.2, -55.55);		//TODO check 'IMPRECISERR'
-		snprintf(VTbuffer.VTbuff, 50, CUP(14,50) "--VR : %f \t %f" DECRC, yANALOG_GetPV(&VRx), yANALOG_GetPV(&VRy));		//TODO check 'IMPRECISERR'
-//		snprintf(VTbuffer.VTbuff, 50, CUP(14,50) "--VR : XX \t YY" DECRC);		//no 'IMPRECISERR'
+		snprintf(VTbuffer.VTbuff, 50, CUP(12,50) "--VR   : %6.2f \t %6.2f", VRx.PV, VRy.PV);	// 'IMPRECISERR' corrigé par modif syscall.c & .ld (v1.3)
 		osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);	//envoi vers task afficahge
 
 }
@@ -517,16 +532,14 @@ void tk_VTaffiche_Fnc(void *argument)
 
 	osDelay(pdMS_TO_TICKS(WaitInTk));
 	TkToStart++;
-//	//-- Attendre toutes les tasks
-//	while (TkToStart != TkAll) {
-//		osDelay(pdMS_TO_TICKS(WaitInTk));
-//	}
 	/* Infinite loop */
 	for(;;)
 	{
-		status = osMessageQueueGet(qVTafficheHandle, &BuffAff, NULL, portMAX_DELAY);	//wait for message
+		/* wait for message in queue */
+		status = osMessageQueueGet(qVTafficheHandle, &BuffAff, NULL, portMAX_DELAY);
 		if (status == osOK) {
-			snprintf(aTxBuffer, 512, DECRC "%s" ERASELINE, BuffAff.VTbuff);
+			//snprintf(aTxBuffer, 512, DECRC "%s" ERASELINE, BuffAff.VTbuff);
+			snprintf(aTxBuffer, 512, DECRC "%s", BuffAff.VTbuff);
 		} else {
 			snprintf(aTxBuffer, 512, DECRC "Queue empty" DECRC);
 		}
@@ -534,32 +547,24 @@ void tk_VTaffiche_Fnc(void *argument)
 		osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);
 		HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 		osSemaphoreRelease(semUARTHandle);
-		//yRazBuff((uint8_t *)&aTxBuffer, 1024);
 		__NOP();
-
-//		osDelay(pdMS_TO_TICKS(Wait1s));
-		//--- Clear Status Bar & traces
-		if (RTC_AlarmA_flag == 1) {
-			mnuSTM.ClearStatusBar(&mnuSTM);	//CLS Bar
-			osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
-			HAL_UART_Transmit(&huart2,(uint8_t *) mnuSTM.Buffer, strlen(mnuSTM.Buffer), 5000);
-			osSemaphoreRelease(semUARTHandle);
-			RTC_AlarmModify();	//relancer alarme ds qq sec
-		}
-
-
 
 	}
   /* USER CODE END tk_VTaffiche_Fnc */
+}
+
+/* t1s_Callback function */
+__weak void t1s_Callback(void *argument)
+{
+  /* USER CODE BEGIN t1s_Callback */
+  
+  /* USER CODE END t1s_Callback */
 }
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
 
 
-#ifdef __cplusplus
-}
-#endif
 /* USER CODE END Application */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -19,6 +19,7 @@
  * v3.0 add threshold & hysteresis to found a variation
  * 		and add output indicate modification
  * v4.0 migration to C
+ * v4.1 some update (no deadband on raw)
  *******************************************************************************
  * @date    Fev-2017, Juil-2020, aout-2020, sept-2020
  *******************************************************************************
@@ -34,9 +35,8 @@
 // valeurs par defaut
 #define DEFAULT_ECH_MIN -100.0    	// Mini scale
 #define DEFAULT_ECH_MAX 100.0    	// Maxi scale
-#define DEFAUlT_COEF_FILTRAGE 1.0	// 1.0=no filtre, 0.0=retard d'un sample
+#define DEFAUlT_COEF_FILTRAGE 0.2	// 1.0=no filtre, 0.0=retard d'un sample
 #define DEFAULT_TRIM 0.0			// Correction
-#define DEFAULT_DEADBAND 5			// sur 0-4095
 #define DEFAULT_HYSTERESIS 10.0		// hysteresis
  
 /*
@@ -44,8 +44,6 @@
  */
 typedef struct {
 	uint32_t	Raw;		// 0-4095 points
-	uint32_t	PrevRaw;	// Raw precedent
-	uint32_t	DeadBand;	// bande morte
 	float		PV;			// Process Value
 	float		PVmemo;	// valeur precedente
 	float		Ech_Mini;	// for scaling
@@ -112,11 +110,6 @@ float yANALOG_GetPV(yANALOG* this);
 //     */
 //    float GetPV(void);
 //
-////    /** Stocker la mesure normee
-////     * @param val la mesure au format (0.0-1.0)
-////     */
-////    void SetValeurN(float val);
-//
 //    /** Ajuster le trim
 //      * @param valeur du trim
 //      */
@@ -124,18 +117,6 @@ float yANALOG_GetPV(yANALOG* this);
 //
 //    /** Stocker la mesure 32bits
 //     * @param valeur du trim
-//     */
-//    void SetRaw(uint32_t val);
-//
-//    /** Renvoi la mesure Raw
-//     * @param none
-//     * @returns raw value
-//     */
-//    uint32_t GetRaw(void);
-//
-//    /** Renvoi l'hysteresisw
-//     * @param none
-//     * @returns value
 //     */
 //    float GetHysteresis(void);
 //
