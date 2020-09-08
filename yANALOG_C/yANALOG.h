@@ -2,7 +2,7 @@
  *******************************************************************************
  * @file    yANALOG.h
  * @brief   Entree analogique elaboree et filtree
- * @version 4.0
+ * @version 4.2
  * @author  Jean92
  * @note    pour formatter une entree analogique\n
  *          lecture DMA via ADC\n
@@ -20,6 +20,7 @@
  * 		and add output indicate modification
  * v4.0 migration to C
  * v4.1 some update (no deadband on raw)
+ * v4.2 check hysteresis & .Ro
  *******************************************************************************
  * @date    Fev-2017, Juil-2020, aout-2020, sept-2020
  *******************************************************************************
@@ -35,9 +36,9 @@
 // valeurs par defaut
 #define DEFAULT_ECH_MIN -100.0    	// Mini scale
 #define DEFAULT_ECH_MAX 100.0    	// Maxi scale
-#define DEFAUlT_COEF_FILTRAGE 0.2	// 1.0=no filtre, 0.0=retard d'un sample
+#define DEFAULT_COEF_FILTRAGE 0.8	// 1.0=no filtre, 0.0=retard d'un sample
 #define DEFAULT_TRIM 0.0			// Correction
-#define DEFAULT_HYSTERESIS 10.0		// hysteresis
+#define DEFAULT_HYSTERESIS 15.0		// hysteresis
  
 /*
  * Structure d'une entrée analogique
@@ -45,7 +46,7 @@
 typedef struct {
 	uint32_t	Raw;		// 0-4095 points
 	float		PV;			// Process Value
-	float		PVmemo;	// valeur precedente
+	float		PVmemo;		// valeur precedente
 	float		Ech_Mini;	// for scaling
 	float		Ech_Maxi;
 	float		Coef_Filtre;	// Coefficient de filtrage [0.0,1.0]
@@ -54,8 +55,9 @@ typedef struct {
 	float		B;
 	float		Trim;		//correction
     float 		Hysteresis; //hysteresis sur PV
+    float		PVhyst;		//memo PV pour hysteresis
     uint8_t 	Ri;			//pulse in (raz inside)
-    uint8_t 	Ro;			//toggle output
+    uint8_t 	Ro;			//pulse output
 } yANALOG;
 
 //------------------------
@@ -86,11 +88,16 @@ void yANALOG_CalulerPV(yANALOG* this);
 /*
  * @brief  Renvoi la PV de l'entrée analogique
  * @param  pointeur sur structure de l'entree analogique
- * @retval PV en float
+ * @retval none
  */
 float yANALOG_GetPV(yANALOG* this);
 
-
+/*
+  * @brief  check variation around hysteresis
+  * @param  pointeur sur structure de l'entree analogique
+  * @retval Ro
+*/
+uint8_t yANALOG_Variation(yANALOG* this);
 
 
 //

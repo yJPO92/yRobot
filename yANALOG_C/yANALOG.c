@@ -2,7 +2,7 @@
  *******************************************************************************
  * @file    yANALOG.c
  * @brief   Entree analogique elaboree et filtree
- * @version 4.0
+ * @version 4.2
  * @author  Jean92
  * @note    pour formatter une entree analogique\n
  *          lecture DMA via ADC\n
@@ -20,6 +20,7 @@
  * 		and add output indicate modification
  * v4.0 migration to C
   * v4.1 some update (no deadband on raw)
+  * v4.2 check hysteresis & .Ro
  *******************************************************************************
  * @date    Fev-2017, Juil-2020, aout-2020, sept-2020
  *******************************************************************************
@@ -39,10 +40,11 @@ void yANALOG_Init(yANALOG* this){
 	this->Ech_Maxi = DEFAULT_ECH_MAX;
 	this->Hysteresis = DEFAULT_HYSTERESIS;
 	this->Trim = DEFAULT_TRIM;
-	this->Coef_Filtre = DEFAUlT_COEF_FILTRAGE;
-	this->UnMoinsCoef = 1.0 - DEFAUlT_COEF_FILTRAGE;
+	this->Coef_Filtre = DEFAULT_COEF_FILTRAGE;
+	this->UnMoinsCoef = 1.0 - this->Coef_Filtre;
 	this->Raw = 0U;
 	this->PVmemo = 0.0;
+	this->PVhyst = 0.0;
 	this->PV = 0.0;
 	/* A = (MAXscale - MINscale) / (MAXpoint - MINpoint)
 	 * B = MAXscale-(A * MAXpoint) */
@@ -72,7 +74,7 @@ void yANALOG_Exec(yANALOG* this)
 void yANALOG_CalulerPV(yANALOG* this)
 {
 	/* Détection_Variation Raw value */
-	float tmp;
+	static float tmp;
 	/* Mise a Echelle
 	 * A = (MAXpercent - MINpercent) / (MAXma - MINma)
 	 * A = (echMAX - echMIN) / 4095.0
@@ -89,14 +91,21 @@ void yANALOG_CalulerPV(yANALOG* this)
 	//mesure filtree y(n) = Coef * x(n) + (1 - Coef) * y(n-1)
 	this->PV = (this->Coef_Filtre * this->PV) + (this->UnMoinsCoef * this->PVmemo);
 	this->PVmemo = this->PV; //memoriser valeur precedente
+}
 
-	//    //check variation around hysteresis
-	//    tmp = m_PV - m_PVmemo;
-	//    (tmp >= 0) ? (tmp = tmp) : (tmp = -tmp);	//abs!
-	//    if (tmp >= m_Hysteresis) {
-	//    	(m_Ro == 1U) ? (m_Ro = 0U) : (m_Ro = 1U);	//output a variation
-	//    	m_PVmemo = m_PV;	//memo new stable value
-	//    }
+/* check variation around hysteresis */
+uint8_t yANALOG_Variation(yANALOG* this)
+{
+	static float tmp;
+	tmp = this->PV - this->PVhyst;
+	(tmp >= 0) ? (tmp = tmp) : (tmp = -tmp);	//abs!
+	if (tmp >= this->Hysteresis) {
+		(this->Ro == 10U) ? (this->Ro = 0U) : (this->Ro = 10U);	//output a variation
+		this->PVhyst = this->PV;	//memo new stable value
+	} else {
+		this->Ro = 0U;
+	}
+	return this->Ro;
 }
 
 /* Renvoyer la valeur en unite engenieur (mise a l'echelle) */

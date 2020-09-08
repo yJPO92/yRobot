@@ -45,7 +45,9 @@ void yCopy2CubeMonitor(uint8_t rw){
 	} else {	//read data from Node-red
 		//VRy.m_Ri = ymx_VRy_Ri;
 		VRx.Coef_Filtre = ymx_Coef;
+		VRx.UnMoinsCoef = 1.0 - ymx_Coef;
 		VRy.Coef_Filtre = ymx_Coef;
+		VRy.UnMoinsCoef = 1.0 - ymx_Coef;
 	}
 }
 

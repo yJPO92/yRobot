@@ -82,7 +82,10 @@ yMENU_t mnuSTM;		// pour Menu VT100
 yANALOG VRx, VRy;	// pour Joystick
 
 /* objet d'echange d'affichage via la queue */
-VTbuff_t VTbuffer = { .src = 0, .VTbuff = "...\0" };
+yVTbuff_t VTbuffer = { .src = 0, .VTbuff = "...\0" };
+
+/* objet d'echange d'event via la queue */
+yEvent_t Event = { .Src = 0, .Topic = 0, .PayLoadF = 0.0, .PayloadI = 0};
 
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
@@ -135,6 +138,11 @@ osTimerId_t t1sHandle;
 const osTimerAttr_t t1s_attributes = {
   .name = "t1s"
 };
+/* Definitions for t250ms */
+osTimerId_t t250msHandle;
+const osTimerAttr_t t250ms_attributes = {
+  .name = "t250ms"
+};
 /* Definitions for semUART */
 osSemaphoreId_t semUARTHandle;
 const osSemaphoreAttr_t semUART_attributes = {
@@ -153,6 +161,7 @@ void tk_CheckVR_Fnc(void *argument);
 void tk_Process_Fnc(void *argument);
 void tk_VTaffiche_Fnc(void *argument);
 void t1s_Callback(void *argument);
+void t250ms_Callback(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -249,6 +258,9 @@ void MX_FREERTOS_Init(void) {
   /* creation of t1s */
   t1sHandle = osTimerNew(t1s_Callback, osTimerPeriodic, NULL, &t1s_attributes);
 
+  /* creation of t250ms */
+  t250msHandle = osTimerNew(t250ms_Callback, osTimerPeriodic, NULL, &t250ms_attributes);
+
   /* USER CODE BEGIN RTOS_TIMERS */
 	/* start timers, add new ones, ... */
 
@@ -259,7 +271,7 @@ void MX_FREERTOS_Init(void) {
   qEventsHandle = osMessageQueueNew (8, sizeof(yEvent_t), &qEvents_attributes);
 
   /* creation of qVTaffiche */
-  qVTafficheHandle = osMessageQueueNew (15, sizeof(VTbuff_t), &qVTaffiche_attributes);
+  qVTafficheHandle = osMessageQueueNew (15, sizeof(yVTbuff_t), &qVTaffiche_attributes);
 
   /* USER CODE BEGIN RTOS_QUEUES */
 	/* add queues, ... */
@@ -326,9 +338,6 @@ void StartDefaultTask(void *argument)
 	for(;;)
 	{
 		osDelay(pdMS_TO_TICKS(250));
-
-		/* toggle LD2 */
-		HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 
 		//--- Récupérer date & heure
 		HAL_RTC_GetTime(&hrtc, &myTime, RTC_FORMAT_BIN);
@@ -455,24 +464,41 @@ void tk_CheckVR_Fnc(void *argument)
 	VRx.Trim = 6.30;
 	yANALOG_Init(&VRy);
 	VRy.Trim = 3.90;
+	static uint8_t i = 0, j = 0;
+
+
 
 	//-- attendre les autres taches
 	while (TkToStart != TkAll) {		//wait here!
 		osDelay(pdMS_TO_TICKS(WaitInTk));
 	}
-//	osDelay(pdMS_TO_TICKS(WaitInTk));
+	//	osDelay(pdMS_TO_TICKS(WaitInTk));
 	/* Infinite loop */
 	for(;;)
 	{
 		osDelay(pdMS_TO_TICKS(250));
 		yANALOG_CalulerPV(&VRx);
-		yANALOG_CalulerPV(&VRy);
+		if (yANALOG_Variation(&VRx) != 0U) {
+			VTbuffer.src = SrcVRx;
+			snprintf(VTbuffer.VTbuff, 50, CUP(13,50) "--VRx   : %d", i++);
+			osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);	//envoi vers task afficahge
+		}
 
-		VTbuffer.src = SrcVRx;
+		yANALOG_CalulerPV(&VRy);
+		if (yANALOG_Variation(&VRy) != 0U) {
+			VTbuffer.src = SrcVRy;
+			snprintf(VTbuffer.VTbuff, 50, CUP(14,50) "--VRy   : %d", j++);
+			osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY); //envoi vers task afficahge
+
+			yEvent_t Event = {.Src = SrcVRx, .Topic = VR_PV, .PayLoadF = VRx.PV, .PayloadI = 0};
+			osMessageQueuePut(qEventsHandle, &Event, 0U, portMAX_DELAY);
+		}
+
+		VTbuffer.src = SrcVRxy;
 		snprintf(VTbuffer.VTbuff, 50, CUP(12,50) "--VR   : %6.2f \t %6.2f", VRx.PV, VRy.PV);	// 'IMPRECISERR' corrigé par modif syscall.c & .ld (v1.3)
 		osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);	//envoi vers task afficahge
 
-}
+	}
   /* USER CODE END tk_CheckVR_Fnc */
 }
 
@@ -487,11 +513,12 @@ void tk_CheckVR_Fnc(void *argument)
 void tk_Process_Fnc(void *argument)
 {
   /* USER CODE BEGIN tk_Process_Fnc */
+	yEvent_t EvtRecu;
+	osStatus_t status;
 	//-- Is it to me to start?
 	while (TkToStart != TkProcess) {
 		osDelay(pdMS_TO_TICKS(WaitInTk));
 	}
-
 	snprintf(aTxBuffer, 1024, DECRC "\n tk_Process\t initialised" DECSC);
 	osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
 	HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
@@ -502,7 +529,15 @@ void tk_Process_Fnc(void *argument)
 	/* Infinite loop */
 	for(;;)
 	{
-		osDelay(pdMS_TO_TICKS(250));
+		//osDelay(pdMS_TO_TICKS(500));
+		/* wait for message in queue */
+		status = osMessageQueueGet(qEventsHandle, &EvtRecu, NULL, portMAX_DELAY);
+		if (status == osOK) {
+			//snprintf(aTxBuffer, 512, DECRC "%s" ERASELINE, BuffAff.VTbuff);
+			//snprintf(aTxBuffer, 512, DECRC "%s", BuffAff.VTbuff);
+		} else {
+			snprintf(aTxBuffer, 512, DECRC "Queue empty" DECRC);
+		}
 	}
   /* USER CODE END tk_Process_Fnc */
 }
@@ -518,7 +553,7 @@ void tk_Process_Fnc(void *argument)
 void tk_VTaffiche_Fnc(void *argument)
 {
   /* USER CODE BEGIN tk_VTaffiche_Fnc */
-	VTbuff_t BuffAff;
+	yVTbuff_t BuffAff;
 	osStatus_t status;
 	//-- Is it to me to start?
 	while (TkToStart != TkVTaffiche) {
@@ -559,6 +594,14 @@ __weak void t1s_Callback(void *argument)
   /* USER CODE BEGIN t1s_Callback */
   
   /* USER CODE END t1s_Callback */
+}
+
+/* t250ms_Callback function */
+__weak void t250ms_Callback(void *argument)
+{
+  /* USER CODE BEGIN t250ms_Callback */
+  
+  /* USER CODE END t250ms_Callback */
 }
 
 /* Private application code --------------------------------------------------*/

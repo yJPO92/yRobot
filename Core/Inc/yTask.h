@@ -1,4 +1,4 @@
-/**
+ /**
  *******************************************************************************
  * @file    yTask.h
  * @author  Jean
@@ -18,7 +18,7 @@
 
 /* Define the structure type of events will be passed on the queue. */
 typedef struct {
-	uint8_t Source;
+	uint8_t Src;
 	uint8_t Topic;
 	float	PayLoadF;
 	uint8_t PayloadI;
@@ -29,7 +29,7 @@ typedef struct {
 typedef struct {
 	int src;			// identifier l'emetteur
 	char VTbuff[200];	// buffer a afficher
-} VTbuff_t;
+} yVTbuff_t;
 
 /* Nommer les sources des messages ds les queues */
 typedef enum {

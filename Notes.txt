@@ -1,5 +1,7 @@
 *** yRobot ***
 
+le 08/09/2020: v1.7 (mx 5.3): envoi events vers tk_Process qui vide la queue
+                ajout timer 250ms pour check virtual CubeMonitor kbd.
 le 04/08/2020: v1.5 (mx 5.): ajout freeRtos timer, CubeMonitor Menu error
 le 04/09/2020: v1.4: yANALOG no deadband, CubeMon & .ld new exchange list
 le 02/09/2020: v1.3: qVTaffiche for tk_VTaffiche
