@@ -52,8 +52,9 @@ typedef enum  {
 } yTkOrder;
 
 /* differents wait time for tasks */
-#define Wait1s 1000U		//1sec
-#define Wait5s 5000U		//5sec
+#define Wait500ms	((uint32_t)500)		//0.5sec
+#define Wait1s		((uint32_t)1000)	//1sec
+#define Wait5s		((uint32_t)5000)	//5sec
 
 
 #endif /* INC_YTASK_H_ */

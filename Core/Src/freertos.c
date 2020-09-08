@@ -302,7 +302,7 @@ void MX_FREERTOS_Init(void) {
 	HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 	osSemaphoreRelease(semUARTHandle);
 
-	WaitInTk = Wait1s;
+	WaitInTk = Wait500ms;
 	osDelay(pdMS_TO_TICKS(WaitInTk));
 	TkToStart = TkInit;
   /* USER CODE END RTOS_THREADS */
@@ -315,7 +315,7 @@ void MX_FREERTOS_Init(void) {
  * @param  argument: Not used
  * @retval None
  */
-//yDOC: task default
+//yDOC: task 5 default
 /* USER CODE END Header_StartDefaultTask */
 void StartDefaultTask(void *argument)
 {
@@ -372,7 +372,7 @@ void StartDefaultTask(void *argument)
  * @param argument: Not used
  * @retval None
  */
-//yDOC task Init
+//yDOC task 1 Init
 /* USER CODE END Header_tk_Init_Fnc */
 void tk_Init_Fnc(void *argument)
 {
@@ -443,7 +443,7 @@ void tk_Init_Fnc(void *argument)
  * @param argument: Not used
  * @retval None
  */
-//yDOC task CheckVR
+//yDOC task 3 check VR
 /* USER CODE END Header_tk_CheckVR_Fnc */
 void tk_CheckVR_Fnc(void *argument)
 {
@@ -480,14 +480,14 @@ void tk_CheckVR_Fnc(void *argument)
 		yANALOG_CalulerPV(&VRx);
 		if (yANALOG_Variation(&VRx) != 0U) {
 			VTbuffer.src = SrcVRx;
-			snprintf(VTbuffer.VTbuff, 50, CUP(13,50) "--VRx   : %d", i++);
+			snprintf(VTbuffer.VTbuff, 50, CUP(13,50) "--VRx  : %d", i++);
 			osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);	//envoi vers task afficahge
 		}
 
 		yANALOG_CalulerPV(&VRy);
 		if (yANALOG_Variation(&VRy) != 0U) {
 			VTbuffer.src = SrcVRy;
-			snprintf(VTbuffer.VTbuff, 50, CUP(14,50) "--VRy   : %d", j++);
+			snprintf(VTbuffer.VTbuff, 50, CUP(14,50) "--VRy  : %d", j++);
 			osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY); //envoi vers task afficahge
 
 			yEvent_t Event = {.Src = SrcVRx, .Topic = VR_PV, .PayLoadF = VRx.PV, .PayloadI = 0};
@@ -508,7 +508,7 @@ void tk_CheckVR_Fnc(void *argument)
  * @param argument: Not used
  * @retval None
  */
-//yDOC task Process
+//yDOC task 4 Process
 /* USER CODE END Header_tk_Process_Fnc */
 void tk_Process_Fnc(void *argument)
 {
@@ -548,7 +548,7 @@ void tk_Process_Fnc(void *argument)
  * @param argument: Not used
  * @retval None
  */
-//yDOC task VT Affiche
+//yDOC task 2 VT Affiche
 /* USER CODE END Header_tk_VTaffiche_Fnc */
 void tk_VTaffiche_Fnc(void *argument)
 {

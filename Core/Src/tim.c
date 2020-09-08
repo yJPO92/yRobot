@@ -21,7 +21,9 @@
 #include "tim.h"
 
 /* USER CODE BEGIN 0 */
-
+//-- TIM1 500ms : to drive ADC1
+//-- TIM2 250ms : reserve
+//-- TIM7 500ms : reserve
 /* USER CODE END 0 */
 
 TIM_HandleTypeDef htim1;

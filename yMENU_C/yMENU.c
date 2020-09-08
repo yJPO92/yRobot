@@ -13,7 +13,8 @@
  *      rempli par ADC/DMA du STM32L476
  * v3.0 C=>C++
  * v3.2 suppression des codes VT100, gérés par ailleurs!
-  * v5.0 C++==>C !!
+ * v5.0 C++==>C !!
+ * v5.2 affinage menu
  *******************************************************************************
  * @date    Fev-2017, Juil-2020, aout-2020
  *******************************************************************************
@@ -107,10 +108,11 @@ void GetTouche_fnc(struct yMENU_t *self) {
 		case 'C': case 'c':		/* Clear Status Bar & +++ */
 			snprintf(self->Buffer, 1024, CUP(9,50) ERASELINE		/*BP1*/
 					  	  	  	  	  	 CUP(10,50) ERASELINE		/*SWxy*/
-										 /*CUP(11,50) ERASELINE*/	/*ADC1*/
+										 CUP(11,50) ERASELINE		/*ADC1*/
+										 CUP(12,50) ERASELINE		/*VRx VRy*/
 										 CUP(7,50) ERASELINE		/*AlarmA*/
-										 /*CUP(13,50) ERASELINE*/		/*VRx Ro*/
-										 /*CUP(14,50) ERASELINE*/		/*VRy Ro*/
+										 CUP(13,50) ERASELINE		/*VRx Ro*/
+										 CUP(14,50) ERASELINE		/*VRy Ro*/
 									     DECRC ERASELINE			/*Status line*/
 									     DECRC );
 			break;
@@ -152,7 +154,6 @@ void GetTouche_fnc(struct yMENU_t *self) {
 	return;
 }
 
-
 //void yMENU::yMenuClearVT(void) {
 //	snprintf(self->Buffer, 1024, OFF clrscr homescr);
 //	HAL_UART_Transmit(&huart2,(uint8_t *) self->Buffer, strlen(self->Buffer), 5000);
@@ -177,7 +178,6 @@ void ClearStatusBar_fnc(struct yMENU_t *self) {
 	return;
 }
 
-
 /*
   * @brief  Initialiser la structure
   * @param  struture elle meme
@@ -195,8 +195,8 @@ void Init_fnc(struct yMENU_t *self)
 							"\n" DECSC);
 
 	self->m_version = 5;
-	self->m_patch = 1;
-	self->m_toto = 77;
+	self->m_patch = 2;
+	self->m_toto = 52;
 	self->GetTouche = GetTouche_fnc;
 	self->Display = Display_fnc;
 	self->Infos = Infos_fnc;

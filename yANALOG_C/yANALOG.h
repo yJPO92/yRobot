@@ -86,13 +86,6 @@ void yANALOG_Exec(yANALOG* this);
 void yANALOG_CalulerPV(yANALOG* this);
 
 /*
- * @brief  Renvoi la PV de l'entrée analogique
- * @param  pointeur sur structure de l'entree analogique
- * @retval none
- */
-float yANALOG_GetPV(yANALOG* this);
-
-/*
   * @brief  check variation around hysteresis
   * @param  pointeur sur structure de l'entree analogique
   * @retval Ro
@@ -111,21 +104,6 @@ uint8_t yANALOG_Variation(yANALOG* this);
 //     * @param Coef_Filtre
 //     */
 //    void majFiltre(float Coef_Filtre);
-//
-//    /** Renvoi la mesure
-//     * @returns la valeur mise a l'echelle et filtree
-//     */
-//    float GetPV(void);
-//
-//    /** Ajuster le trim
-//      * @param valeur du trim
-//      */
-//     void AdjustTrim(float trim);
-//
-//    /** Stocker la mesure 32bits
-//     * @param valeur du trim
-//     */
-//    float GetHysteresis(void);
 //
     
 //};

@@ -16,6 +16,15 @@ le 29/08/2020: regrouper les interrupts & callbacks ds un .c
 le 27/08/2020: creation à partie de NewCpp.
                 purge git, qq search/replace.
                 commit en v1.0
+----------------
+MCU timers
+TIM1 500ms : to drive ADC1
+TIM2 250ms : reserve
+TIM7 500ms : reserve
+
+FreeRTOS timers
+t1S     : LD2 flashing
+t250ms  : check virtual CubeMonitor kbd
 ===================================================================================================
 le 26/08/2020: v5.0, en C, reécriture yMENU_C avec une structure equiv objet
                 affichage ok mais lourd!!!

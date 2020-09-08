@@ -19,8 +19,9 @@
  * v3.0 add threshold & hysteresis to found a variation
  * 		and add output indicate modification
  * v4.0 migration to C
-  * v4.1 some update (no deadband on raw)
-  * v4.2 check hysteresis & .Ro
+ * v4.1 some update (no deadband on raw)
+ * v4.2 check hysteresis & .Ro
+ * v5.2 affinage menu
  *******************************************************************************
  * @date    Fev-2017, Juil-2020, aout-2020, sept-2020
  *******************************************************************************
@@ -108,12 +109,6 @@ uint8_t yANALOG_Variation(yANALOG* this)
 	return this->Ro;
 }
 
-/* Renvoyer la valeur en unite engenieur (mise a l'echelle) */
-float yANALOG_GetPV(yANALOG* this)
-{
-	return this->PV;
-}
-
 ///** Changer le coefficient de filtrage */
 //void yANALOG_FLT::majFiltre(float Coef_Filtre)
 //{
@@ -121,16 +116,6 @@ float yANALOG_GetPV(yANALOG* this)
 //    this->m_1moinsCoef = 1.0 - Coef_Filtre;
 //    this->CalulerMesure();
 //}
-
-
-///** Ajuster le trim
-//  * @param valeur du trim
-//  */
-// void yANALOG_FLT::AdjustTrim(float trim)
-// {
-//	 //TODO verifier limites!
-//	 this->m_Trim = trim;
-// }
 
 
 /*
