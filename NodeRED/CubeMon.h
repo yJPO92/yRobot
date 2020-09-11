@@ -26,6 +26,7 @@
 //#endif
 
 #include "yANALOG.h"
+#include "yMOTOR.h"
 
 /* Variables pour Mode-RED/STM32CubeMonitor */
 #ifndef NR_VAR_GLO_		//for CubeMon.c
@@ -50,6 +51,7 @@
  extern yANALOG VRx;
  extern yANALOG VRy;
  extern uint32_t adcbuf[2];
+ extern yMOTOR Moteur_D;
 
  #else		//for others .c
  extern float ymx_Coef;
@@ -70,6 +72,8 @@
 
 extern yANALOG VRx;
 extern yANALOG VRy;
+extern yMOTOR Moteur_D;
+
 #endif
 
 /* define functions for corresponding and others .c files */

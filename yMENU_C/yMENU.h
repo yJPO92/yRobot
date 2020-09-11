@@ -14,6 +14,8 @@
  * v3.0 C=>C++
  * v3.1 suppression des codes VT100, gérés par ailleurs!
  * v5.0 C++==>C !!
+ * v5.2 affinage menu
+ * v6.0 cde test yMOTOR
  *******************************************************************************
  * @date    Fev-2017, Juil-2020, aout-2020
  *******************************************************************************
@@ -36,23 +38,20 @@
 #define mmenu1 "\n\
 ----------------------------------\n\
 \n\
- R (ADC1 analog values) \n\
- T (start toggle LED1 avec time)\n\
- L (free)\n\
- S (stop toggle LED1)\n\
- D (display Real Time)\n\
- H (display zone)\n\
+ A (Arret yMOTOR) \n\
+ B (start/speed 0 yMOTOR)\n\
+ D (speed +15.5)\n\
+ E (speed -20.2)\n\
+ F (speed VRx)\n\
+ H (display Horloge zone)\n\
  \n\
  0-9|a|b (affiche le chiffre)\n\
  +|- (change de chiffre)\n\
 \n\
  W (saisie de 2 touches)\n\
- 0-9 0-9 (affiche les caracteres 10 a 99) \n\
 \n\
  Veuillez utiliser le dashboard\n\
  STM32CubeMonitor / Node-RED\n\
-\n\
- Cdes reconnues: R,T,L,S,I,X,Y,0-9\n\
 \n\
 ----------------------------------\n\
  Cls | Menu | Quit\n"

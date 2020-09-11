@@ -15,6 +15,7 @@
  * v3.2 suppression des codes VT100, gérés par ailleurs!
  * v5.0 C++==>C !!
  * v5.2 affinage menu
+ * v6.0 cde test yMOTOR
  *******************************************************************************
  * @date    Fev-2017, Juil-2020, aout-2020
  *******************************************************************************
@@ -26,15 +27,15 @@
 #include "main.h"
 #include "VT100.h"
 
-/*
+
 //----- pour STM32CubeMonitor
 #define NR_VAR_GLO_
 #include "CubeMon.h"
-*/
+
 
 extern uint8_t aRxBuffer[3];		//buffer de reception
 extern uint16_t uart2NbCar;			//nb de byte attendu
-extern char tmpBuffer[10];		    //buffer temporaire pour switch/case
+extern char tmpBuffer[10];		    //buffer temporary pour switch/case
 
 /*--------------------------------------
  * Fonctions/methode applicables au Menu
@@ -84,27 +85,6 @@ void GetTouche_fnc(struct yMENU_t *self) {
 			snprintf(self->Buffer, 1024, DECRC ERASELINE "\tFrom Node-RED (0-9) %d     ", aRxBuffer[0]);
 			break;
 
-		case 'T': case 't':		/* ???????e */
-			snprintf(self->Buffer, 1024, DECRC ERASELINE "\tFrom Node-RED (T) %d     ", aRxBuffer[0]);
-			break;
-
-		case 'L': case 'l':		/* ?????? */
-			snprintf(self->Buffer, 1024, DECRC ERASELINE "\tFrom Node-RED (L) %d     ", aRxBuffer[0]);
-			break;
-
-////		case 'E': case 'e':		/* vider la queue de RTOS */
-////			//msg = 101;
-////			//status = osMessageQueuePut(QueueTestHandle, &msg, 0U, 0U);	//ne fonctionne pas! (doit être appelée depuis une interrupt)
-////			break;
-//
-		case 'S': case 's':		/* ?????? */
-			snprintf(self->Buffer, 1024, DECRC ERASELINE "\tFrom Node-RED (S) %d     ", aRxBuffer[0]);
-			break;
-
-		case 'I': case 'i':		/* afficher qqs infos sur la classe yMENU) */
-//			yMenuInfos();
-			break;
-
 		case 'C': case 'c':		/* Clear Status Bar & +++ */
 			snprintf(self->Buffer, 1024, CUP(9,50) ERASELINE		/*BP1*/
 					  	  	  	  	  	 CUP(10,50) ERASELINE		/*SWxy*/
@@ -113,8 +93,46 @@ void GetTouche_fnc(struct yMENU_t *self) {
 										 CUP(7,50) ERASELINE		/*AlarmA*/
 										 CUP(13,50) ERASELINE		/*VRx Ro*/
 										 CUP(14,50) ERASELINE		/*VRy Ro*/
+										 CUP(17,50) ERASELINE		/*Mot D*/
+										 CUP(18,50) ERASELINE		/*Mot G*/
 									     DECRC ERASELINE			/*Status line*/
 									     DECRC );
+			break;
+
+		case 'A': case 'a':		/* yMOTOR arret */
+			yMOTOR_MarArr(&Moteur_D, yARRET);
+			Moteur_D.Speed_SP =0.0;
+			break;
+
+		case 'B': case 'b':		/* yMOTOR start/speed 0.0 */
+			yMOTOR_MarArr(&Moteur_D, yMARCHE);
+			yMOTOR_Speed(&Moteur_D, 0.0);
+			break;
+
+		case 'D': case 'd':		/* yMOTOR speed pos */
+			yMOTOR_Speed(&Moteur_D, 15.5);
+			break;
+
+		case 'E': case 'e':		/* yMOTOR speed neg */
+			yMOTOR_Speed(&Moteur_D, -20.2);
+			break;
+
+		case 'F': case 'f':		/* yMOTOR ??? */
+			yMOTOR_Speed(&Moteur_D, VRx.PV);
+			break;
+
+		case 'h': case 'H':		/* affiche cadre pour horloge */
+			snprintf(self->Buffer, 1024, screen1);
+			break;
+
+		case 'I': case 'i':		/* afficher qqs infos sur la classe yMENU) */
+//			yMenuInfos();
+			break;
+
+		case 'S': case 's':		/* ?????? */
+			snprintf(self->Buffer, 1024, DECRC ERASELINE "\tFrom Node-RED (S) %d     ", aRxBuffer[0]);
+			yMOTOR_MarArr(&Moteur_D, yMARCHE);
+			Moteur_D.Speed_SP = 10.5;
 			break;
 
 		case 'M': case 'm':		/* Display menu */
@@ -127,10 +145,6 @@ void GetTouche_fnc(struct yMENU_t *self) {
 
 		case 'Y': case 'y':		/* adjust VRy Trim */
 //			snprintf(self->Buffer, 1024, ERASELINE "\tFrom Node-RED (Y) %d; VRy trim %2.1f" ERASELINE DECRC, aRxBuffer[0], ymx_VRy_trim);
-			break;
-
-		case 'h': case 'H':		/* affiche cadre pour horloge */
-			snprintf(self->Buffer, 1024, screen1);
 			break;
 
 //		case 'W': case 'w':		/* passage en modee 2 touches */
@@ -194,9 +208,9 @@ void Init_fnc(struct yMENU_t *self)
 						    "\nSTmicro NUCLEO_L476RG"
 							"\n" DECSC);
 
-	self->m_version = 5;
-	self->m_patch = 2;
-	self->m_toto = 52;
+	self->m_version = 6;
+	self->m_patch = 0;
+	self->m_toto = 60;
 	self->GetTouche = GetTouche_fnc;
 	self->Display = Display_fnc;
 	self->Infos = Infos_fnc;

@@ -43,7 +43,7 @@ typedef enum {
 
 /* Nommer les Topics des messages ds les queues */
 typedef enum {
-  TopicNone = 0, VR_PV = 1, VR_Raw = 2, VR_xxx = 3, BP1 = 4, SWxy = 5,
+  TopicNone = 0, VR_PV = 1, VR_Raw = 2, VR_xxx = 3, BP1 = 4, SWxy = 5, MotD = 11, MotG = 12,
 } yTopic;
 
 /* Flag de démarrage des taches */

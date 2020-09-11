@@ -34,6 +34,7 @@
 #include "VT100.h"
 #include "yMENU.h"
 #include "yANALOG.h"
+#include "yMOTOR.h"
 
 #define NR_VAR_GLO_
 #include "CubeMon.h"
@@ -80,6 +81,7 @@ extern TIM_HandleTypeDef htim1;
 
 yMENU_t mnuSTM;		// pour Menu VT100
 yANALOG VRx, VRy;	// pour Joystick
+yMOTOR Moteur_D;	// les moteurs
 
 /* objet d'echange d'affichage via la queue */
 yVTbuff_t VTbuffer = { .src = 0, .VTbuff = "...\0" };
@@ -358,6 +360,12 @@ void StartDefaultTask(void *argument)
 			RTC_AlarmModify();	//relancer alarme ds qq sec
 		}
 
+		//--- debug yMOTOR
+		VTbuffer.src = MotD;
+		snprintf(VTbuffer.VTbuff, 50, CUP(17,50) "--Mot_D: run %d, speed %6.2f",
+											Moteur_D.Run, Moteur_D.Speed_SP);
+		osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);	//envoi vers task afficahge
+
 		//--- get/set data for STM32CubeMonitor
 		yCopy2CubeMonitor(1U);		//set data
 		yCopy2CubeMonitor(0U);		//get data
@@ -422,6 +430,8 @@ void tk_Init_Fnc(void *argument)
 	RTC_MiseAheure();
 	//--- initialize interrupts
 	Interrputs_Init();
+	//--- initialize Moteurs
+	yMOTOR_Init(&Moteur_D);
 
 	osDelay(WaitInTk);
 	/* Infinite loop */
@@ -465,8 +475,6 @@ void tk_CheckVR_Fnc(void *argument)
 	yANALOG_Init(&VRy);
 	VRy.Trim = 3.90;
 	static uint8_t i = 0, j = 0;
-
-
 
 	//-- attendre les autres taches
 	while (TkToStart != TkAll) {		//wait here!

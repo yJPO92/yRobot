@@ -18,6 +18,7 @@
   ******************************************************************************
   */
 // ajout Free-RTOS v4.0
+// v2.0 ajout yMOTOR
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
@@ -84,7 +85,7 @@ void Error_Handler(void);
 #define SWO_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 #define yPROG "*** yRobot ***"
-#define yVER  "V1.8"
+#define yVER  "V2.0"
 #define yDATE "xx-Sept-2020"
 //#define yDBG_tk 1        //debug display on terminal (ou commenter ligne)
 
