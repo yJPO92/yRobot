@@ -40,12 +40,13 @@
 //}
 
 /** Initialisation de la structure Motor */
-void yMOTOR_Init(yMOTOR* this) {
+void yMOTOR_Init(yMOTOR* this, uint32_t gpioPort, uint16_t gpioPin) {
 	//--- Inputs
 	this->MarArr = 0;
 	this->Speed_SP = 0.0;
 	//--- Outputs
 	this->Run = 0;
+	this->Speed_MV = 0.0;
 	this->Velocity = 0.0;
 	//--- Paramters
 	this->Period = PERIODE_DEFAULT;
@@ -55,6 +56,8 @@ void yMOTOR_Init(yMOTOR* this) {
 	this->Run_memo = 0;
 	this->DB_memo = DEADBAND_DEFAULT;
 	//--- Real outputs
+	this->_gpioPort = gpioPort;
+	this->_gpioPin = gpioPin;
 //    PwmOut _pwm;
 //    DigitalOut _av;
 //    DigitalOut _ar;
@@ -79,6 +82,11 @@ void yMOTOR_MarArr(yMOTOR* this, uint8_t mararr) {
 void yMOTOR_Speed(yMOTOR* this, float speed) {
 	//TODO check speed limits! & running
 	this->Speed_SP = speed;
+}
+
+/* calcul moteur */
+void yMOTOR_Exec(yMOTOR* this) {
+	HAL_GPIO_WritePin(this->_gpioPort, this->_gpioPin, this->Run);
 }
 
 ///** Traiter le changement de vitesse */

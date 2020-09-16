@@ -61,6 +61,7 @@ typedef struct {
 	float Speed_SP;		// Vitesse request
 	//--- Outputs
 	uint8_t Run;		// Etat marche (running state)
+    float Speed_MV;		// commande vitesse vers sortie
 	float Velocity;		// Vitesse effective
 	//--- Paramters
 	float Period;		// PWM duty cycle periode in seconde
@@ -70,7 +71,8 @@ typedef struct {
     uint8_t Run_memo;	//running memory
     float DB_memo;		//deadband
 	//--- Real outputs
-    float Speed_MV;		// commande vitesse vers sortie
+    uint32_t _gpioPort;
+    uint16_t _gpioPin;
 //    PwmOut _pwm;
 //    DigitalOut _av;
 //    DigitalOut _ar;
@@ -83,24 +85,33 @@ typedef struct {
 /*
  * @brief  Initialisation data pour un moteur
  * @param  pointeur sur structure du moteur
+ * @params gpioPort/Pin de ...
  * @retval status
 */
-void yMOTOR_Init(yMOTOR* this);
+void yMOTOR_Init(yMOTOR* this, uint32_t gpioPort, uint16_t gpioPin);
 
 /*
  * @brief  Marche/Arret request
  * @param  pointeur sur structure du moteur
+ * @param  request order
  * @retval status
 */
 void yMOTOR_MarArr(yMOTOR* this, uint8_t mararr);
 
-
 /*
  * @brief  Speed_SP request
  * @param  pointeur sur structure du moteur
+ * @param  request value
  * @retval status
 */
 void yMOTOR_Speed(yMOTOR* this, float speed);
+
+/*
+ * @brief  calcul moteur
+ * @param  pointeur sur structure du moteur
+ * @retval status
+*/
+void yMOTOR_Exec(yMOTOR* this);
 
 //    /** Interface de controle du moteur
 //     * @param pwm (Pwmout, vitesse variable)

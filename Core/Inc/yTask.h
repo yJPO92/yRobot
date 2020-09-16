@@ -3,7 +3,7 @@
  * @file    yTask.h
  * @author  Jean
  * @brief   Outils pour mes taches
- * @version 3.0
+ * @version 3.1
  *******************************************************************************
  * Modified : aout 2020 (pour NewCpp)
  * Modified : 16 avr. 2020
@@ -18,7 +18,6 @@
 
 /* Define the structure type of events will be passed on the queue. */
 typedef struct {
-	uint8_t Src;
 	uint8_t Topic;
 	float	PayLoadF;
 	uint8_t PayloadI;
@@ -33,17 +32,15 @@ typedef struct {
 
 /* Nommer les sources des messages ds les queues */
 typedef enum {
-  SrcNone = 0, SrcBP1 = 1, SrcSWxy = 2, SrcVRx = 5, SrcVRy = 6, SrcVRxy= 7, SrcKbd = 11, SrcTk = 20,
+  SrcNone = 0,
+  SrcTk = 1,
 } ySource;
-
-/* Nommer les destinations des messages ds les queues */
-typedef enum {
-  DestNone  = 50, Process = 51, VTaffiche = 52,
-} yDestination;
 
 /* Nommer les Topics des messages ds les queues */
 typedef enum {
-  TopicNone = 0, VR_PV = 1, VR_Raw = 2, VR_xxx = 3, BP1 = 4, SWxy = 5, MotD = 11, MotG = 12,
+  TopicNone = 0,  BP1 = 1, SWXY = 2, Kbd =3,
+  	  	  	  	  VRX = 11, VRY = 12,
+				  MotD = 21, MotG = 22,
 } yTopic;
 
 /* Flag de démarrage des taches */

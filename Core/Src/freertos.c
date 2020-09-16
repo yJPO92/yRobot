@@ -84,10 +84,10 @@ yANALOG VRx, VRy;	// pour Joystick
 yMOTOR Moteur_D;	// les moteurs
 
 /* objet d'echange d'affichage via la queue */
-yVTbuff_t VTbuffer = { .src = 0, .VTbuff = "...\0" };
+yVTbuff_t VTbuffer = { .src = SrcNone, .VTbuff = "...\0" };
 
 /* objet d'echange d'event via la queue */
-yEvent_t Event = { .Src = 0, .Topic = 0, .PayLoadF = 0.0, .PayloadI = 0};
+yEvent_t yEvent = {.Topic = TopicNone, .PayLoadF = 0.0, .PayloadI = 0};
 
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
@@ -326,26 +326,23 @@ void StartDefaultTask(void *argument)
 	while (TkToStart != TkDefault) {
 		osDelay(pdMS_TO_TICKS(WaitInTk));
 	}
-
-	snprintf(aTxBuffer, 1024, DECRC "\n tk_Default\t initialised" DECSC);
+	snprintf(aTxBuffer, 50, DECRC "\n tk_Default\t initialised" DECSC);
 	osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
 	HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 	osSemaphoreRelease(semUARTHandle);
 
-	osDelay(pdMS_TO_TICKS(WaitInTk));
 	TkToStart++;
 	osDelay(pdMS_TO_TICKS(WaitInTk));
 	//osThreadTerminate(defaultTaskHandle);
 	/* Infinite loop */
 	for(;;)
 	{
-		osDelay(pdMS_TO_TICKS(250));
+		osDelay(pdMS_TO_TICKS(241));
 
 		//--- Récupérer date & heure
 		HAL_RTC_GetTime(&hrtc, &myTime, RTC_FORMAT_BIN);
 		HAL_RTC_GetDate(&hrtc, &myDate, RTC_FORMAT_BIN);	//need to read also the date!!!
 		//--- afficher date & heure ds zone encadrée et mettre curseur sur ligne status
-		VTbuffer.src = SrcTk;
 		snprintf(VTbuffer.VTbuff, 50, CUP(4,61) "%02d-%02d-%02d" CUP(5,61) "%02d:%02d:%02d",
 									myDate.Date, myDate.Month, myDate.Year,
 									myTime.Hours, myTime.Minutes, myTime.Seconds);
@@ -354,15 +351,14 @@ void StartDefaultTask(void *argument)
 		//--- Clear Status Bar & traces
 		if (RTC_AlarmA_flag == 1) {
 			mnuSTM.ClearStatusBar(&mnuSTM);	//CLS Bar
-			VTbuffer.src = SrcTk;
 			snprintf(VTbuffer.VTbuff, 50, "%s", mnuSTM.Buffer);
 			osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);	//envoi vers task afficahge
 			RTC_AlarmModify();	//relancer alarme ds qq sec
 		}
 
 		//--- debug yMOTOR
-		VTbuffer.src = MotD;
-		snprintf(VTbuffer.VTbuff, 50, CUP(17,50) "--Mot_D: run %d, speed %6.2f",
+		yMOTOR_Exec(&Moteur_D);		//calculer le moteur
+		snprintf(VTbuffer.VTbuff, 50, CUP(17,50) "--Mot_D: run %d, speedSP %6.2f",
 											Moteur_D.Run, Moteur_D.Speed_SP);
 		osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);	//envoi vers task afficahge
 
@@ -387,20 +383,20 @@ void tk_Init_Fnc(void *argument)
   /* USER CODE BEGIN tk_Init_Fnc */
 	//-- Is it to me to start?
 	while (TkToStart != TkInit) {
-		snprintf(aTxBuffer, 1024, DECRC "\n tk_Init\t waiting %d" DECSC, TkToStart);
+		snprintf(aTxBuffer, 50, DECRC "\n tk_Init\t waiting %d" DECSC, TkToStart);
 		osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
 		HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 		osSemaphoreRelease(semUARTHandle);
 		osDelay(pdMS_TO_TICKS(WaitInTk));
 	}	//wait here!
 
-	snprintf(aTxBuffer, 1024, DECRC "\n tk_Init\t initialised" DECSC);
+	snprintf(aTxBuffer, 50, DECRC "\n tk_Init\t initialised" DECSC);
 	osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
 	HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 	osSemaphoreRelease(semUARTHandle);
 
-	osDelay(pdMS_TO_TICKS(WaitInTk));
 	TkToStart++;
+	osDelay(pdMS_TO_TICKS(WaitInTk));
 
 	while (TkToStart != TkAll) {		//wait here!
 		osDelay(pdMS_TO_TICKS(WaitInTk));
@@ -428,17 +424,23 @@ void tk_Init_Fnc(void *argument)
 
 	//--- Mise a heure RTC
 	RTC_MiseAheure();
+	//--- initialize Joystick (direction & vitesse pour moteurs)
+	yANALOG_Init(&VRx);
+	VRx.Trim = 6.30;
+	yANALOG_Init(&VRy);
+	VRy.Trim = 3.90;
+	//--- initialize Moteurs
+	yMOTOR_Init(&Moteur_D, (uint32_t)LD2_GPIO_Port, (uint16_t)LD2_Pin);
+
 	//--- initialize interrupts
 	Interrputs_Init();
-	//--- initialize Moteurs
-	yMOTOR_Init(&Moteur_D);
 
 	osDelay(WaitInTk);
 	/* Infinite loop */
 	for(;;)
 	{
 
-		osDelay(pdMS_TO_TICKS(500));
+		osDelay(pdMS_TO_TICKS(503));
 
 		/* Suspend me */
 		//osThreadSuspend(tk_InitHandle);
@@ -463,46 +465,45 @@ void tk_CheckVR_Fnc(void *argument)
 		osDelay(pdMS_TO_TICKS(WaitInTk));
 	}
 	//-- start & init task
-	snprintf(aTxBuffer, 1024, DECRC "\n tk_CheckVR\t initialised" DECSC);
+	snprintf(aTxBuffer, 50, DECRC "\n tk_CheckVR\t initialised" DECSC);
 	osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
 	HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 	osSemaphoreRelease(semUARTHandle);
 
 	TkToStart++;
 	/* cree objets entree analog */
-	yANALOG_Init(&VRx);
-	VRx.Trim = 6.30;
-	yANALOG_Init(&VRy);
-	VRy.Trim = 3.90;
+//	yANALOG_Init(&VRx);
+//	VRx.Trim = 6.30;
+//	yANALOG_Init(&VRy);
+//	VRy.Trim = 3.90;
 	static uint8_t i = 0, j = 0;
 
 	//-- attendre les autres taches
 	while (TkToStart != TkAll) {		//wait here!
 		osDelay(pdMS_TO_TICKS(WaitInTk));
 	}
-	//	osDelay(pdMS_TO_TICKS(WaitInTk));
 	/* Infinite loop */
 	for(;;)
 	{
-		osDelay(pdMS_TO_TICKS(250));
+		osDelay(pdMS_TO_TICKS(251));
 		yANALOG_CalulerPV(&VRx);
 		if (yANALOG_Variation(&VRx) != 0U) {
-			VTbuffer.src = SrcVRx;
 			snprintf(VTbuffer.VTbuff, 50, CUP(13,50) "--VRx  : %d", i++);
 			osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);	//envoi vers task afficahge
+
+			yEvent_t yEvent = {.Topic = VRX, .PayLoadF = VRx.PV, .PayloadI = 0};
+			osMessageQueuePut(qEventsHandle, &yEvent, 0U, portMAX_DELAY);
 		}
 
 		yANALOG_CalulerPV(&VRy);
 		if (yANALOG_Variation(&VRy) != 0U) {
-			VTbuffer.src = SrcVRy;
 			snprintf(VTbuffer.VTbuff, 50, CUP(14,50) "--VRy  : %d", j++);
 			osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY); //envoi vers task afficahge
 
-			yEvent_t Event = {.Src = SrcVRx, .Topic = VR_PV, .PayLoadF = VRx.PV, .PayloadI = 0};
-			osMessageQueuePut(qEventsHandle, &Event, 0U, portMAX_DELAY);
+			yEvent_t yEvent = {.Topic = VRY, .PayLoadF = VRy.PV, .PayloadI = 0};
+			osMessageQueuePut(qEventsHandle, &yEvent, 0U, portMAX_DELAY);
 		}
 
-		VTbuffer.src = SrcVRxy;
 		snprintf(VTbuffer.VTbuff, 50, CUP(12,50) "--VR   : %6.2f \t %6.2f", VRx.PV, VRy.PV);	// 'IMPRECISERR' corrigé par modif syscall.c & .ld (v1.3)
 		osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);	//envoi vers task afficahge
 
@@ -532,19 +533,52 @@ void tk_Process_Fnc(void *argument)
 	HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 	osSemaphoreRelease(semUARTHandle);
 
-	osDelay(pdMS_TO_TICKS(WaitInTk));
 	TkToStart++;
+	osDelay(pdMS_TO_TICKS(WaitInTk));
 	/* Infinite loop */
 	for(;;)
 	{
-		//osDelay(pdMS_TO_TICKS(500));
 		/* wait for message in queue */
 		status = osMessageQueueGet(qEventsHandle, &EvtRecu, NULL, portMAX_DELAY);
 		if (status == osOK) {
-			//snprintf(aTxBuffer, 512, DECRC "%s" ERASELINE, BuffAff.VTbuff);
-			//snprintf(aTxBuffer, 512, DECRC "%s", BuffAff.VTbuff);
+			//-- tracer l'event recu
+			snprintf(VTbuffer.VTbuff, 100, DECRC "\tEventRec: %d %6.2f %d" ERASELINE,
+					EvtRecu.Topic, EvtRecu.PayLoadF, EvtRecu.PayloadI);
+			osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
+
+			switch (EvtRecu.Topic) {
+			case BP1:
+				snprintf(VTbuffer.VTbuff, 50, CUP(9,50) "--(tk_Proc) BP1 Interrupt");
+				osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
+				//-- action?
+				break;
+			case SWXY:
+				snprintf(VTbuffer.VTbuff, 50, CUP(10,50) "--(tk_Proc) Swxy Interrupt");
+				osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
+				//-- request moteur Run
+				(Moteur_D.Run == 1U) ? (yMOTOR_MarArr(&Moteur_D, yARRET)) : (yMOTOR_MarArr(&Moteur_D, yMARCHE));
+				break;
+			case Kbd:
+				//-- request moteur Run
+				Moteur_D.Run = EvtRecu.PayloadI;
+				break;
+			case VRX:	//direction
+				//-- action ?
+				break;
+			case VRY:	//Vitesse
+				//-- request moteur consigne vitesse
+				Moteur_D.Speed_SP = EvtRecu.PayLoadF;
+				break;
+			default:
+				snprintf(VTbuffer.VTbuff, 50, DECRC "\ttk_Process: unknow event" ERASELINE);
+				osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
+				break;
+			}	// switch EvtRecu
 		} else {
 			snprintf(aTxBuffer, 512, DECRC "Queue empty" DECRC);
+			osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
+			HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+			osSemaphoreRelease(semUARTHandle);
 		}
 	}
   /* USER CODE END tk_Process_Fnc */
@@ -573,8 +607,8 @@ void tk_VTaffiche_Fnc(void *argument)
 	HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 	osSemaphoreRelease(semUARTHandle);
 
-	osDelay(pdMS_TO_TICKS(WaitInTk));
 	TkToStart++;
+	osDelay(pdMS_TO_TICKS(WaitInTk));
 	/* Infinite loop */
 	for(;;)
 	{
@@ -586,7 +620,7 @@ void tk_VTaffiche_Fnc(void *argument)
 		} else {
 			snprintf(aTxBuffer, 512, DECRC "Queue empty" DECRC);
 		}
-		//yDOC: ici il faut bien ecrire via l'UART!!!
+		//ici il faut bien ecrire via l'UART!!!
 		osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);
 		HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 		osSemaphoreRelease(semUARTHandle);

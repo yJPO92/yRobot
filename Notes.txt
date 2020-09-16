@@ -1,5 +1,9 @@
 *** yRobot ***
 
+
+le 14/08/2020: v2.1a (mx 5.3): BP1, SWxy, VRx_PV, VRy_PV, Kbd touch ==> yEvent vers tk_Process.
+                msg de ces events par tk_process => tk_VTaffiche via queue
+                suppresion enum 'yDestination'. suppression 'Src' de yEvent_t
 le 08/08/2020: v2.0 (mx 5.3): ebauche yMOTOR, debug ds tk_default, commandes ds yMenu
 le 08/09/2020: v1.7 (mx 5.3): envoi events vers tk_Process qui vide la queue
                 ajout timer 250ms pour check virtual CubeMonitor kbd.
@@ -14,7 +18,7 @@ le 30/08/2020: v1.1a: clearstatusbar by VT_affiche task
 le 30/08/2020: ADC1 cadencé par TIM1 (il faut etre en 'Discontinuous Conversion Mode')
 le 29/08/2020: regrouper les interrupts & callbacks ds un .c
                 add get touche ds structure yMENU_t
-le 27/08/2020: creation à partie de NewCpp.
+le 27/08/2020: creation à partir de NewCpp.
                 purge git, qq search/replace.
                 commit en v1.0
 ----------------

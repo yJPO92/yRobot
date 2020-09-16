@@ -35,8 +35,10 @@ extern TIM_HandleTypeDef htim1;
 extern osTimerId_t t1sHandle;
 extern osTimerId_t t250msHandle;
 extern osMessageQueueId_t qVTafficheHandle;
+extern osMessageQueueId_t qEventsHandle;
 
 extern yVTbuff_t VTbuffer;
+extern yEvent_t yEvent;
 extern yMENU_t mnuSTM;
 extern uint32_t adcbuf[];
 extern yANALOG VRx, VRy;
@@ -56,7 +58,7 @@ void Interrputs_Init(void) {
 	HAL_TIM_Base_Start(&htim1);
 	//--- timers set period & start
 	osTimerStart(t1sHandle, pdMS_TO_TICKS(1000));
-	osTimerStart(t250msHandle, pdMS_TO_TICKS(250));
+	osTimerStart(t250msHandle, pdMS_TO_TICKS(241));
 	return;
 }
 
@@ -69,24 +71,21 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	/** PC13 GPIO_EXTI15_10 (B1 blue button) */
 	if(GPIO_Pin == B1_Pin) {
-		snprintf(mnuSTM.Buffer, 1024, CUP(9,50) "--BP1 Interrupt");
-		osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
-		HAL_UART_Transmit(&huart2,(uint8_t *) mnuSTM.Buffer, strlen(mnuSTM.Buffer), 5000);
-		osSemaphoreRelease(semUARTHandle);
+		yEvent_t yEvent = {.Topic = BP1, .PayLoadF = 0.0, .PayloadI = 1U};
+		osMessageQueuePut(qEventsHandle, &yEvent, 0U, 0U);
+
 		//MU flag detection interrupt, traitement ds le while du main
 		//BP1Detected = 1;
 	}
 
 	/** PB2	GPIO_EXTI2	(Joystick button) */
 	if(GPIO_Pin == SWxy_Pin) {
-		snprintf(mnuSTM.Buffer, 1024, CUP(10,50) "--Swxy Interrupt");
-		osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
-		HAL_UART_Transmit(&huart2,(uint8_t *) mnuSTM.Buffer, strlen(mnuSTM.Buffer), 5000);
-		osSemaphoreRelease(semUARTHandle);
+		yEvent_t yEvent = {.Topic = SWXY, .PayLoadF = 0.0, .PayloadI = 1U};
+		osMessageQueuePut(qEventsHandle, &yEvent, 0U, 0U);
 	}
 
 	/** autre entree interrupt */
-}
+} //callback gpio
 
 /*
  * USARTs callback
@@ -100,13 +99,13 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 		// interruption qd le nb de caracteres recu est correct
 //		yMenuGetTouche(aRxBuffer);
 		mnuSTM.GetTouche(&mnuSTM);
-		osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
+		osSemaphoreAcquire(semUARTHandle, 0U);  //timeout 0 if from ISR, else portmax
 		HAL_UART_Transmit(&huart2,(uint8_t *) mnuSTM.Buffer, strlen(mnuSTM.Buffer), 5000);
 		osSemaphoreRelease(semUARTHandle);
-		//TODO: afficher le nvx choix
+		// afficher le nvx choix ??
 	} //if usart2
 	/** manage an other usart if any! */
-}	//callback
+}	//callback uart
 
 
 /* interrupt methode (via callback function)
@@ -125,12 +124,11 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
 		VRx.Raw = adcbuf[0];
 		VRy.Raw = adcbuf[1];
 
-		VTbuffer.src = SrcVRxy;
 		snprintf(VTbuffer.VTbuff, 50, CUP(11,50) "--ADC1 : %4d \t %4d", (int)VRx.Raw, (int)VRy.Raw);
 		osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, 0U);	//envoi vers task afficahge
 
 	}
-}
+} //callback ADC
 
 /**
   * @brief  Alarm A callback.
@@ -145,7 +143,7 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 	HAL_UART_Transmit(&huart2,(uint8_t *) mnuSTM.Buffer, strlen(mnuSTM.Buffer), 5000);
 	osSemaphoreRelease(semUARTHandle);
 	RTC_AlarmA_flag = 1;
-}
+} //callback rtc alarm
 
 /* t1s_Callback function */
 /*
@@ -157,20 +155,18 @@ void t1s_Callback(void *argument)
 {
   /* USER CODE BEGIN t1s_Callback */
 	//debug/test timer
-	//VTbuffer.src = SrcNone;
 	//snprintf(VTbuffer.VTbuff, 50, DECRC "\t--FreeRTOS timer 1s");
 	//osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);	//envoi vers task afficahge
 	//--- gestion menu STM32Monitor
 //	if (aRxBuffer[0] != aRxBuffer[2]) {
 //		mnuSTM.GetTouche(&mnuSTM);		//utilise aRxBuffer
-//		VTbuffer.src = SrcNone;
 //		snprintf(VTbuffer.VTbuff, 50, DECRC "%s", mnuSTM.Buffer);
 //		osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);	//envoi vers task afficahge
 //		aRxBuffer[2] = aRxBuffer[0];		//memoriser la cde pour ne l'appliquer qu'une seule fois!
 //	}
 
 	/* toggle LD2 */
-	HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+	//HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
   /* USER CODE END t1s_Callback */
 }
 
@@ -181,7 +177,6 @@ void t250ms_Callback(void *argument)
 	/* gestion menu STM32Monitor - check CubeMonitor VT100 emulation Keyboard */
 	if (aRxBuffer[0] != aRxBuffer[2]) {
 		mnuSTM.GetTouche(&mnuSTM);		//utilise aRxBuffer
-		VTbuffer.src = SrcNone;
 		snprintf(VTbuffer.VTbuff, 50, DECRC "%s", mnuSTM.Buffer);
 		osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);	//envoi vers task afficahge
 		aRxBuffer[2] = aRxBuffer[0];		//memoriser la cde pour ne l'appliquer qu'une seule fois!

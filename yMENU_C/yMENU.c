@@ -23,9 +23,13 @@
  *******************************************************************************
  */
 
-#include "yMENU.h"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "cmsis_os.h"
 #include "main.h"
+#include "yMENU.h"
 #include "VT100.h"
+#include "yTask.h"
 
 
 //----- pour STM32CubeMonitor
@@ -36,6 +40,8 @@
 extern uint8_t aRxBuffer[3];		//buffer de reception
 extern uint16_t uart2NbCar;			//nb de byte attendu
 extern char tmpBuffer[10];		    //buffer temporary pour switch/case
+extern yEvent_t yEvent;				//queue des events
+extern osMessageQueueId_t qEventsHandle;
 
 /*--------------------------------------
  * Fonctions/methode applicables au Menu
@@ -73,6 +79,8 @@ void Infos_fnc(struct yMENU_t *self) {
 */
 void GetTouche_fnc(struct yMENU_t *self) {
 	//TODO: menu get touche, mettre un flag cde erronée!!
+//	extern yEvent_t yEvent;				//queue des events
+//	extern osMessageQueueId_t qEventsHandle;
 	if(uart2NbCar == 1) {		/* on attend 1 seule touche */
 		switch (aRxBuffer[0]) {
 		case 'R': case 'r':		/* ???? */
@@ -100,14 +108,18 @@ void GetTouche_fnc(struct yMENU_t *self) {
 			break;
 
 		case 'A': case 'a':		/* yMOTOR arret */
-			yMOTOR_MarArr(&Moteur_D, yARRET);
-			Moteur_D.Speed_SP =0.0;
+			{
+			yEvent_t yEvent = {.Topic = Kbd, .PayloadI = 0U};
+			osMessageQueuePut(qEventsHandle, &yEvent, 0U, 0U);
 			break;
+			}
 
-		case 'B': case 'b':		/* yMOTOR start/speed 0.0 */
-			yMOTOR_MarArr(&Moteur_D, yMARCHE);
-			yMOTOR_Speed(&Moteur_D, 0.0);
+		case 'B': case 'b':		/* yMOTOR start */
+			{
+			yEvent_t yEvent = {.Topic= Kbd, .PayloadI= 1U};
+			osMessageQueuePut(qEventsHandle, &yEvent, 0U, 0U);
 			break;
+			}
 
 		case 'D': case 'd':		/* yMOTOR speed pos */
 			yMOTOR_Speed(&Moteur_D, 15.5);
@@ -118,7 +130,7 @@ void GetTouche_fnc(struct yMENU_t *self) {
 			break;
 
 		case 'F': case 'f':		/* yMOTOR ??? */
-			yMOTOR_Speed(&Moteur_D, VRx.PV);
+			yMOTOR_Speed(&Moteur_D, VRy.PV);
 			break;
 
 		case 'h': case 'H':		/* affiche cadre pour horloge */

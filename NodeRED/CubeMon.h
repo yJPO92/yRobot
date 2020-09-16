@@ -48,9 +48,10 @@
  float ymx_VRy_trim  __attribute__((section(".myvars"))) = 0.0;
 
  //et en 'extern" necessary variable
+ extern uint32_t adcbuf[2];
+
  extern yANALOG VRx;
  extern yANALOG VRy;
- extern uint32_t adcbuf[2];
  extern yMOTOR Moteur_D;
 
  #else		//for others .c
@@ -68,11 +69,11 @@
  extern uint8_t ymx_VRy_Ro;
  extern float ymx_VRy_trim;
 
-  extern uint32_t adcbuf[2];
+ extern uint32_t adcbuf[2];
 
-extern yANALOG VRx;
-extern yANALOG VRy;
-extern yMOTOR Moteur_D;
+ extern yANALOG VRx;
+ extern yANALOG VRy;
+ extern yMOTOR Moteur_D;
 
 #endif
 

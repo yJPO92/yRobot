@@ -36,9 +36,9 @@
 // valeurs par defaut
 #define DEFAULT_ECH_MIN -100.0    	// Mini scale
 #define DEFAULT_ECH_MAX 100.0    	// Maxi scale
-#define DEFAULT_COEF_FILTRAGE 0.8	// 1.0=no filtre, 0.0=retard d'un sample
+#define DEFAULT_COEF_FILTRAGE 0.9	// 1.0=no filtre, 0.0=retard d'un sample
 #define DEFAULT_TRIM 0.0			// Correction
-#define DEFAULT_HYSTERESIS 15.0		// hysteresis
+#define DEFAULT_HYSTERESIS 5.0		// hysteresis
  
 /*
  * Structure d'une entrée analogique
