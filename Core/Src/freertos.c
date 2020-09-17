@@ -407,6 +407,7 @@ void tk_Init_Fnc(void *argument)
 	HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 	osSemaphoreRelease(semUARTHandle);
 
+
 	/* Initialize menu structure & Message de Bienvenue*/
 	mnuSTM.Init =Init_fnc;	//assigne function
 	mnuSTM.Init(&mnuSTM);	//initialize structure
@@ -460,23 +461,19 @@ void tk_Init_Fnc(void *argument)
 void tk_CheckVR_Fnc(void *argument)
 {
   /* USER CODE BEGIN tk_CheckVR_Fnc */
+	static uint8_t i = 0, j = 0;
+
 	//-- Is it to me to start?
 	while (TkToStart != TkCheckVR) {
 		osDelay(pdMS_TO_TICKS(WaitInTk));
 	}
-	//-- start & init task
+
 	snprintf(aTxBuffer, 50, DECRC "\n tk_CheckVR\t initialised" DECSC);
 	osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
 	HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 	osSemaphoreRelease(semUARTHandle);
 
 	TkToStart++;
-	/* cree objets entree analog */
-//	yANALOG_Init(&VRx);
-//	VRx.Trim = 6.30;
-//	yANALOG_Init(&VRy);
-//	VRy.Trim = 3.90;
-	static uint8_t i = 0, j = 0;
 
 	//-- attendre les autres taches
 	while (TkToStart != TkAll) {		//wait here!
@@ -609,6 +606,7 @@ void tk_VTaffiche_Fnc(void *argument)
 
 	TkToStart++;
 	osDelay(pdMS_TO_TICKS(WaitInTk));
+	osDelay(pdMS_TO_TICKS(2000));	//temps de voir l'affichage
 	/* Infinite loop */
 	for(;;)
 	{

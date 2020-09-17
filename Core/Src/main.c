@@ -146,8 +146,6 @@ int main(void)
   MX_ADC1_Init();
   MX_RTC_Init();
   MX_TIM1_Init();
-  MX_TIM2_Init();
-  MX_TIM7_Init();
 
   /* Initialize interrupts */
   MX_NVIC_Init();

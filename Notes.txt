@@ -1,6 +1,6 @@
 *** yRobot ***
 
-
+le 17/09/2020: v2.2 (mx 5.4): supprimer TIM2 & TIM7 non utilisés, preferer rtos timers.
 le 14/08/2020: v2.1a (mx 5.3): BP1, SWxy, VRx_PV, VRy_PV, Kbd touch ==> yEvent vers tk_Process.
                 msg de ces events par tk_process => tk_VTaffiche via queue
                 suppresion enum 'yDestination'. suppression 'Src' de yEvent_t
