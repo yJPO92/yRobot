@@ -1,5 +1,9 @@
 *** yRobot ***
 
+le 19/09/2020: v2.3b (mx 5.5): modif yANALOG => PV abs et sens
+le 17/09/2020: v2.3 (mx 5.5): ajout MotD_pwm en PB7 (PWM4/2)
+                test adcbuf[0] (VRx) avec une Led et l'oscillo.
+                tests OK ==> yRobot_PWM-jpg.7z
 le 17/09/2020: v2.2 (mx 5.4): supprimer TIM2 & TIM7 non utilisés, preferer rtos timers.
 le 14/08/2020: v2.1a (mx 5.3): BP1, SWxy, VRx_PV, VRy_PV, Kbd touch ==> yEvent vers tk_Process.
                 msg de ces events par tk_process => tk_VTaffiche via queue

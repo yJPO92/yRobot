@@ -24,7 +24,6 @@ typedef struct {
 } yEvent_t;
 
 /* Define structure to pass texte to display via VTdisplay */
-//yDOC: objet d'échange vers la task d'affichage
 typedef struct {
 	int src;			// identifier l'emetteur
 	char VTbuff[200];	// buffer a afficher

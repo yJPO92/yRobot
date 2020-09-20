@@ -21,7 +21,7 @@
  * v4.0 migration to C
  * v4.1 some update (no deadband on raw)
  * v4.2 check hysteresis & .Ro
- * v5.2 affinage menu
+ * v4.3 abs de PV et sens
  *******************************************************************************
  * @date    Fev-2017, Juil-2020, aout-2020, sept-2020
  *******************************************************************************
@@ -47,6 +47,8 @@ void yANALOG_Init(yANALOG* this){
 	this->PVmemo = 0.0;
 	this->PVhyst = 0.0;
 	this->PV = 0.0;
+	this->PVa = 0.0;
+	this->sens = 0;		//indeterminé
 	/* A = (MAXscale - MINscale) / (MAXpoint - MINpoint)
 	 * B = MAXscale-(A * MAXpoint) */
 	this->A = (this->Ech_Maxi - this->Ech_Mini) / 4096.0;
@@ -57,7 +59,7 @@ void yANALOG_Init(yANALOG* this){
 
 
 /** Executer entree ana
- * sur ordre lorsque Ri change
+ * sur ordre ou lorsque Ri change
  */
 void yANALOG_Exec(yANALOG* this)
 {
@@ -92,11 +94,21 @@ void yANALOG_CalulerPV(yANALOG* this)
 	//mesure filtree y(n) = Coef * x(n) + (1 - Coef) * y(n-1)
 	this->PV = (this->Coef_Filtre * this->PV) + (this->UnMoinsCoef * this->PVmemo);
 	this->PVmemo = this->PV; //memoriser valeur precedente
+
+	//extraire valeur absolue et sens
+	if (this->PV >= 0.0) {
+		this->PVa = this->PV;
+		this->sens = 1;
+	} else {
+		this->PVa = -(this->PV);
+		this->sens = -1;
+	}
 }
 
 /* check variation around hysteresis */
 uint8_t yANALOG_Variation(yANALOG* this)
 {
+	//TODO verifier Ro
 	static float tmp;
 	tmp = this->PV - this->PVhyst;
 	(tmp >= 0) ? (tmp = tmp) : (tmp = -tmp);	//abs!
@@ -110,6 +122,7 @@ uint8_t yANALOG_Variation(yANALOG* this)
 }
 
 ///** Changer le coefficient de filtrage */
+//TODO maj filtrage
 //void yANALOG_FLT::majFiltre(float Coef_Filtre)
 //{
 //    this->m_Coef_Filtre = Coef_Filtre;   // filtre

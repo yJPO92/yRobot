@@ -2,7 +2,7 @@
  *******************************************************************************
  * @file    yANALOG.h
  * @brief   Entree analogique elaboree et filtree
- * @version 4.2
+ * @version 4.3
  * @author  Jean92
  * @note    pour formatter une entree analogique\n
  *          lecture DMA via ADC\n
@@ -21,6 +21,7 @@
  * v4.0 migration to C
  * v4.1 some update (no deadband on raw)
  * v4.2 check hysteresis & .Ro
+ * v4.3 abs de PV et sens
  *******************************************************************************
  * @date    Fev-2017, Juil-2020, aout-2020, sept-2020
  *******************************************************************************
@@ -38,7 +39,7 @@
 #define DEFAULT_ECH_MAX 100.0    	// Maxi scale
 #define DEFAULT_COEF_FILTRAGE 0.9	// 1.0=no filtre, 0.0=retard d'un sample
 #define DEFAULT_TRIM 0.0			// Correction
-#define DEFAULT_HYSTERESIS 5.0		// hysteresis
+#define DEFAULT_HYSTERESIS 1.0		// hysteresis
  
 /*
  * Structure d'une entrée analogique
@@ -46,6 +47,8 @@
 typedef struct {
 	uint32_t	Raw;		// 0-4095 points
 	float		PV;			// Process Value
+	float		PVa;		// abs(PV)
+	int8_t		sens;		// (-1) PV neg, (0) indeterminé, (+1) PV pos.
 	float		PVmemo;		// valeur precedente
 	float		Ech_Mini;	// for scaling
 	float		Ech_Maxi;

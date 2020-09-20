@@ -28,7 +28,7 @@
 /* USER CODE BEGIN Includes */     
 #include <stdio.h>
 #include <string.h>
-//#include <math.h>
+#include <math.h>
 #include "rtc.h"
 #include "yTask.h"
 #include "VT100.h"
@@ -78,6 +78,7 @@ extern UART_HandleTypeDef huart2;
 extern ADC_HandleTypeDef hadc1;
 extern DMA_HandleTypeDef hdma_adc1;
 extern TIM_HandleTypeDef htim1;
+extern TIM_HandleTypeDef htim4;
 
 yMENU_t mnuSTM;		// pour Menu VT100
 yANALOG VRx, VRy;	// pour Joystick
@@ -331,6 +332,13 @@ void StartDefaultTask(void *argument)
 	HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 	osSemaphoreRelease(semUARTHandle);
 
+    /* Start PWM signals generation TIM4 channel 2 */
+    if (HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_2) != HAL_OK)
+    {
+    	Error_Handler();	//PWM Generation Error
+    }
+    htim4.Instance->CCR2 = 10;
+
 	TkToStart++;
 	osDelay(pdMS_TO_TICKS(WaitInTk));
 	//osThreadTerminate(defaultTaskHandle);
@@ -365,6 +373,14 @@ void StartDefaultTask(void *argument)
 		//--- get/set data for STM32CubeMonitor
 		yCopy2CubeMonitor(1U);		//set data
 		yCopy2CubeMonitor(0U);		//get data
+
+		//--- check PWM
+		uint32_t yccr2 = (uint32_t) (adcbuf[0] * 100 / 4096);
+		//uint32_t yccr2 = VRx.PVa;
+		snprintf(VTbuffer.VTbuff, 50, CUP(18,50) "--pwm %d  ", (int)yccr2);
+		osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);	//envoi vers task afficahge
+
+	    htim4.Instance->CCR2 = yccr2;
 
 	}
   /* USER CODE END StartDefaultTask */
@@ -483,6 +499,7 @@ void tk_CheckVR_Fnc(void *argument)
 	for(;;)
 	{
 		osDelay(pdMS_TO_TICKS(251));
+		//--- VRx (direction)
 		yANALOG_CalulerPV(&VRx);
 		if (yANALOG_Variation(&VRx) != 0U) {
 			snprintf(VTbuffer.VTbuff, 50, CUP(13,50) "--VRx  : %d", i++);
@@ -492,6 +509,7 @@ void tk_CheckVR_Fnc(void *argument)
 			osMessageQueuePut(qEventsHandle, &yEvent, 0U, portMAX_DELAY);
 		}
 
+		//--- VRy (vitesse)
 		yANALOG_CalulerPV(&VRy);
 		if (yANALOG_Variation(&VRy) != 0U) {
 			snprintf(VTbuffer.VTbuff, 50, CUP(14,50) "--VRy  : %d", j++);
@@ -501,7 +519,9 @@ void tk_CheckVR_Fnc(void *argument)
 			osMessageQueuePut(qEventsHandle, &yEvent, 0U, portMAX_DELAY);
 		}
 
-		snprintf(VTbuffer.VTbuff, 50, CUP(12,50) "--VR   : %6.2f \t %6.2f", VRx.PV, VRy.PV);	// 'IMPRECISERR' corrigé par modif syscall.c & .ld (v1.3)
+		//snprintf(VTbuffer.VTbuff, 50, CUP(12,50) "--VR   : %6.2f \t %6.2f", VRx.PV, VRy.PV);	// 'IMPRECISERR' corrigé par modif syscall.c & .ld (v1.3)
+		snprintf(VTbuffer.VTbuff, 50, CUP(12,50) "--VR   : (%d) %6.2f \t (%d) %6.2f",
+														VRx.sens, VRx.PVa, VRy.sens, VRy.PVa);	// 'IMPRECISERR' corrigé par modif syscall.c & .ld (v1.3)
 		osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);	//envoi vers task afficahge
 
 	}

@@ -22,7 +22,6 @@
 !.project
 !.cproject
 !.mxproject
-!flows.json
 
 # MCU particular files
 # ld modifie pour adresse fixes
@@ -37,14 +36,15 @@
 /Middlewares/
 /Drivers/
 
-# project specifics files (personnal notes & debug helper)
-*.txt
+# project specifics files (personnal notes & debug helper & node-RED)
+#*.txt
 *.log
 *.png
 *.bat
 
 #mais garder
 !Notes.txt
+!flows.json
 !*.pdf
 
 # me versionner moi-meme
