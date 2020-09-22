@@ -40,13 +40,16 @@
 //}
 
 /** Initialisation de la structure Motor */
-void yMOTOR_Init(yMOTOR* this, uint32_t gpioPort, uint16_t gpioPin) {
+void yMOTOR_Init(yMOTOR* this,
+		uint32_t gpioPortIN1, uint16_t gpioPinIN1,
+		uint32_t gpioPortIN2, uint16_t gpioPinIN2,
+		TIM_HandleTypeDef htimpwm) {
 	//--- Inputs
 	this->MarArr = 0;
 	this->Speed_SP = 0.0;
 	//--- Outputs
-	this->Run = 0;
-	this->Speed_MV = 0.0;
+	this->inRun = 0;
+	this->Speed_MV = 0;
 	this->Velocity = 0.0;
 	//--- Paramters
 	this->Period = PERIODE_DEFAULT;
@@ -56,24 +59,23 @@ void yMOTOR_Init(yMOTOR* this, uint32_t gpioPort, uint16_t gpioPin) {
 	this->Run_memo = 0;
 	this->DB_memo = DEADBAND_DEFAULT;
 	//--- Real outputs
-	this->_gpioPort = gpioPort;
-	this->_gpioPin = gpioPin;
-//    PwmOut _pwm;
-//    DigitalOut _av;
-//    DigitalOut _ar;
-
+    this->_gpioPortIN1 = gpioPortIN1;
+    this->_gpioPinIN1 = gpioPinIN1;
+    this->_gpioPortIN2 = gpioPortIN2;
+    this->_gpioPinIN2 = gpioPinIN2;
+    this->_htimpwm= htimpwm;
 }
 
 /** Marche/Arret request */
 void yMOTOR_MarArr(yMOTOR* this, uint8_t mararr) {
     if (mararr == yMARCHE) {
-        this->Run = 1;        	// état 'enMarche'
+        this->inRun = 1;        	// état 'enMarche'
         //Speed(this->m_speed);   // appliquer la vitesse demandée
     }
     else if (mararr == yARRET) {
         //_ar = 0;                // mettre les 2 cdes a zero
         //_av = 0;                // ==> arret rotation
-        this->Run = 0;        	// état 'enArret'
+        this->inRun = 0;        	// état 'enArret'
 
     }
 }
@@ -86,7 +88,23 @@ void yMOTOR_Speed(yMOTOR* this, float speed) {
 
 /* calcul moteur */
 void yMOTOR_Exec(yMOTOR* this) {
-	HAL_GPIO_WritePin(this->_gpioPort, this->_gpioPin, this->Run);
+	if (this->inRun == 1) {
+		HAL_GPIO_WritePin(this->_gpioPortIN1, this->_gpioPinIN1, GPIO_PIN_SET);
+		//HAL_GPIO_WritePin(MotDin1_GPIO_Port, MotDin1_Pin, GPIO_PIN_SET);
+
+		HAL_GPIO_WritePin(this->_gpioPortIN2, this->_gpioPinIN2, GPIO_PIN_RESET);	//????
+
+		//HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);					//ok
+	} else {
+		HAL_GPIO_WritePin(this->_gpioPortIN1, this->_gpioPinIN1, GPIO_PIN_RESET);
+		//HAL_GPIO_WritePin(MotDin1_GPIO_Port, MotDin1_Pin, GPIO_PIN_RESET);			//????
+
+		HAL_GPIO_WritePin(this->_gpioPortIN2, this->_gpioPinIN2, GPIO_PIN_SET);
+
+		//HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);					//ok
+	}
+
+	this->_htimpwm.Instance->CCR2 = this->Speed_MV;
 }
 
 ///** Traiter le changement de vitesse */

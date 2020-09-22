@@ -25,6 +25,7 @@
 #define _yMOTOR_H
 
 #include <sys/types.h>			//definir types mcu like uint32_t
+#include "tim.h"
 
 #define yARRET 0
 #define yMARCHE 1
@@ -60,22 +61,26 @@ typedef struct {
 	uint8_t MarArr;		// Marche/Arret request
 	float Speed_SP;		// Vitesse request
 	//--- Outputs
-	uint8_t Run;		// Etat marche (running state)
-    float Speed_MV;		// commande vitesse vers sortie
+	uint8_t inRun;		// Etat marche (running state)
+    uint32_t Speed_MV;	// commande vitesse vers sortie
 	float Velocity;		// Vitesse effective
 	//--- Paramters
 	float Period;		// PWM duty cycle periode in seconde
 	float DeadBand;		// dead band (around 0.0 not action)
 	//--- memories
-    float Speed_memo;	//spedd memory
+    float Speed_memo;	//speed memory
     uint8_t Run_memo;	//running memory
     float DB_memo;		//deadband
+    //--- Virtual outputs
+    uint32_t _pwm;		//pour htim.instance.CCR2
+    uint8_t _av;		//marche avant/stop
+    uint8_t _ar;		//marche arrier/stop
 	//--- Real outputs
-    uint32_t _gpioPort;
-    uint16_t _gpioPin;
-//    PwmOut _pwm;
-//    DigitalOut _av;
-//    DigitalOut _ar;
+    uint32_t _gpioPortIN1;
+    uint16_t _gpioPinIN1;
+    uint32_t _gpioPortIN2;
+    uint16_t _gpioPinIN2;
+    TIM_HandleTypeDef _htimpwm;
 } yMOTOR;
 
 /*------------------------
@@ -88,7 +93,10 @@ typedef struct {
  * @params gpioPort/Pin de ...
  * @retval status
 */
-void yMOTOR_Init(yMOTOR* this, uint32_t gpioPort, uint16_t gpioPin);
+void yMOTOR_Init(yMOTOR* this,
+			uint32_t gpioPortIN1, uint16_t gpioPinIN1,
+			uint32_t gpioPortIN2, uint16_t gpioPinIN2,
+			TIM_HandleTypeDef htimpwm);
 
 /*
  * @brief  Marche/Arret request

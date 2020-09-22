@@ -19,6 +19,14 @@
   */
 // ajout Free-RTOS v4.0
 // v2.0 ajout yMOTOR
+
+/*	H bridge  ---- MC33886 ----
+ *           IN1   IN2   D1   /D2
+ * Forward    H     L    0    pwm
+ * Reverse    L     H    0    pwm
+ * FreeLow    L     L    0    pwm
+ * FreeH      H     H    0    pwm
+ */
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
@@ -60,10 +68,14 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define yCubeMX "rtosV5.5"
+#define yCubeMX "rtosV5.6"
 #define B1_Pin GPIO_PIN_13
 #define B1_GPIO_Port GPIOC
 #define B1_EXTI_IRQn EXTI15_10_IRQn
+#define MotDin1_Pin GPIO_PIN_0
+#define MotDin1_GPIO_Port GPIOH
+#define MotDin2_Pin GPIO_PIN_1
+#define MotDin2_GPIO_Port GPIOH
 #define VRx_Pin GPIO_PIN_2
 #define VRx_GPIO_Port GPIOC
 #define VRy_Pin GPIO_PIN_3
@@ -87,7 +99,7 @@ void Error_Handler(void);
 #define MotDpwm_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 #define yPROG "*** yRobot ***"
-#define yVER  "V2.3b"
+#define yVER  "V2.4"
 #define yDATE "xx-Sept-2020"
 //#define yDBG_tk 1        //debug display on terminal (ou commenter ligne)
 

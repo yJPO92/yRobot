@@ -14,10 +14,13 @@ Cr&eacute;ation de l'appli.
 ## Fonctionnalit&eacute;es
 
 BP1 interrupt  
-Jostick VRx, VRy, SWxy  
+Jostick VRx, VRy, SWxy
+* VRx direction
+* VRy vitesse 
+* SWxy Marche/Arret 
 
 Menu VT100, display & envoie de commandes  
-STM32CubeMonitor 
+STM32CubeMonitor (Node-RED)
 
 ## Authors
 

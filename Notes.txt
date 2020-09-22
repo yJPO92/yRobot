@@ -1,5 +1,7 @@
 *** yRobot ***
 
+le 21/09/2020: v2.4 (mx 5.6): 3 gpio pour Moteur Droit (pwm, in1, in2)
+                !! PC14 & PC15 ne fonctionnent pas !! (cablés pour oscillateur 32k)
 le 19/09/2020: v2.3b (mx 5.5): modif yANALOG => PV abs et sens
 le 17/09/2020: v2.3 (mx 5.5): ajout MotD_pwm en PB7 (PWM4/2)
                 test adcbuf[0] (VRx) avec une Led et l'oscillo.
@@ -28,12 +30,12 @@ le 27/08/2020: creation à partir de NewCpp.
 ----------------
 MCU timers
 TIM1 500ms : to drive ADC1
-TIM2 250ms : reserve
-TIM7 500ms : reserve
+TIM4 ch2 : PWM Moteur_D (in pogress)
+TIM3 ch4 : PWM Moteur_G (future)
 
 FreeRTOS timers
-t1S     : LD2 flashing
-t250ms  : check virtual CubeMonitor kbd
+t1S     : reserve
+t250ms  : check virtual CubeMonitor & VT kbd
 ===================================================================================================
 le 26/08/2020: v5.0, en C, reécriture yMENU_C avec une structure equiv objet
                 affichage ok mais lourd!!!

@@ -367,7 +367,7 @@ void StartDefaultTask(void *argument)
 		//--- debug yMOTOR
 		yMOTOR_Exec(&Moteur_D);		//calculer le moteur
 		snprintf(VTbuffer.VTbuff, 50, CUP(17,50) "--Mot_D: run %d, speedSP %6.2f",
-											Moteur_D.Run, Moteur_D.Speed_SP);
+											Moteur_D.inRun, Moteur_D.Speed_SP);
 		osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);	//envoi vers task afficahge
 
 		//--- get/set data for STM32CubeMonitor
@@ -377,10 +377,11 @@ void StartDefaultTask(void *argument)
 		//--- check PWM
 		uint32_t yccr2 = (uint32_t) (adcbuf[0] * 100 / 4096);
 		//uint32_t yccr2 = VRx.PVa;
+		Moteur_D.Speed_MV = yccr2;
 		snprintf(VTbuffer.VTbuff, 50, CUP(18,50) "--pwm %d  ", (int)yccr2);
 		osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);	//envoi vers task afficahge
 
-	    htim4.Instance->CCR2 = yccr2;
+	    //htim4.Instance->CCR2 = yccr2;
 
 	}
   /* USER CODE END StartDefaultTask */
@@ -447,7 +448,10 @@ void tk_Init_Fnc(void *argument)
 	yANALOG_Init(&VRy);
 	VRy.Trim = 3.90;
 	//--- initialize Moteurs
-	yMOTOR_Init(&Moteur_D, (uint32_t)LD2_GPIO_Port, (uint16_t)LD2_Pin);
+	//yMOTOR_Init(&Moteur_D, (uint32_t)LD2_GPIO_Port, (uint16_t)LD2_Pin);
+	yMOTOR_Init(&Moteur_D, (uint32_t)MotDin1_GPIO_Port, (uint16_t)MotDin1_Pin,
+					  (uint32_t)MotDin2_GPIO_Port, (uint16_t)MotDin2_Pin, htim4);
+
 
 	//--- initialize interrupts
 	Interrputs_Init();
@@ -573,11 +577,12 @@ void tk_Process_Fnc(void *argument)
 				snprintf(VTbuffer.VTbuff, 50, CUP(10,50) "--(tk_Proc) Swxy Interrupt");
 				osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
 				//-- request moteur Run
-				(Moteur_D.Run == 1U) ? (yMOTOR_MarArr(&Moteur_D, yARRET)) : (yMOTOR_MarArr(&Moteur_D, yMARCHE));
+				(Moteur_D.inRun == 1U) ? (yMOTOR_MarArr(&Moteur_D, yARRET)) : (yMOTOR_MarArr(&Moteur_D, yMARCHE));
 				break;
 			case Kbd:
 				//-- request moteur Run
-				Moteur_D.Run = EvtRecu.PayloadI;
+				//Moteur_D.MarArr = EvtRecu.PayloadI;
+				yMOTOR_MarArr(&Moteur_D, EvtRecu.PayloadI);
 				break;
 			case VRX:	//direction
 				//-- action ?
