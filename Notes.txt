@@ -1,5 +1,8 @@
 *** yRobot ***
 
+le 22/09/2020: v2.5: retour sur branch 'master' yANALOG en float
+                l'essai en integer (ds branch 'integer') ne fonctionne pas
+                les tailles ram & flash sont identiques!
 le 21/09/2020: v2.4 (mx 5.6): 3 gpio pour Moteur Droit (pwm, in1, in2)
                 !! PC14 & PC15 ne fonctionnent pas !! (cablés pour oscillateur 32k)
 le 19/09/2020: v2.3b (mx 5.5): modif yANALOG => PV abs et sens
