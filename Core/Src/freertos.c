@@ -65,7 +65,7 @@ uint8_t aRxBuffer[3] __attribute__((section(".myvars")));		//buffer de reception
 char tmpBuffer[10];		    	//buffer temporaire pour switch/case
 //----- buffer DMA / ADC1
 uint32_t adcbuf[2];
-uint32_t adc1_value[2];
+//uint32_t adc1_value[2];	//TO CHECK: utile???
 
 uint8_t TkToStart = TkNone;		//pour scheduler le démarrage des taches
 uint16_t WaitInTk;

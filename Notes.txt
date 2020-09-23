@@ -1,5 +1,6 @@
 *** yRobot ***
 
+le 23/09/2020: v2.6 (mx 5.6): branch 'master' 
 le 22/09/2020: v2.5: retour sur branch 'master' yANALOG en float
                 l'essai en integer (ds branch 'integer') ne fonctionne pas
                 les tailles ram & flash sont identiques!

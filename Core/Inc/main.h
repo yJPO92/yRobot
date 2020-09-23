@@ -99,7 +99,7 @@ void Error_Handler(void);
 #define MotDpwm_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 #define yPROG "*** yRobot ***"
-#define yVER  "V2.5"
+#define yVER  "V2.6"
 #define yDATE "xx-Sept-2020"
 //#define yDBG_tk 1        //debug display on terminal (ou commenter ligne)
 

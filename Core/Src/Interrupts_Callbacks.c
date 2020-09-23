@@ -97,7 +97,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	/** USART2 - console interface */
 	if (huart->Instance == USART2) {
 		// interruption qd le nb de caracteres recu est correct
-//		yMenuGetTouche(aRxBuffer);
 		mnuSTM.GetTouche(&mnuSTM);
 		osSemaphoreAcquire(semUARTHandle, 0U);  //timeout 0 if from ISR, else portmax
 		HAL_UART_Transmit(&huart2,(uint8_t *) mnuSTM.Buffer, strlen(mnuSTM.Buffer), 5000);
@@ -115,11 +114,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
  */
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
 	if(hadc->Instance == ADC1) {
-		//debug
-		//snprintf(mnuSTM.Buffer, 1024, CUP(11,50) "--ADC1 : %4d \t %4d", (int)adcbuf[0], (int)adcbuf[1]);
-		//osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
-		//HAL_UART_Transmit(&huart2,(uint8_t *) mnuSTM.Buffer, strlen(mnuSTM.Buffer), 5000);
-		//osSemaphoreRelease(semUARTHandle);
 
 		VRx.Raw = adcbuf[0];
 		VRy.Raw = adcbuf[1];

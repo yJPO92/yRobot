@@ -85,14 +85,6 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-////----- buffer DMA / ADC1
-//#define ADCBUFSIZE	2
-//uint32_t adcbuf[ADCBUFSIZE];
-//uint32_t adc1_value[ADCBUFSIZE];
-////----- pour usart2, gestion interface sur console VT
-//char aTxBuffer[2048];		//buffer d'emission
-////uint16_t uart2NbCar = 1;	//nb de byte attendu
-//uint8_t aRxBuffer[3] __attribute__((section(".myvars")));		//buffer de reception at specific address
 
 
 /* USER CODE END PV */
@@ -117,9 +109,9 @@ static void MX_NVIC_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	ymx_VRx_trim = 2.0;
-	ymx_VRy_trim = 2.0;
-	ymx_Coef = 0.2;
+//	ymx_VRx_trim = 2.0;
+//	ymx_VRy_trim = 2.0;
+//	ymx_Coef = 0.2;
 
   /* USER CODE END 1 */
 
