@@ -111,7 +111,7 @@ int main(void)
   /* USER CODE BEGIN 1 */
 //	ymx_VRx_trim = 2.0;
 //	ymx_VRy_trim = 2.0;
-//	ymx_Coef = 0.2;
+//	ymx_Coef = 0.9;
 
   /* USER CODE END 1 */
 

@@ -365,9 +365,11 @@ void StartDefaultTask(void *argument)
 		}
 
 		//--- debug yMOTOR
-		yMOTOR_Exec(&Moteur_D);		//calculer le moteur
-		snprintf(VTbuffer.VTbuff, 50, CUP(17,50) "--Mot_D: run %d, speedSP %6.2f",
-											Moteur_D.inRun, Moteur_D.Speed_SP);
+		//--- trace via LD2
+		HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, Moteur_D.inRun);
+		//--- trace via VT
+		snprintf(VTbuffer.VTbuff, 60, CUP(17,50) "--Mot_D: run %d, speedSP %6.2f, speedMV %3ld",
+											Moteur_D.inRun, Moteur_D.Speed_SP, Moteur_D.Speed_MV);
 		osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);	//envoi vers task afficahge
 
 		//--- get/set data for STM32CubeMonitor
@@ -375,11 +377,11 @@ void StartDefaultTask(void *argument)
 		yCopy2CubeMonitor(0U);		//get data
 
 		//--- check PWM
-		uint32_t yccr2 = (uint32_t) (adcbuf[0] * 100 / 4096);
-		//uint32_t yccr2 = VRx.PVa;
-		Moteur_D.Speed_MV = yccr2;
-		snprintf(VTbuffer.VTbuff, 50, CUP(18,50) "--pwm %d  ", (int)yccr2);
-		osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);	//envoi vers task afficahge
+		//uint32_t yccr2 = (uint32_t) (adcbuf[1] * 100 / 4096);
+		//uint32_t yccr2 = VRy.PVa;
+		//Moteur_D.Speed_MV = yccr2;
+		//snprintf(VTbuffer.VTbuff, 50, CUP(18,50) "--pwm %d  ", (int)yccr2);
+		//osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);	//envoi vers task afficahge
 
 	    //htim4.Instance->CCR2 = yccr2;
 
@@ -442,13 +444,14 @@ void tk_Init_Fnc(void *argument)
 
 	//--- Mise a heure RTC
 	RTC_MiseAheure();
+
 	//--- initialize Joystick (direction & vitesse pour moteurs)
 	yANALOG_Init(&VRx);
-	VRx.Trim = 6.30;
+	yANALOG_SetTrimRaw(&VRx, 148);
 	yANALOG_Init(&VRy);
-	VRy.Trim = 3.90;
+	yANALOG_SetTrimRaw(&VRy, 101);
+
 	//--- initialize Moteurs
-	//yMOTOR_Init(&Moteur_D, (uint32_t)LD2_GPIO_Port, (uint16_t)LD2_Pin);
 	yMOTOR_Init(&Moteur_D, (uint32_t)MotDin1_GPIO_Port, (uint16_t)MotDin1_Pin,
 					  (uint32_t)MotDin2_GPIO_Port, (uint16_t)MotDin2_Pin, htim4);
 
@@ -460,7 +463,6 @@ void tk_Init_Fnc(void *argument)
 	/* Infinite loop */
 	for(;;)
 	{
-
 		osDelay(pdMS_TO_TICKS(503));
 
 		/* Suspend me */
@@ -523,7 +525,6 @@ void tk_CheckVR_Fnc(void *argument)
 			osMessageQueuePut(qEventsHandle, &yEvent, 0U, portMAX_DELAY);
 		}
 
-		//snprintf(VTbuffer.VTbuff, 50, CUP(12,50) "--VR   : %6.2f \t %6.2f", VRx.PV, VRy.PV);	// 'IMPRECISERR' corrigé par modif syscall.c & .ld (v1.3)
 		snprintf(VTbuffer.VTbuff, 50, CUP(12,50) "--VR   : (%d) %6.2f \t (%d) %6.2f",
 														VRx.sens, VRx.PVa, VRy.sens, VRy.PVa);	// 'IMPRECISERR' corrigé par modif syscall.c & .ld (v1.3)
 		osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);	//envoi vers task afficahge
@@ -576,20 +577,19 @@ void tk_Process_Fnc(void *argument)
 			case SWXY:
 				snprintf(VTbuffer.VTbuff, 50, CUP(10,50) "--(tk_Proc) Swxy Interrupt");
 				osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
-				//-- request moteur Run
+				//-- request moteur Run or not
 				(Moteur_D.inRun == 1U) ? (yMOTOR_MarArr(&Moteur_D, yARRET)) : (yMOTOR_MarArr(&Moteur_D, yMARCHE));
 				break;
 			case Kbd:
 				//-- request moteur Run
-				//Moteur_D.MarArr = EvtRecu.PayloadI;
 				yMOTOR_MarArr(&Moteur_D, EvtRecu.PayloadI);
 				break;
-			case VRX:	//direction
+			case VRX:	//Direction
 				//-- action ?
 				break;
 			case VRY:	//Vitesse
 				//-- request moteur consigne vitesse
-				Moteur_D.Speed_SP = EvtRecu.PayLoadF;
+				yMOTOR_Speed(&Moteur_D, EvtRecu.PayLoadF);
 				break;
 			default:
 				snprintf(VTbuffer.VTbuff, 50, DECRC "\ttk_Process: unknow event" ERASELINE);
@@ -604,53 +604,6 @@ void tk_Process_Fnc(void *argument)
 		}
 	}
   /* USER CODE END tk_Process_Fnc */
-}
-
-/* USER CODE BEGIN Header_tk_VTaffiche_Fnc */
-/**
- * @brief Function implementing the tk_VTaffiche thread.
- * @param argument: Not used
- * @retval None
- */
-//yDOC task 2 VT Affiche
-/* USER CODE END Header_tk_VTaffiche_Fnc */
-void tk_VTaffiche_Fnc(void *argument)
-{
-  /* USER CODE BEGIN tk_VTaffiche_Fnc */
-	yVTbuff_t BuffAff;
-	osStatus_t status;
-	//-- Is it to me to start?
-	while (TkToStart != TkVTaffiche) {
-		osDelay(pdMS_TO_TICKS(WaitInTk));
-	}
-
-	snprintf(aTxBuffer, 1024, DECRC "\n tk_VTaffiche\t initialised" DECSC);
-	osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
-	HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
-	osSemaphoreRelease(semUARTHandle);
-
-	TkToStart++;
-	osDelay(pdMS_TO_TICKS(WaitInTk));
-	osDelay(pdMS_TO_TICKS(2000));	//temps de voir l'affichage
-	/* Infinite loop */
-	for(;;)
-	{
-		/* wait for message in queue */
-		status = osMessageQueueGet(qVTafficheHandle, &BuffAff, NULL, portMAX_DELAY);
-		if (status == osOK) {
-			//snprintf(aTxBuffer, 512, DECRC "%s" ERASELINE, BuffAff.VTbuff);
-			snprintf(aTxBuffer, 512, DECRC "%s", BuffAff.VTbuff);
-		} else {
-			snprintf(aTxBuffer, 512, DECRC "Queue empty" DECRC);
-		}
-		//ici il faut bien ecrire via l'UART!!!
-		osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);
-		HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
-		osSemaphoreRelease(semUARTHandle);
-		__NOP();
-
-	}
-  /* USER CODE END tk_VTaffiche_Fnc */
 }
 
 /* t1s_Callback function */

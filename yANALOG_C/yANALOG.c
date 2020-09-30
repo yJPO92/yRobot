@@ -37,24 +37,29 @@
 
 /* Initialisation data pour entrée analogique */
 void yANALOG_Init(yANALOG* this){
-	this->Ech_Mini = DEFAULT_ECH_MIN;
-	this->Ech_Maxi = DEFAULT_ECH_MAX;
-	this->Hysteresis = DEFAULT_HYSTERESIS;
-	this->Trim = DEFAULT_TRIM;
-	this->Coef_Filtre = DEFAULT_COEF_FILTRAGE;
-	this->UnMoinsCoef = 1.0 - this->Coef_Filtre;
+	//--- Inputs
 	this->Raw = 0U;
-	this->PVmemo = 0.0;
-	this->PVhyst = 0.0;
+	this->Ri = 0U;
+    //--- Outputs
 	this->PV = 0.0;
 	this->PVa = 0.0;
-	this->sens = 0;		//indeterminé
+	this->sens = 0;		//indeterminé (freewheeling)
+	this->Ro = 0U;
+    //--- Parameters
+	this->Ech_Mini = DEFAULT_ECH_MIN;
+	this->Ech_Maxi = DEFAULT_ECH_MAX;
 	/* A = (MAXscale - MINscale) / (MAXpoint - MINpoint)
 	 * B = MAXscale-(A * MAXpoint) */
-	this->A = (this->Ech_Maxi - this->Ech_Mini) / 4096.0;
-	this->B = this->Ech_Maxi - (this->A * 4096.0);
-	this->Ri = 0U;
-	this->Ro = 0U;
+	this->A = (this->Ech_Maxi - this->Ech_Mini) / 4095.0;
+	this->B = this->Ech_Maxi - (this->A * 4095.0);
+	this->Coef_Filtre = DEFAULT_COEF_FILTRAGE;
+	this->UnMoinsCoef = 1.0 - DEFAULT_COEF_FILTRAGE;
+	this->Trim = DEFAULT_TRIM;
+	this->TrimRaw = DEFAULT_TRIMRAW;
+	this->Hysteresis = DEFAULT_HYSTERESIS;
+    //--- Memories
+	this->PVmemo = 0.0;
+	this->PVhyst = 0.0;
 }
 
 
@@ -83,9 +88,10 @@ void yANALOG_CalulerPV(yANALOG* this)
 	 * A = (echMAX - echMIN) / 4095.0
 	 * B = MAXpercent-(A*MAXma)
 	 * B = echMAX - (A * 4095) ou echMiIN
-	 * PV = A * Raw + B + trim
+	 * PV = A * (Raw + TrimRaw) + B + Trim
 	 */
-	tmp = this->A * (float)this->Raw + this->B + this->Trim;
+	//tmp = this->A * (float)this->Raw + this->B + this->Trim;
+	tmp = this->A * (float)(this->Raw + this->TrimRaw) + this->B + this->Trim;
 	//ecretage Ech_Min / Ech_Max
 	if (tmp > this->Ech_Maxi) {tmp = this->Ech_Maxi;}
 	if (tmp < this->Ech_Mini) {tmp = this->Ech_Mini;}
@@ -119,6 +125,18 @@ uint8_t yANALOG_Variation(yANALOG* this)
 		this->Ro = 0U;
 	}
 	return this->Ro;
+}
+
+/* Modifier la valeur du Trim sue PV */
+void yANALOG_SetTrim(yANALOG* this, float trim)
+{
+	this->Trim = trim;
+}
+
+/* Modifier la valeur du Trim sur RAw*/
+void yANALOG_SetTrimRaw(yANALOG* this, float trimr)
+{
+	this->TrimRaw = trimr;
 }
 
 ///** Changer le coefficient de filtrage */

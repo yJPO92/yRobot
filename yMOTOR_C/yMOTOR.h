@@ -18,42 +18,41 @@
  * @date    sept-2015, sept-2020
  *******************************************************************************
  * @note
+ *	H bridge  ---- MC33886 ----
+ *           IN1   IN2   D1   /D2
+ * Forward    H     L    0    pwm
+ * Reverse    L     H    0    pwm
+ * FreeWLow   L     L    0    pwm
+ * FreeWHigh  H     H    0    pwm
+ *
  *******************************************************************************
  */
 
 #ifndef _yMOTOR_H
 #define _yMOTOR_H
 
-#include <sys/types.h>			//definir types mcu like uint32_t
+#include <sys/types.h>		//definir types mcu like uint32_t
+#include "FreeRTOS.h"		//pour avoir acces aux fnc RTOS ds les objects
+#include "cmsis_os.h"
 #include "tim.h"
 
 #define yARRET 0
 #define yMARCHE 1
 #define DEADBAND_DEFAULT	3.0     // dead band around 0.0 for nul speed
-#define PERIODE_DEFAULT		0.5     // en seconds
+#define DUTY_CYCLE_DEFAULT	3	    // en %
 
 /*---------------------
  * Structure d'un motor
  *--------------------*/
 
-/* yARRET ==> av = ar = 0
+/*
+ * yARRET ==> av = ar = 0
  * yMARCHE ==> av & ar = sign of speed
 
- * Vitesse request
- * @param speed (float normalised [-100.0,+100.0]
- * negative ==> reverse, positive ==> forward
-
  * Vitesse effective
- * float normalised [-100.0,+100.0]
+ * float [-100.0,+100.0]
  * negative ==> reverse, positive ==> forward
-
- * PWM duty cycle periode in seconde
- * wrapper for PwmOut::period()
- * @param seconds (PWM duty cycle)
-
- * Change DeadBand
- * @param db
- * modify the default dead band (around 0.0 not action)
+ *
  */
 
 typedef struct {
@@ -63,9 +62,10 @@ typedef struct {
 	//--- Outputs
 	uint8_t inRun;		// Etat marche (running state)
     uint32_t Speed_MV;	// commande vitesse vers sortie
+    int8_t Sens;		// sens de marche (AV/AR)
 	float Velocity;		// Vitesse effective
 	//--- Paramters
-	float Period;		// PWM duty cycle periode in seconde
+	uint32_t DutyCycle;	// PWM duty cycle in %
 	float DeadBand;		// dead band (around 0.0 not action)
 	//--- memories
     float Speed_memo;	//speed memory
@@ -83,9 +83,9 @@ typedef struct {
     TIM_HandleTypeDef _htimpwm;
 } yMOTOR;
 
-/*------------------------
- * Methodes
- *----------------------*/
+//------------------------
+// Methodes
+//------------------------
 
 /*
  * @brief  Initialisation data pour un moteur
@@ -94,9 +94,9 @@ typedef struct {
  * @retval status
 */
 void yMOTOR_Init(yMOTOR* this,
-			uint32_t gpioPortIN1, uint16_t gpioPinIN1,
-			uint32_t gpioPortIN2, uint16_t gpioPinIN2,
-			TIM_HandleTypeDef htimpwm);
+			    uint32_t gpioPortIN1, uint16_t gpioPinIN1,
+		    	uint32_t gpioPortIN2, uint16_t gpioPinIN2,
+				TIM_HandleTypeDef htimpwm);
 
 /*
  * @brief  Marche/Arret request
@@ -121,18 +121,13 @@ void yMOTOR_Speed(yMOTOR* this, float speed);
 */
 void yMOTOR_Exec(yMOTOR* this);
 
-//    /** Interface de controle du moteur
-//     * @param pwm (Pwmout, vitesse variable)
-//     * @param av  (DigitalOut, marche avant)
-//     * @param ar  (DigitalOut, marche arriere)
-//     */
-//    yMOTOR(PinName pwm, PinName av, PinName ar);        /// Constructeur par defaut
+/*
+  * @brief  calcul Real Outputs
+  * @param  pointeur sur structure du moteur
+  * @retval none
+*/
+void yMOTOR_RealOutputs(yMOTOR* this);
 
-//    /** Vitesse request
-//     * @param speed (float normalised [-1.0,+1.0]
-//     * negative ==> reverse, positive ==> forward
-//     */
-//    void Speed(float speed);
     
 //    /** PWM duty cycle periode in seconde
 //     * wrapper for PwmOut::period()
@@ -153,18 +148,7 @@ void yMOTOR_Exec(yMOTOR* this);
 //    //void mararr(int mararr = yARRET);
 //    void MarArr(int mararr);
     
-    
 
-//private:    /// Attributs - m_membres (visibles par les methodes)
-//    float m_speed;  //spedd memory
-//    bool m_run;     //running memory
-//    float m_DB;     //deadband
-
-//protected:  /// Attibuts (accessibles seulement via les methodes)
-//    PwmOut _pwm;
-//    DigitalOut _av;
-//    DigitalOut _ar;
-        
 
 #endif	//_yMOTOR_H
 

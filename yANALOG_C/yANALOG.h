@@ -38,29 +38,35 @@
 #define DEFAULT_ECH_MIN -100.0    	// Mini scale
 #define DEFAULT_ECH_MAX 100.0    	// Maxi scale
 #define DEFAULT_COEF_FILTRAGE 0.9	// 1.0=no filtre, 0.0=retard d'un sample
-#define DEFAULT_TRIM 0.0			// Correction
+#define DEFAULT_TRIM 0.0			// Correction PV
+#define DEFAULT_TRIMRAW 0			// Correction Raw
 #define DEFAULT_HYSTERESIS 1.0		// hysteresis
  
 /*
  * Structure d'une entrée analogique
  */
 typedef struct {
+	//--- Inputs
 	uint32_t	Raw;		// 0-4095 points
+    uint8_t 	Ri;			//pulse in (raz inside)
+    //--- Outputs
 	float		PV;			// Process Value
 	float		PVa;		// abs(PV)
 	int8_t		sens;		// (-1) PV neg, (0) indeterminé, (+1) PV pos.
-	float		PVmemo;		// valeur precedente
+    uint8_t 	Ro;			//pulse output
+    //--- Parameters
 	float		Ech_Mini;	// for scaling
 	float		Ech_Maxi;
-	float		Coef_Filtre;	// Coefficient de filtrage [0.0,1.0]
-    float		UnMoinsCoef;	// 1 - Coeff
 	float		A;			// coefs de mise à l'échelle
 	float		B;
-	float		Trim;		//correction
-    float 		Hysteresis; //hysteresis sur PV
+	float		Coef_Filtre;	// Coefficient de filtrage [0.0,1.0]
+    float		UnMoinsCoef;	// 1 - Coeff
+	float		Trim;			//correction sur PV
+	uint32_t	TrimRaw;		//sur Raw
+    float 		Hysteresis; 	//hysteresis sur PV
+    //--- Memories
+	float		PVmemo;		// valeur precedente
     float		PVhyst;		//memo PV pour hysteresis
-    uint8_t 	Ri;			//pulse in (raz inside)
-    uint8_t 	Ro;			//pulse output
 } yANALOG;
 
 //------------------------
@@ -95,8 +101,22 @@ void yANALOG_CalulerPV(yANALOG* this);
 */
 uint8_t yANALOG_Variation(yANALOG* this);
 
+/*
+  * @brief  Modifier la valeur du Trim sur PV
+  * @param  pointeur sur structure de l'entree analogique
+  * @param  valeur du Trim
+  * @retval status
+*/
+void yANALOG_SetTrim(yANALOG* this, float trim);
 
-//
+/*
+  * @brief  Modifier la valeur du Trim Raw
+  * @param  pointeur sur structure de l'entree analogique
+  * @param  valeur du Trim sur RAw
+  * @retval status
+*/
+void yANALOG_SetTrimRaw(yANALOG* this, float trimr);
+
 //    /** Changer l'echelle de l'objet entree analogique
 //     * @param Ech_Min
 //     * @param Ech_Max la nouvelle echelle

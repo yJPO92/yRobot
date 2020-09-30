@@ -118,6 +118,7 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
 		VRx.Raw = adcbuf[0];
 		VRy.Raw = adcbuf[1];
 
+		//TODO: essayer queue event vers tk_check vrpour forcer calcul de yANALOG
 		snprintf(VTbuffer.VTbuff, 50, CUP(11,50) "--ADC1 : %4d \t %4d", (int)VRx.Raw, (int)VRy.Raw);
 		osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, 0U);	//envoi vers task afficahge
 

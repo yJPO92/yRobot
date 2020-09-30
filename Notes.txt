@@ -1,5 +1,11 @@
 *** yRobot ***
 
+le 30/09/2020: v2.7 (mx 5.7): some task function in separate file
+                warning: CubeMX recree fnc ds freertos.c
+                CubeMonitor affiche toutes les data ds tableau
+                yANALOG: ajout TrimPV & TrimRaw
+                yANALOG & yMOTOR instance: set inputs via fnc (no direct write in structure)
+                ajout acces fnc RTOS ds les objets yMOTOR
 le 23/09/2020: v2.6 (mx 5.6): branch 'master' 
 le 22/09/2020: v2.5: retour sur branch 'master' yANALOG en float
                 l'essai en integer (ds branch 'integer') ne fonctionne pas

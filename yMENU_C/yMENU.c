@@ -144,7 +144,7 @@ void GetTouche_fnc(struct yMENU_t *self) {
 		case 'S': case 's':		/* ?????? */
 			snprintf(self->Buffer, 1024, DECRC ERASELINE "\tFrom Node-RED (S) %d     ", aRxBuffer[0]);
 			yMOTOR_MarArr(&Moteur_D, yMARCHE);
-			Moteur_D.Speed_SP = 10.5;
+			yMOTOR_Speed(&Moteur_D, 10.5);
 			break;
 
 		case 'M': case 'm':		/* Display menu */
