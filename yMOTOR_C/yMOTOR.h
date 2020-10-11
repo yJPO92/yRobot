@@ -61,20 +61,21 @@ typedef struct {
 	float Speed_SP;		// Vitesse request
 	//--- Outputs
 	uint8_t inRun;		// Etat marche (running state)
-    uint32_t Speed_MV;	// commande vitesse vers sortie
-    int8_t Sens;		// sens de marche (AV/AR)
-	float Velocity;		// Vitesse effective
+	//float Velocity;		// Vitesse effective	???????
 	//--- Paramters
 	uint32_t DutyCycle;	// PWM duty cycle in %
 	float DeadBand;		// dead band (around 0.0 not action)
 	//--- memories
-    float Speed_memo;	//speed memory
-    uint8_t Run_memo;	//running memory
-    float DB_memo;		//deadband
+    float Speed_memo;	// speed memory
+    uint8_t Sens_memo;	// sens memory
+    uint8_t Run_memo;	// running memory
+    float DB_memo;		// deadband
     //--- Virtual outputs
-    uint32_t _pwm;		//pour htim.instance.CCR2
-    uint8_t _av;		//marche avant/stop
-    uint8_t _ar;		//marche arrier/stop
+    uint32_t Speed_MV;	// commande vitesse vers sortie
+    int8_t Sens;		// sens de marche (AR/0/AV ; -1/0/+1)
+    uint32_t _pwm;		// pour htim.instance.CCR2
+    uint8_t _av;		// marche avant/stop
+    uint8_t _ar;		// marche arrier/stop
 	//--- Real outputs
     uint32_t _gpioPortIN1;
     uint16_t _gpioPinIN1;
@@ -120,6 +121,13 @@ void yMOTOR_Speed(yMOTOR* this, float speed);
  * @retval status
 */
 void yMOTOR_Exec(yMOTOR* this);
+
+/*
+  * @brief  calcul Virtuals Outputs
+  * @param  pointeur sur structure du moteur
+  * @retval none
+*/
+void yMOTOR_VirtualOutputs(yMOTOR* this);
 
 /*
   * @brief  calcul Real Outputs

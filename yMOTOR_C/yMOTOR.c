@@ -36,17 +36,18 @@ void yMOTOR_Init(yMOTOR* this,
 	this->Speed_SP = 0.0;
 	//--- Outputs
 	this->inRun = 0;
-	this->Speed_MV = 0;
-	this->Sens = 0;
-	this->Velocity = 0.0;
+	//this->Velocity = 0.0;
 	//--- Paramters
 	this->DutyCycle = DUTY_CYCLE_DEFAULT;
 	this->DeadBand = DEADBAND_DEFAULT;
 	//--- memories
 	this->Speed_memo = 0.0;
+	this->Sens_memo = 0;
 	this->Run_memo = 0;
 	this->DB_memo = DEADBAND_DEFAULT;
     //--- Virtual outputs
+	this->Speed_MV = 0;
+	this->Sens = 0;
 	this->_pwm = 0;
 	this->_av = 0;	//a verifier
 	this->_ar = 0;
@@ -74,37 +75,83 @@ void yMOTOR_MarArr(yMOTOR* this, uint8_t mararr) {
 
 /** Speed_SP request */
 void yMOTOR_Speed(yMOTOR* this, float speed) {
-	//TODO check speed limits! & running
+	//TODO check speed limits!
 	this->Speed_SP = speed;
-	if (this->Speed_SP >= 0.0) {
+	// check SP outside Deaband
+	if (this->Speed_SP >= this->DeadBand) {
 		this->Speed_MV = (uint32_t)(this->Speed_SP + 0.5);
 		this->Sens = 1;
-	} else {
+	} else if (this->Speed_SP <= -this->DeadBand) {
 		this->Speed_MV = (uint32_t)(- this->Speed_SP - 0.5);
 		this->Sens = -1;
+	} else {
+		this->Speed_MV = 0;
+		this->Sens = 0;
 	}
+	//memoriser
+	this->Speed_memo = this->Speed_MV;
+	this->Sens_memo = this->Sens;
+
 	//-- re exec motor
 	yMOTOR_Exec(this);
 }
 
-/** calcul Real Outputs */
-void yMOTOR_RealOutputs(yMOTOR* this) {
+/** calcul Virtuals Outputs */
+void yMOTOR_VirtualOutputs(yMOTOR* this) {
 	if (this->inRun == 1) {
-		HAL_GPIO_WritePin((uint32_t)this->_gpioPortIN1, (uint16_t)this->_gpioPinIN1, GPIO_PIN_SET);
-		HAL_GPIO_WritePin(this->_gpioPortIN2, this->_gpioPinIN2, GPIO_PIN_RESET);
-		this->_htimpwm.Instance->CCR2 = this->Speed_MV;
+		switch (this->Sens) {
+			case 1:
+				this->_av = 1;
+				this->_ar = 0;
+				break;
+			case 0:
+				this->_av = 0;
+				this->_ar = 0;
+				break;
+			case -1:
+				this->_av = 0;
+				this->_ar = 1;
+				break;
+			default:
+				break;
+		}
+		this->_pwm = this->Speed_MV;
 	} else {
-		HAL_GPIO_WritePin(this->_gpioPortIN1, this->_gpioPinIN1, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(this->_gpioPortIN2, this->_gpioPinIN2, GPIO_PIN_SET);
-		this->_htimpwm.Instance->CCR2 = 0;
+		this->_ar = 0;
+		this->_av = 0;
+		this->_pwm = 0;
+		//this->Speed_memo = 0.0;
+		//this->Sens_memo = 0;
 	}
 
+}
+
+/** calcul Real Outputs */
+void yMOTOR_RealOutputs(yMOTOR* this) {
+	uint8_t tmp_in1 = this->_av & !this->_ar;
+	HAL_GPIO_WritePin((uint32_t)this->_gpioPortIN1, (uint16_t)this->_gpioPinIN1, tmp_in1);
+
+	uint8_t tmp_in2 = !this->_av & this->_ar;
+	HAL_GPIO_WritePin(this->_gpioPortIN2, this->_gpioPinIN2, tmp_in2);
+
+	this->_htimpwm.Instance->CCR2 = this->_pwm;
+
+	//	if (this->inRun == 1) {
+	//		HAL_GPIO_WritePin((uint32_t)this->_gpioPortIN1, (uint16_t)this->_gpioPinIN1, GPIO_PIN_SET);
+	//		HAL_GPIO_WritePin(this->_gpioPortIN2, this->_gpioPinIN2, GPIO_PIN_RESET);
+	//		this->_htimpwm.Instance->CCR2 = this->Speed_MV;
+	//	} else {
+	//		HAL_GPIO_WritePin(this->_gpioPortIN1, this->_gpioPinIN1, GPIO_PIN_RESET);
+	//		HAL_GPIO_WritePin(this->_gpioPortIN2, this->_gpioPinIN2, GPIO_PIN_SET);
+	//		this->_htimpwm.Instance->CCR2 = 0;
+	//	}
 }
 
 /** calcul moteur */
 void yMOTOR_Exec(yMOTOR* this) {
 	//--- a faire apres que qq chose ait changé!
-	osDelay(pdMS_TO_TICKS(1000));	// test d'une fnc FreeRTOS ds s/fnc: OK
+//	osDelay(pdMS_TO_TICKS(10));	// test d'une fnc FreeRTOS ds s/fnc: OK
+	yMOTOR_VirtualOutputs(this);
 	yMOTOR_RealOutputs(this);
 }
 
