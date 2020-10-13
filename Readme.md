@@ -22,6 +22,9 @@ Jostick VRx, VRy, SWxy
 Menu VT100, display & envoie de commandes  
 STM32CubeMonitor (Node-RED)
 
+6 task (inclus default)  
+3 queue
+
 ## Authors
 
 * **JPO** - *FreeRTOS, C in TrueStudio*

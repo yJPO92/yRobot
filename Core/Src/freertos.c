@@ -368,22 +368,15 @@ void StartDefaultTask(void *argument)
 		//--- trace via LD2
 		HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, Moteur_D.inRun);
 		//--- trace via VT
-		snprintf(VTbuffer.VTbuff, 60, CUP(17,50) "--Mot_D: run %d, speedSP %6.2f, speedMV %3ld",
-											Moteur_D.inRun, Moteur_D.Speed_SP, Moteur_D.Speed_MV);
+		snprintf(VTbuffer.VTbuff, 60, CUP(17,50) "--Mot_D: r %d, SP %6.2f, s %d, MV %3ld, rl %d  ",
+											Moteur_D.inRun, Moteur_D.Speed_SP, Moteur_D.Sens,
+											Moteur_D.Speed_MV, Moteur_D.FeeWheel);
 		osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);	//envoi vers task afficahge
 
 		//--- get/set data for STM32CubeMonitor
 		yCopy2CubeMonitor(1U);		//set data
 		yCopy2CubeMonitor(0U);		//get data
 
-		//--- check PWM
-		//uint32_t yccr2 = (uint32_t) (adcbuf[1] * 100 / 4096);
-		//uint32_t yccr2 = VRy.PVa;
-		//Moteur_D.Speed_MV = yccr2;
-		//snprintf(VTbuffer.VTbuff, 50, CUP(18,50) "--pwm %d  ", (int)yccr2);
-		//osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);	//envoi vers task afficahge
-
-	    //htim4.Instance->CCR2 = yccr2;
 
 	}
   /* USER CODE END StartDefaultTask */

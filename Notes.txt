@@ -1,5 +1,7 @@
 *** yRobot ***
 
+le 13/10/2020: v2.9 (mx 5.7): yMOTOR real outputs freewheeling
+                suivi version de yRobot-FreeRTOS.xml (updated on 18/10)
 le 11/10/2020: v2.8 (mx 5.7): yMOTOR deadband sur Speed_SP, virtual outputs, real outputs
 le 30/09/2020: v2.7 (mx 5.7): some task function in separate file
                 warning: CubeMX recree fnc ds freertos.c

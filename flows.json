@@ -1,1 +1,4632 @@
-[{"id":"baaf425c.2e52f","type":"tab","label":"Base","disabled":false,"info":""},{"id":"2d126e47.f46862","type":"tab","label":"L476RG_jostick","disabled":false,"info":""},{"id":"8b8d2438.d4fab8","type":"tab","label":"L476RG_Menu","disabled":false,"info":""},{"id":"c38b0ce6.66e1c","type":"tab","label":"L476RG_Data_Read","disabled":false,"info":""},{"id":"8381c865.236028","type":"subflow","name":"Single value","info":"The 'single value' subflow allows to :\r\n * Filter Data to extract only one variable after the \"processing node\" step .\r\n * Modify the message to fit with standard widgets such as gauges.\r\n * Limit the number of messages to a maximum of 10 msg per second.\r\n\r\n### **Input**\r\n\r\nThe subflow 'single value' takes in input the `msg.payload`\r\nfrom the processing output. All the messages sent by the processing node have the same structure.\r\n\r\n    \"payload\": {\r\n        \"groupname\": \"Snapshot2\",\r\n        \"variabledata\": [\r\n            {\r\n                \"y\": \"9\",\r\n                \"x\": \"1567509421459\"\r\n            },\r\n            {\r\n                \"y\": \"9\",\r\n                \"x\": \"1567509421459\"\r\n            },\r\n            {\r\n                \"y\": \"9\",\r\n                \"x\": \"1567509421459\"\r\n            }\r\n        ],\r\n        \"variablename\": \"int2\"\r\n      }\r\n    }\r\n\r\n### **Filter on selected variable**\r\nSeveral messages are sent by the processing node for each variable, so the first step of this 'single value' subflow is to filter and keep only messages related to the selected variable.\r\nThe 'filter variable' node will only keep messages with the right `variablename` key.\r\n\r\n### **Extract duplets table**\r\n\r\nThe received message is an Object containing {groupname, variabledata[array], variablename}.  \r\nThe array contains two variables :\r\n - `y` the value \r\n - `x` the time\r\n\r\nA single message contains multiple pairs of values extract at a regular time interval.\r\nThe time interval depends on the acquisition frequency.\r\nWith the 'change' node and the `set` property, the `msg.payload` is set to \r\n`msg.payload.variabledata`, only the data variable array is set into msg.payload.\r\n\r\n    \"payload\": {\r\n        \"variabledata\": [\r\n            {\r\n                \"y\": \"9\",\r\n                \"x\": \"1567509421459\"\r\n            },\r\n            {\r\n                \"y\": \"9\",\r\n                \"x\": \"1567509421459\"\r\n            },\r\n            {\r\n                \"y\": \"9\",\r\n                \"x\": \"1567509421459\"\r\n            }\r\n        ]\r\n    }\r\n\r\n### **Split duplets table**\r\n\r\nThe data variable array is split with a length of one in smaller objects by the 'split' node.\r\nEach new object contains two subvariables : `y` and `x`.\r\n\r\n    \"payload\": {\r\n        \"y\": \"9\",\r\n        \"x\": \"1567509421459\"\r\n    }\r\n\r\n\r\n### **Limit the number of messages**\r\n\r\nThe 'delay' node allows to limit the maximum number of message per second.\r\nIn the 'single value' subflow, one message is extracted per second.\r\n\r\n>_Be careful, a dashboard saturation risk exists if too many messages are received per second._\r\n\r\n### **Extract only y values**\r\n\r\nThe `msg.payload` is set to `msg.payload.y` with the `set` property. \r\nOnly `y` variable is set into msg.payload as single value.\r\n\r\n    \"payload\": { \r\n        \"y\": \"9\" \r\n    }\r\n\r\n### **Output** \r\n\r\nSome widgets such as the gauge and the text node are using the `msg.payload` property.  \r\nThe output node is linked to a gauge that allows to see the evolution \r\nof the `y` variable as a function of time.\r\n\r\n\r\n![subflow_gauge](images/subflow_gauge.png)\r\n\r\n### **Details**\r\n\r\nNote : The debug node allows to see clearly and easily the \r\nmessage at the node output.  \r\n\r\n\r\n> More details on [Node-Red][nr]\r\n[nr]: https://nodered.org/docs/user-guide/editor/workspace/subflows\r\n\r\n\r\n-------\r\n\r\n","category":"","in":[{"x":40,"y":60,"wires":[{"id":"3c5ffe0d.9063b2"}]}],"out":[{"x":780,"y":140,"wires":[{"id":"66397fd3.d8111","port":0}]}],"env":[{"name":"varfilter","type":"str","value":""}],"color":"#DDAA99"},{"id":"f3572396.ff04b","type":"subflow","name":"Subflow 1","info":"","category":"","in":[{"x":110,"y":170,"wires":[{"id":"f6e9381f.abe348"}]}],"out":[],"env":[{"name":"var","type":"str","value":""}],"color":"#DDAA99","status":{"x":160,"y":30,"wires":[]}},{"id":"6cdd2d7c.a92c74","type":"subflow","name":"Multiply-10","info":"","category":"","in":[{"x":70,"y":110,"wires":[{"id":"e0ad6ee1.f2205"}]}],"out":[{"x":980,"y":180,"wires":[{"id":"38133e32.ab5572","port":0}]}],"env":[{"name":"ValueBy10","type":"str","value":""}],"color":"#DDAA99","status":{"x":160,"y":30,"wires":[]}},{"id":"64574786.2c65d8","type":"ui_base","z":"","theme":{"name":"theme-dark","lightTheme":{"default":"#0094CE","baseColor":"#008000","baseFont":"Arial,Arial,Helvetica,sans-serif","edited":true,"reset":false},"darkTheme":{"default":"#097479","baseColor":"#097479","baseFont":"-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif","edited":true,"reset":false},"customTheme":{"name":"Untitled Theme 1","default":"#4B7930","baseColor":"#4B7930","baseFont":"-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif","reset":false},"themeState":{"base-color":{"default":"#097479","value":"#097479","edited":true},"page-titlebar-backgroundColor":{"value":"#097479","edited":false},"page-backgroundColor":{"value":"#111111","edited":false},"page-sidebar-backgroundColor":{"value":"#000000","edited":false},"group-textColor":{"value":"#0eb8c0","edited":false},"group-borderColor":{"value":"#555555","edited":false},"group-backgroundColor":{"value":"#333333","edited":false},"widget-textColor":{"value":"#eeeeee","edited":false},"widget-backgroundColor":{"value":"#097479","edited":false},"widget-borderColor":{"value":"#333333","edited":false},"base-font":{"value":"-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"}},"angularTheme":{"primary":"indigo","accents":"blue","warn":"red","background":"grey"}},"site":{"name":"Node-RED Dashboard","hideToolbar":"false","allowSwipe":"false","lockMenu":"false","allowTempTheme":"true","dateFormat":"YYYY/MM/DD","sizes":{"sx":48,"sy":48,"gx":6,"gy":6,"cx":6,"cy":6,"px":2,"py":2}}},{"id":"3dfdb3a5.11521c","type":"ui_group","z":"","name":"Data","tab":"da9b2906.8948c8","order":2,"disp":true,"width":"7","collapse":false},{"id":"da9b2906.8948c8","type":"ui_tab","z":"","name":"Dashboard","icon":"dashboard","order":2,"disabled":false,"hidden":false},{"id":"1326d3e9.6d4ebc","type":"ui_group","z":"","name":"Infos","tab":"3eac6833.ef73e8","order":1,"disp":true,"width":"10","collapse":false},{"id":"97aba708.5252a8","type":"exe-config","z":"","name":"L476RG","exefile":"D:\\GitDepots\\yRobot\\Debug\\yRobot.elf","exefolder":"D:\\GitDepots\\yRobot\\Debug","exevariablelist":[{"address":"0x00000000","name":"pcInterruptPriorityRegisters","type":5},{"address":"0x00000000","name":"ulTotalRunTime","type":5},{"address":"0x00000000","name":"xHeapStructSize","type":5},{"address":"0x00000000","name":"xIdleTaskHandle","type":5},{"address":"0x08017ce8","name":"semUART_attributes.name","type":5},{"address":"0x08017cec","name":"semUART_attributes.attr_bits","type":5},{"address":"0x08017cf0","name":"semUART_attributes.cb_mem","type":5},{"address":"0x08017cf4","name":"semUART_attributes.cb_size","type":5},{"address":"0x08017cf8","name":"t1s_attributes.name","type":5},{"address":"0x08017cfc","name":"t1s_attributes.attr_bits","type":5},{"address":"0x08017d00","name":"t1s_attributes.cb_mem","type":5},{"address":"0x08017d04","name":"t1s_attributes.cb_size","type":5},{"address":"0x08017d08","name":"t250ms_attributes.name","type":5},{"address":"0x08017d0c","name":"t250ms_attributes.attr_bits","type":5},{"address":"0x08017d10","name":"t250ms_attributes.cb_mem","type":5},{"address":"0x08017d14","name":"t250ms_attributes.cb_size","type":5},{"address":"0x08017d18","name":"qEvents_attributes.name","type":5},{"address":"0x08017d1c","name":"qEvents_attributes.attr_bits","type":5},{"address":"0x08017d20","name":"qEvents_attributes.cb_mem","type":5},{"address":"0x08017d24","name":"qEvents_attributes.cb_size","type":5},{"address":"0x08017d28","name":"qEvents_attributes.mq_mem","type":5},{"address":"0x08017d2c","name":"qEvents_attributes.mq_size","type":5},{"address":"0x08017d30","name":"qVTaffiche_attributes.name","type":5},{"address":"0x08017d34","name":"qVTaffiche_attributes.attr_bits","type":5},{"address":"0x08017d38","name":"qVTaffiche_attributes.cb_mem","type":5},{"address":"0x08017d3c","name":"qVTaffiche_attributes.cb_size","type":5},{"address":"0x08017d40","name":"qVTaffiche_attributes.mq_mem","type":5},{"address":"0x08017d44","name":"qVTaffiche_attributes.mq_size","type":5},{"address":"0x08017d48","name":"defaultTask_attributes.name","type":5},{"address":"0x08017d4c","name":"defaultTask_attributes.attr_bits","type":5},{"address":"0x08017d50","name":"defaultTask_attributes.cb_mem","type":5},{"address":"0x08017d54","name":"defaultTask_attributes.cb_size","type":5},{"address":"0x08017d58","name":"defaultTask_attributes.stack_mem","type":5},{"address":"0x08017d5c","name":"defaultTask_attributes.stack_size","type":5},{"address":"0x08017d60","name":"defaultTask_attributes.priority","type":4},{"address":"0x08017d64","name":"defaultTask_attributes.tz_module","type":5},{"address":"0x08017d68","name":"defaultTask_attributes.reserved","type":5},{"address":"0x08017d6c","name":"tk_Init_attributes.name","type":5},{"address":"0x08017d70","name":"tk_Init_attributes.attr_bits","type":5},{"address":"0x08017d74","name":"tk_Init_attributes.cb_mem","type":5},{"address":"0x08017d78","name":"tk_Init_attributes.cb_size","type":5},{"address":"0x08017d7c","name":"tk_Init_attributes.stack_mem","type":5},{"address":"0x08017d80","name":"tk_Init_attributes.stack_size","type":5},{"address":"0x08017d84","name":"tk_Init_attributes.priority","type":4},{"address":"0x08017d88","name":"tk_Init_attributes.tz_module","type":5},{"address":"0x08017d8c","name":"tk_Init_attributes.reserved","type":5},{"address":"0x08017d90","name":"tk_CheckVR_attributes.name","type":5},{"address":"0x08017d94","name":"tk_CheckVR_attributes.attr_bits","type":5},{"address":"0x08017d98","name":"tk_CheckVR_attributes.cb_mem","type":5},{"address":"0x08017d9c","name":"tk_CheckVR_attributes.cb_size","type":5},{"address":"0x08017da0","name":"tk_CheckVR_attributes.stack_mem","type":5},{"address":"0x08017da4","name":"tk_CheckVR_attributes.stack_size","type":5},{"address":"0x08017da8","name":"tk_CheckVR_attributes.priority","type":4},{"address":"0x08017dac","name":"tk_CheckVR_attributes.tz_module","type":5},{"address":"0x08017db0","name":"tk_CheckVR_attributes.reserved","type":5},{"address":"0x08017db4","name":"tk_Process_attributes.name","type":5},{"address":"0x08017db8","name":"tk_Process_attributes.attr_bits","type":5},{"address":"0x08017dbc","name":"tk_Process_attributes.cb_mem","type":5},{"address":"0x08017dc0","name":"tk_Process_attributes.cb_size","type":5},{"address":"0x08017dc4","name":"tk_Process_attributes.stack_mem","type":5},{"address":"0x08017dc8","name":"tk_Process_attributes.stack_size","type":5},{"address":"0x08017dcc","name":"tk_Process_attributes.priority","type":4},{"address":"0x08017dd0","name":"tk_Process_attributes.tz_module","type":5},{"address":"0x08017dd4","name":"tk_Process_attributes.reserved","type":5},{"address":"0x08017dd8","name":"tk_VTaffiche_attributes.name","type":5},{"address":"0x08017ddc","name":"tk_VTaffiche_attributes.attr_bits","type":5},{"address":"0x08017de0","name":"tk_VTaffiche_attributes.cb_mem","type":5},{"address":"0x08017de4","name":"tk_VTaffiche_attributes.cb_size","type":5},{"address":"0x08017de8","name":"tk_VTaffiche_attributes.stack_mem","type":5},{"address":"0x08017dec","name":"tk_VTaffiche_attributes.stack_size","type":5},{"address":"0x08017df0","name":"tk_VTaffiche_attributes.priority","type":4},{"address":"0x08017df4","name":"tk_VTaffiche_attributes.tz_module","type":5},{"address":"0x08017df8","name":"tk_VTaffiche_attributes.reserved","type":5},{"address":"0x08017dfc","name":"MSIRangeTable[0]","type":5},{"address":"0x08017e2c","name":"AHBPrescTable[0]","type":1},{"address":"0x08017e3c","name":"APBPrescTable[0]","type":1},{"address":"0x20000000","name":"aRxBuffer[0]","type":1,"checked":true},{"address":"0x20000004","name":"ymx_VRx_PV","type":9,"checked":true},{"address":"0x20000008","name":"ymx_VRx_Raw","type":5,"checked":true},{"address":"0x2000000c","name":"ymx_VRx_Ri","type":1,"checked":true},{"address":"0x2000000d","name":"ymx_VRx_Ro","type":1,"checked":true},{"address":"0x20000010","name":"ymx_VRx_trim","type":9,"checked":true},{"address":"0x20000014","name":"ymx_VRy_PV","type":9,"checked":true},{"address":"0x20000018","name":"ymx_VRy_Raw","type":5,"checked":true},{"address":"0x2000001c","name":"ymx_VRy_Ri","type":1,"checked":true},{"address":"0x2000001d","name":"ymx_VRy_Ro","type":1,"checked":true},{"address":"0x20000020","name":"ymx_VRy_trim","type":9,"checked":true},{"address":"0x20000024","name":"ymx_Coef","type":9,"checked":true},{"address":"0x20002800","name":"VTbuffer.src","type":6,"checked":false},{"address":"0x20002804","name":"VTbuffer.VTbuff[0]","type":2,"checked":false},{"address":"0x200028cc","name":"uart2NbCar","type":3},{"address":"0x200028d0","name":"SystemCoreClock","type":5},{"address":"0x200028d4","name":"uwTickFreq","type":5},{"address":"0x200028d8","name":"uwTickPrio","type":5},{"address":"0x200028dc","name":"uxCriticalNesting","type":5},{"address":"0x20002f6c","name":"TkToStart","type":1},{"address":"0x20002f70","name":"aTxBuffer[0]","type":2},{"address":"0x20003774","name":"yEvent.Topic","type":1},{"address":"0x20003778","name":"yEvent.PayLoadF","type":9},{"address":"0x2000377c","name":"yEvent.PayloadI","type":1},{"address":"0x20003780","name":"sAlarm.AlarmTime.Hours","type":1},{"address":"0x20003781","name":"sAlarm.AlarmTime.Minutes","type":1},{"address":"0x20003782","name":"sAlarm.AlarmTime.Seconds","type":1},{"address":"0x20003783","name":"sAlarm.AlarmTime.TimeFormat","type":1},{"address":"0x20003784","name":"sAlarm.AlarmTime.SubSeconds","type":5},{"address":"0x20003788","name":"sAlarm.AlarmTime.SecondFraction","type":5},{"address":"0x2000378c","name":"sAlarm.AlarmTime.DayLightSaving","type":5},{"address":"0x20003790","name":"sAlarm.AlarmTime.StoreOperation","type":5},{"address":"0x20003794","name":"sAlarm.AlarmMask","type":5},{"address":"0x20003798","name":"sAlarm.SubSeconds","type":5},{"address":"0x2000379c","name":"sAlarm.AlarmSubSecondMask","type":5},{"address":"0x200037a0","name":"sAlarm.AlarmDateWeekDaySel","type":5},{"address":"0x200037a4","name":"sAlarm.AlarmDateWeekDay","type":1},{"address":"0x200037a8","name":"sAlarm.Alarm","type":5},{"address":"0x200037ac","name":"RTC_AlarmA_flag","type":1},{"address":"0x200037b4","name":"__env[0]","type":5},{"address":"0x200037b8","name":"KernelState","type":4},{"address":"0x200037bc","name":"Idle_TCB.pxDummy1","type":5},{"address":"0x200037c0","name":"Idle_TCB.xDummy3[0].xDummy2","type":5},{"address":"0x200037c4","name":"Idle_TCB.xDummy3[0].pvDummy3[0]","type":5},{"address":"0x200037e8","name":"Idle_TCB.uxDummy5","type":5},{"address":"0x200037ec","name":"Idle_TCB.pxDummy6","type":5},{"address":"0x200037f0","name":"Idle_TCB.ucDummy7[0]","type":1},{"address":"0x20003800","name":"Idle_TCB.pxDummy8","type":5},{"address":"0x20003804","name":"Idle_TCB.uxDummy10[0]","type":5},{"address":"0x2000380c","name":"Idle_TCB.uxDummy12[0]","type":5},{"address":"0x20003814","name":"Idle_TCB.pxDummy14","type":5},{"address":"0x20003818","name":"Idle_TCB.ulDummy16","type":5},{"address":"0x2000381c","name":"Idle_TCB.ulDummy18","type":5},{"address":"0x20003820","name":"Idle_TCB.ucDummy19","type":1},{"address":"0x20003821","name":"Idle_TCB.uxDummy20","type":1},{"address":"0x20003824","name":"Idle_Stack[0]","type":5},{"address":"0x20003a24","name":"Timer_TCB.pxDummy1","type":5},{"address":"0x20003a28","name":"Timer_TCB.xDummy3[0].xDummy2","type":5},{"address":"0x20003a2c","name":"Timer_TCB.xDummy3[0].pvDummy3[0]","type":5},{"address":"0x20003a50","name":"Timer_TCB.uxDummy5","type":5},{"address":"0x20003a54","name":"Timer_TCB.pxDummy6","type":5},{"address":"0x20003a58","name":"Timer_TCB.ucDummy7[0]","type":1},{"address":"0x20003a68","name":"Timer_TCB.pxDummy8","type":5},{"address":"0x20003a6c","name":"Timer_TCB.uxDummy10[0]","type":5},{"address":"0x20003a74","name":"Timer_TCB.uxDummy12[0]","type":5},{"address":"0x20003a7c","name":"Timer_TCB.pxDummy14","type":5},{"address":"0x20003a80","name":"Timer_TCB.ulDummy16","type":5},{"address":"0x20003a84","name":"Timer_TCB.ulDummy18","type":5},{"address":"0x20003a88","name":"Timer_TCB.ucDummy19","type":1},{"address":"0x20003a89","name":"Timer_TCB.uxDummy20","type":1},{"address":"0x20003a8c","name":"Timer_Stack[0]","type":5},{"address":"0x20003e8c","name":"xMaximumPossibleSuppressedTicks","type":5},{"address":"0x20003e90","name":"ulTimerCountsForOneTick","type":5},{"address":"0x20003e94","name":"ulStoppedTimerCompensation","type":5},{"address":"0x20003e98","name":"ucMaxSysCallPriority","type":1},{"address":"0x20003e9c","name":"ulMaxPRIGROUPValue","type":5},{"address":"0x20003ea0","name":"ucHeap[0]","type":1},{"address":"0x2000a818","name":"xStart.pxNextFreeBlock","type":5},{"address":"0x2000a81c","name":"xStart.xBlockSize","type":5},{"address":"0x2000a820","name":"pxEnd","type":5},{"address":"0x2000a824","name":"xMinimumEverFreeBytesRemaining","type":5},{"address":"0x2000a828","name":"xFreeBytesRemaining","type":5},{"address":"0x2000a82c","name":"xBlockAllocatedBit","type":5},{"address":"0x2000a830","name":"xSuspendedTaskList.uxNumberOfItems","type":5},{"address":"0x2000a834","name":"xSuspendedTaskList.pxIndex","type":5},{"address":"0x2000a838","name":"xSuspendedTaskList.xListEnd.xItemValue","type":5},{"address":"0x2000a83c","name":"xSuspendedTaskList.xListEnd.pxNext","type":5},{"address":"0x2000a840","name":"xSuspendedTaskList.xListEnd.pxPrevious","type":5},{"address":"0x2000a844","name":"xPendingReadyList.uxNumberOfItems","type":5},{"address":"0x2000a848","name":"xPendingReadyList.pxIndex","type":5},{"address":"0x2000a84c","name":"xPendingReadyList.xListEnd.xItemValue","type":5},{"address":"0x2000a850","name":"xPendingReadyList.xListEnd.pxNext","type":5},{"address":"0x2000a854","name":"xPendingReadyList.xListEnd.pxPrevious","type":5},{"address":"0x2000a858","name":"uxTopReadyPriority","type":5},{"address":"0x2000a85c","name":"pxCurrentTCB","type":5},{"address":"0x2000a860","name":"pxReadyTasksLists[0].uxNumberOfItems","type":5},{"address":"0x2000a864","name":"pxReadyTasksLists[0].pxIndex","type":5},{"address":"0x2000a868","name":"pxReadyTasksLists[0].xListEnd.xItemValue","type":5},{"address":"0x2000a86c","name":"pxReadyTasksLists[0].xListEnd.pxNext","type":5},{"address":"0x2000a870","name":"pxReadyTasksLists[0].xListEnd.pxPrevious","type":5},{"address":"0x2000acc0","name":"xNextTaskUnblockTime","type":5},{"address":"0x2000acc4","name":"xTickCount","type":5},{"address":"0x2000acc8","name":"pxDelayedTaskList","type":5},{"address":"0x2000accc","name":"xDelayedTaskList1.uxNumberOfItems","type":5},{"address":"0x2000acd0","name":"xDelayedTaskList1.pxIndex","type":5},{"address":"0x2000acd4","name":"xDelayedTaskList1.xListEnd.xItemValue","type":5},{"address":"0x2000acd8","name":"xDelayedTaskList1.xListEnd.pxNext","type":5},{"address":"0x2000acdc","name":"xDelayedTaskList1.xListEnd.pxPrevious","type":5},{"address":"0x2000ace0","name":"xDelayedTaskList2.uxNumberOfItems","type":5},{"address":"0x2000ace4","name":"xDelayedTaskList2.pxIndex","type":5},{"address":"0x2000ace8","name":"xDelayedTaskList2.xListEnd.xItemValue","type":5},{"address":"0x2000acec","name":"xDelayedTaskList2.xListEnd.pxNext","type":5},{"address":"0x2000acf0","name":"xDelayedTaskList2.xListEnd.pxPrevious","type":5},{"address":"0x2000acf4","name":"xTasksWaitingTermination.uxNumberOfItems","type":5},{"address":"0x2000acf8","name":"xTasksWaitingTermination.pxIndex","type":5},{"address":"0x2000acfc","name":"xTasksWaitingTermination.xListEnd.xItemValue","type":5},{"address":"0x2000ad00","name":"xTasksWaitingTermination.xListEnd.pxNext","type":5},{"address":"0x2000ad04","name":"xTasksWaitingTermination.xListEnd.pxPrevious","type":5},{"address":"0x2000ad08","name":"pxOverflowDelayedTaskList","type":5},{"address":"0x2000ad0c","name":"uxCurrentNumberOfTasks","type":5},{"address":"0x2000ad10","name":"xSchedulerRunning","type":6},{"address":"0x2000ad14","name":"uxTaskNumber","type":5},{"address":"0x2000ad18","name":"uxDeletedTasksWaitingCleanUp","type":5},{"address":"0x2000ad1c","name":"uxSchedulerSuspended","type":5},{"address":"0x2000ad20","name":"xNumOfOverflows","type":6},{"address":"0x2000ad24","name":"uxPendedTicks","type":5},{"address":"0x2000ad28","name":"xYieldPending","type":6},{"address":"0x2000ad2c","name":"ulTaskSwitchedInTime","type":5},{"address":"0x2000ad30","name":"pxCurrentTimerList","type":5},{"address":"0x2000ad34","name":"pxOverflowTimerList","type":5},{"address":"0x2000ad38","name":"xTimerQueue","type":5},{"address":"0x2000ad3c","name":"xActiveTimerList1.uxNumberOfItems","type":5},{"address":"0x2000ad40","name":"xActiveTimerList1.pxIndex","type":5},{"address":"0x2000ad44","name":"xActiveTimerList1.xListEnd.xItemValue","type":5},{"address":"0x2000ad48","name":"xActiveTimerList1.xListEnd.pxNext","type":5},{"address":"0x2000ad4c","name":"xActiveTimerList1.xListEnd.pxPrevious","type":5},{"address":"0x2000ad50","name":"xActiveTimerList2.uxNumberOfItems","type":5},{"address":"0x2000ad54","name":"xActiveTimerList2.pxIndex","type":5},{"address":"0x2000ad58","name":"xActiveTimerList2.xListEnd.xItemValue","type":5},{"address":"0x2000ad5c","name":"xActiveTimerList2.xListEnd.pxNext","type":5},{"address":"0x2000ad60","name":"xActiveTimerList2.xListEnd.pxPrevious","type":5},{"address":"0x2000ae54","name":"xTimerTaskHandle","type":5},{"address":"0x2000ae98","name":"hadc1.Instance","type":5},{"address":"0x2000ae9c","name":"hadc1.Init.ClockPrescaler","type":5},{"address":"0x2000aea0","name":"hadc1.Init.Resolution","type":5},{"address":"0x2000aea4","name":"hadc1.Init.DataAlign","type":5},{"address":"0x2000aea8","name":"hadc1.Init.ScanConvMode","type":5},{"address":"0x2000aeac","name":"hadc1.Init.EOCSelection","type":5},{"address":"0x2000aeb0","name":"hadc1.Init.LowPowerAutoWait","type":2},{"address":"0x2000aeb1","name":"hadc1.Init.ContinuousConvMode","type":2},{"address":"0x2000aeb4","name":"hadc1.Init.NbrOfConversion","type":5},{"address":"0x2000aeb8","name":"hadc1.Init.DiscontinuousConvMode","type":2},{"address":"0x2000aebc","name":"hadc1.Init.NbrOfDiscConversion","type":5},{"address":"0x2000aec0","name":"hadc1.Init.ExternalTrigConv","type":5},{"address":"0x2000aec4","name":"hadc1.Init.ExternalTrigConvEdge","type":5},{"address":"0x2000aec8","name":"hadc1.Init.DMAContinuousRequests","type":2},{"address":"0x2000aecc","name":"hadc1.Init.Overrun","type":5},{"address":"0x2000aed0","name":"hadc1.Init.OversamplingMode","type":2},{"address":"0x2000aed4","name":"hadc1.Init.Oversampling.Ratio","type":5},{"address":"0x2000aed8","name":"hadc1.Init.Oversampling.RightBitShift","type":5},{"address":"0x2000aedc","name":"hadc1.Init.Oversampling.TriggeredMode","type":5},{"address":"0x2000aee0","name":"hadc1.Init.Oversampling.OversamplingStopReset","type":5},{"address":"0x2000aee4","name":"hadc1.DMA_Handle","type":5},{"address":"0x2000aee8","name":"hadc1.Lock","type":2},{"address":"0x2000aeec","name":"hadc1.State","type":5},{"address":"0x2000aef0","name":"hadc1.ErrorCode","type":5},{"address":"0x2000aef4","name":"hadc1.InjectionConfig.ContextQueue","type":5},{"address":"0x2000aef8","name":"hadc1.InjectionConfig.ChannelCount","type":5},{"address":"0x2000aefc","name":"hdma_adc1.Instance","type":5},{"address":"0x2000af00","name":"hdma_adc1.Init.Request","type":5},{"address":"0x2000af04","name":"hdma_adc1.Init.Direction","type":5},{"address":"0x2000af08","name":"hdma_adc1.Init.PeriphInc","type":5},{"address":"0x2000af0c","name":"hdma_adc1.Init.MemInc","type":5},{"address":"0x2000af10","name":"hdma_adc1.Init.PeriphDataAlignment","type":5},{"address":"0x2000af14","name":"hdma_adc1.Init.MemDataAlignment","type":5},{"address":"0x2000af18","name":"hdma_adc1.Init.Mode","type":5},{"address":"0x2000af1c","name":"hdma_adc1.Init.Priority","type":5},{"address":"0x2000af20","name":"hdma_adc1.Lock","type":2},{"address":"0x2000af21","name":"hdma_adc1.State","type":2},{"address":"0x2000af24","name":"hdma_adc1.Parent","type":5},{"address":"0x2000af28","name":"hdma_adc1.XferCpltCallback","type":5},{"address":"0x2000af2c","name":"hdma_adc1.XferHalfCpltCallback","type":5},{"address":"0x2000af30","name":"hdma_adc1.XferErrorCallback","type":5},{"address":"0x2000af34","name":"hdma_adc1.XferAbortCallback","type":5},{"address":"0x2000af38","name":"hdma_adc1.ErrorCode","type":5},{"address":"0x2000af3c","name":"hdma_adc1.DmaBaseAddress","type":5},{"address":"0x2000af40","name":"hdma_adc1.ChannelIndex","type":5},{"address":"0x2000af44","name":"defaultTaskHandle","type":5},{"address":"0x2000af48","name":"myTime.Hours","type":1},{"address":"0x2000af49","name":"myTime.Minutes","type":1},{"address":"0x2000af4a","name":"myTime.Seconds","type":1},{"address":"0x2000af4b","name":"myTime.TimeFormat","type":1},{"address":"0x2000af4c","name":"myTime.SubSeconds","type":5},{"address":"0x2000af50","name":"myTime.SecondFraction","type":5},{"address":"0x2000af54","name":"myTime.DayLightSaving","type":5},{"address":"0x2000af58","name":"myTime.StoreOperation","type":5},{"address":"0x2000af5c","name":"tk_InitHandle","type":5},{"address":"0x2000af60","name":"t250msHandle","type":5},{"address":"0x2000af64","name":"VRy.Raw","type":5,"checked":true},{"address":"0x2000af68","name":"VRy.Ri","type":1,"checked":true},{"address":"0x2000af6c","name":"VRy.PV","type":9,"checked":true},{"address":"0x2000af70","name":"VRy.PVa","type":9,"checked":true},{"address":"0x2000af74","name":"VRy.sens","type":2,"checked":true},{"address":"0x2000af75","name":"VRy.Ro","type":1,"checked":true},{"address":"0x2000af78","name":"VRy.Ech_Mini","type":9,"checked":true},{"address":"0x2000af7c","name":"VRy.Ech_Maxi","type":9,"checked":true},{"address":"0x2000af80","name":"VRy.A","type":9,"checked":true},{"address":"0x2000af84","name":"VRy.B","type":9,"checked":true},{"address":"0x2000af88","name":"VRy.Coef_Filtre","type":9,"checked":true},{"address":"0x2000af8c","name":"VRy.UnMoinsCoef","type":9,"checked":true},{"address":"0x2000af90","name":"VRy.Trim","type":9,"checked":true},{"address":"0x2000af94","name":"VRy.TrimRaw","type":5,"checked":true},{"address":"0x2000af98","name":"VRy.Hysteresis","type":9,"checked":true},{"address":"0x2000af9c","name":"VRy.PVmemo","type":9,"checked":true},{"address":"0x2000afa0","name":"VRy.PVhyst","type":9,"checked":true},{"address":"0x2000afa4","name":"tk_ProcessHandle","type":5},{"address":"0x2000afa8","name":"tmpBuffer[0]","type":2},{"address":"0x2000afb4","name":"VRx.Raw","type":5,"checked":false},{"address":"0x2000afb8","name":"VRx.Ri","type":1,"checked":false},{"address":"0x2000afbc","name":"VRx.PV","type":9,"checked":true},{"address":"0x2000afc0","name":"VRx.PVa","type":9,"checked":false},{"address":"0x2000afc4","name":"VRx.sens","type":2,"checked":false},{"address":"0x2000afc5","name":"VRx.Ro","type":1,"checked":false},{"address":"0x2000afc8","name":"VRx.Ech_Mini","type":9,"checked":false},{"address":"0x2000afcc","name":"VRx.Ech_Maxi","type":9,"checked":false},{"address":"0x2000afd0","name":"VRx.A","type":9,"checked":false},{"address":"0x2000afd4","name":"VRx.B","type":9,"checked":false},{"address":"0x2000afd8","name":"VRx.Coef_Filtre","type":9},{"address":"0x2000afdc","name":"VRx.UnMoinsCoef","type":9},{"address":"0x2000afe0","name":"VRx.Trim","type":9},{"address":"0x2000afe4","name":"VRx.TrimRaw","type":5},{"address":"0x2000afe8","name":"VRx.Hysteresis","type":9},{"address":"0x2000afec","name":"VRx.PVmemo","type":9},{"address":"0x2000aff0","name":"VRx.PVhyst","type":9},{"address":"0x2000aff4","name":"mnuSTM.Buffer[0]","type":2},{"address":"0x2000b3f4","name":"mnuSTM.m_version","type":6},{"address":"0x2000b3f8","name":"mnuSTM.m_patch","type":6},{"address":"0x2000b3fc","name":"mnuSTM.m_toto","type":6},{"address":"0x2000b400","name":"mnuSTM.GetTouche","type":5},{"address":"0x2000b404","name":"mnuSTM.Display","type":5},{"address":"0x2000b408","name":"mnuSTM.Infos","type":5},{"address":"0x2000b40c","name":"mnuSTM.Init","type":5},{"address":"0x2000b410","name":"mnuSTM.ClearStatusBar","type":5},{"address":"0x2000b414","name":"qEventsHandle","type":5},{"address":"0x2000b418","name":"semUARTHandle","type":5},{"address":"0x2000b41c","name":"Moteur_D.MarArr","type":1,"checked":true},{"address":"0x2000b420","name":"Moteur_D.Speed_SP","type":9,"checked":true},{"address":"0x2000b424","name":"Moteur_D.inRun","type":1,"checked":true},{"address":"0x2000b428","name":"Moteur_D.Speed_MV","type":5,"checked":true},{"address":"0x2000b42c","name":"Moteur_D.Sens","type":2,"checked":true},{"address":"0x2000b430","name":"Moteur_D.Velocity","type":9,"checked":true},{"address":"0x2000b434","name":"Moteur_D.DutyCycle","type":5,"checked":true},{"address":"0x2000b438","name":"Moteur_D.DeadBand","type":9,"checked":true},{"address":"0x2000b43c","name":"Moteur_D.Speed_memo","type":9,"checked":true},{"address":"0x2000b440","name":"Moteur_D.Run_memo","type":1,"checked":true},{"address":"0x2000b444","name":"Moteur_D.DB_memo","type":9,"checked":true},{"address":"0x2000b448","name":"Moteur_D._pwm","type":5,"checked":true},{"address":"0x2000b44c","name":"Moteur_D._av","type":1,"checked":true},{"address":"0x2000b44d","name":"Moteur_D._ar","type":1,"checked":true},{"address":"0x2000b450","name":"Moteur_D._gpioPortIN1","type":5},{"address":"0x2000b454","name":"Moteur_D._gpioPinIN1","type":3},{"address":"0x2000b458","name":"Moteur_D._gpioPortIN2","type":5},{"address":"0x2000b45c","name":"Moteur_D._gpioPinIN2","type":3},{"address":"0x2000b460","name":"Moteur_D._htimpwm.Instance","type":5},{"address":"0x2000b464","name":"Moteur_D._htimpwm.Init.Prescaler","type":5},{"address":"0x2000b468","name":"Moteur_D._htimpwm.Init.CounterMode","type":5},{"address":"0x2000b46c","name":"Moteur_D._htimpwm.Init.Period","type":5},{"address":"0x2000b470","name":"Moteur_D._htimpwm.Init.ClockDivision","type":5},{"address":"0x2000b474","name":"Moteur_D._htimpwm.Init.RepetitionCounter","type":5},{"address":"0x2000b478","name":"Moteur_D._htimpwm.Init.AutoReloadPreload","type":5},{"address":"0x2000b47c","name":"Moteur_D._htimpwm.Channel","type":2},{"address":"0x2000b480","name":"Moteur_D._htimpwm.hdma[0]","type":5},{"address":"0x2000b49c","name":"Moteur_D._htimpwm.Lock","type":2},{"address":"0x2000b49d","name":"Moteur_D._htimpwm.State","type":2},{"address":"0x2000b4a0","name":"myDate.WeekDay","type":1},{"address":"0x2000b4a1","name":"myDate.Month","type":1},{"address":"0x2000b4a2","name":"myDate.Date","type":1},{"address":"0x2000b4a3","name":"myDate.Year","type":1},{"address":"0x2000b4a4","name":"tk_VTafficheHandle","type":5},{"address":"0x2000b4a8","name":"WaitInTk","type":3},{"address":"0x2000b4ac","name":"adcbuf[0]","type":5},{"address":"0x2000b4b4","name":"qVTafficheHandle","type":5},{"address":"0x2000b4b8","name":"tk_CheckVRHandle","type":5},{"address":"0x2000b4bc","name":"t1sHandle","type":5},{"address":"0x2000b4c0","name":"hrtc.Instance","type":5},{"address":"0x2000b4c4","name":"hrtc.Init.HourFormat","type":5},{"address":"0x2000b4c8","name":"hrtc.Init.AsynchPrediv","type":5},{"address":"0x2000b4cc","name":"hrtc.Init.SynchPrediv","type":5},{"address":"0x2000b4d0","name":"hrtc.Init.OutPut","type":5},{"address":"0x2000b4d4","name":"hrtc.Init.OutPutRemap","type":5},{"address":"0x2000b4d8","name":"hrtc.Init.OutPutPolarity","type":5},{"address":"0x2000b4dc","name":"hrtc.Init.OutPutType","type":5},{"address":"0x2000b4e0","name":"hrtc.Lock","type":2},{"address":"0x2000b4e1","name":"hrtc.State","type":2},{"address":"0x2000b4e4","name":"htim6.Instance","type":5},{"address":"0x2000b4e8","name":"htim6.Init.Prescaler","type":5},{"address":"0x2000b4ec","name":"htim6.Init.CounterMode","type":5},{"address":"0x2000b4f0","name":"htim6.Init.Period","type":5},{"address":"0x2000b4f4","name":"htim6.Init.ClockDivision","type":5},{"address":"0x2000b4f8","name":"htim6.Init.RepetitionCounter","type":5},{"address":"0x2000b4fc","name":"htim6.Init.AutoReloadPreload","type":5},{"address":"0x2000b500","name":"htim6.Channel","type":2},{"address":"0x2000b504","name":"htim6.hdma[0]","type":5},{"address":"0x2000b520","name":"htim6.Lock","type":2},{"address":"0x2000b521","name":"htim6.State","type":2},{"address":"0x2000b524","name":"htim4.Instance","type":5},{"address":"0x2000b528","name":"htim4.Init.Prescaler","type":5},{"address":"0x2000b52c","name":"htim4.Init.CounterMode","type":5},{"address":"0x2000b530","name":"htim4.Init.Period","type":5},{"address":"0x2000b534","name":"htim4.Init.ClockDivision","type":5},{"address":"0x2000b538","name":"htim4.Init.RepetitionCounter","type":5},{"address":"0x2000b53c","name":"htim4.Init.AutoReloadPreload","type":5},{"address":"0x2000b540","name":"htim4.Channel","type":2},{"address":"0x2000b544","name":"htim4.hdma[0]","type":5},{"address":"0x2000b560","name":"htim4.Lock","type":2},{"address":"0x2000b561","name":"htim4.State","type":2},{"address":"0x2000b564","name":"htim1.Instance","type":5},{"address":"0x2000b568","name":"htim1.Init.Prescaler","type":5},{"address":"0x2000b56c","name":"htim1.Init.CounterMode","type":5},{"address":"0x2000b570","name":"htim1.Init.Period","type":5},{"address":"0x2000b574","name":"htim1.Init.ClockDivision","type":5},{"address":"0x2000b578","name":"htim1.Init.RepetitionCounter","type":5},{"address":"0x2000b57c","name":"htim1.Init.AutoReloadPreload","type":5},{"address":"0x2000b580","name":"htim1.Channel","type":2},{"address":"0x2000b584","name":"htim1.hdma[0]","type":5},{"address":"0x2000b5a0","name":"htim1.Lock","type":2},{"address":"0x2000b5a1","name":"htim1.State","type":2},{"address":"0x2000b5a4","name":"huart2.Instance","type":5},{"address":"0x2000b5a8","name":"huart2.Init.BaudRate","type":5},{"address":"0x2000b5ac","name":"huart2.Init.WordLength","type":5},{"address":"0x2000b5b0","name":"huart2.Init.StopBits","type":5},{"address":"0x2000b5b4","name":"huart2.Init.Parity","type":5},{"address":"0x2000b5b8","name":"huart2.Init.Mode","type":5},{"address":"0x2000b5bc","name":"huart2.Init.HwFlowCtl","type":5},{"address":"0x2000b5c0","name":"huart2.Init.OverSampling","type":5},{"address":"0x2000b5c4","name":"huart2.Init.OneBitSampling","type":5},{"address":"0x2000b5c8","name":"huart2.AdvancedInit.AdvFeatureInit","type":5},{"address":"0x2000b5cc","name":"huart2.AdvancedInit.TxPinLevelInvert","type":5},{"address":"0x2000b5d0","name":"huart2.AdvancedInit.RxPinLevelInvert","type":5},{"address":"0x2000b5d4","name":"huart2.AdvancedInit.DataInvert","type":5},{"address":"0x2000b5d8","name":"huart2.AdvancedInit.Swap","type":5},{"address":"0x2000b5dc","name":"huart2.AdvancedInit.OverrunDisable","type":5},{"address":"0x2000b5e0","name":"huart2.AdvancedInit.DMADisableonRxError","type":5},{"address":"0x2000b5e4","name":"huart2.AdvancedInit.AutoBaudRateEnable","type":5},{"address":"0x2000b5e8","name":"huart2.AdvancedInit.AutoBaudRateMode","type":5},{"address":"0x2000b5ec","name":"huart2.AdvancedInit.MSBFirst","type":5},{"address":"0x2000b5f0","name":"huart2.pTxBuffPtr","type":5},{"address":"0x2000b5f4","name":"huart2.TxXferSize","type":3},{"address":"0x2000b5f6","name":"huart2.TxXferCount","type":3},{"address":"0x2000b5f8","name":"huart2.pRxBuffPtr","type":5},{"address":"0x2000b5fc","name":"huart2.RxXferSize","type":3},{"address":"0x2000b5fe","name":"huart2.RxXferCount","type":3},{"address":"0x2000b600","name":"huart2.Mask","type":3},{"address":"0x2000b604","name":"huart2.RxISR","type":5},{"address":"0x2000b608","name":"huart2.TxISR","type":5},{"address":"0x2000b60c","name":"huart2.hdmatx","type":5},{"address":"0x2000b610","name":"huart2.hdmarx","type":5},{"address":"0x2000b614","name":"huart2.Lock","type":2},{"address":"0x2000b618","name":"huart2.gState","type":5},{"address":"0x2000b61c","name":"huart2.RxState","type":5},{"address":"0x2000b620","name":"huart2.ErrorCode","type":5},{"address":"0x2000b624","name":"uwTick","type":5},{"address":"0x2000b628","name":"xQueueRegistry[0].pcQueueName","type":5},{"address":"0x2000b62c","name":"xQueueRegistry[0].xHandle","type":5}],"expand":false,"filename":"yRobot.elf","exeModifiedTime":1601035031115,"configLastUpdate":1601035407368},{"id":"b090ccaa.ab526","type":"probe","z":"","probeid":"066DFF535752877167095728","probename":"ST-Link v2-1B (...95728)","protocol":"SWD","frequency":"1.8 MHz - Default","probeproperty":"{\"SWD\":[\"4.6 MHz\",\"1.8 MHz - Default\",\"950 kHz\",\"400 kHz\",\"150 kHz\"],\"JTAG\":[\"18 MHz\",\"9 MHz\",\"4.5 MHz\",\"2.25 MHz\",\"1.12 MHz - Default\",\"560 kHz\",\"280 kHz\",\"140 kHz\"]}","probeversion":"ST Link firmware version V2.J31","connectionType":"p2p"},{"id":"3eac6833.ef73e8","type":"ui_tab","z":"","name":"Base","icon":"dashboard","order":1,"disabled":false,"hidden":false},{"id":"17e61a5a.2f1f96","type":"ui_group","z":"","name":"Display","tab":"dab5031.450db","order":1,"disp":true,"width":"6","collapse":false},{"id":"dab5031.450db","type":"ui_tab","z":"","name":"VT100","icon":"dashboard","order":4,"disabled":false,"hidden":false},{"id":"f5709582.fc06c8","type":"ui_group","z":"","name":"Faire un choix...","tab":"dab5031.450db","order":2,"disp":true,"width":"6","collapse":false},{"id":"95ad7962.75a0a8","type":"ui_group","z":"","name":"Graphique","tab":"da9b2906.8948c8","order":2,"disp":true,"width":10,"collapse":false},{"id":"cd2430f3.f6b74","type":"ui_spacer","name":"spacer","group":"f5709582.fc06c8","order":2,"width":2,"height":1},{"id":"48030429.006c0c","type":"ui_spacer","name":"spacer","group":"f5709582.fc06c8","order":4,"width":2,"height":1},{"id":"72f3f7c0.e6ebb8","type":"ui_spacer","name":"spacer","group":"3dfdb3a5.11521c","order":2,"width":6,"height":1},{"id":"eed782d1.b4a7","type":"ui_spacer","name":"spacer","group":"3dfdb3a5.11521c","order":3,"width":6,"height":1},{"id":"68ae55e9.ac2f4c","type":"ui_spacer","name":"spacer","group":"3dfdb3a5.11521c","order":5,"width":1,"height":1},{"id":"d6ecc8a1.53cca8","type":"ui_spacer","name":"spacer","group":"3dfdb3a5.11521c","order":6,"width":6,"height":1},{"id":"b1b03e20.34484","type":"ui_spacer","name":"spacer","group":"3dfdb3a5.11521c","order":7,"width":6,"height":1},{"id":"fec6ed33.35892","type":"ui_spacer","name":"spacer","group":"3dfdb3a5.11521c","order":11,"width":1,"height":1},{"id":"ed7a5744.2bcd78","type":"ui_spacer","name":"spacer","group":"95ad7962.75a0a8","order":2,"width":1,"height":1},{"id":"1a5a1614.b2f0ea","type":"ui_spacer","name":"spacer","group":"95ad7962.75a0a8","order":5,"width":2,"height":1},{"id":"ebbc0e39.4cade","type":"ui_spacer","name":"spacer","group":"95ad7962.75a0a8","order":7,"width":1,"height":1},{"id":"381c31c9.1d8f8e","type":"ui_group","z":"f3572396.ff04b","name":"Moteurs","tab":"da9b2906.8948c8","order":3,"disp":true,"width":"6","collapse":false},{"id":"81b688ed.ba6248","type":"ui_group","z":"","name":"Moteurs","tab":"da9b2906.8948c8","order":4,"disp":false,"width":"10","collapse":false},{"id":"59193cc8.916a34","type":"ui_group","z":"","name":"Tableau des variables lues","tab":"e9875e3d.8cf87","order":2,"disp":true,"width":"16","collapse":false},{"id":"e9875e3d.8cf87","type":"ui_tab","z":"","name":"Toutes les Data","icon":"dashboard","order":3,"disabled":false,"hidden":false},{"id":"3c5ffe0d.9063b2","type":"switch","z":"8381c865.236028","name":"filter variable","property":"payload.variablename","propertyType":"msg","rules":[{"t":"eq","v":"varfilter","vt":"env"}],"checkall":"true","repair":false,"outputs":1,"x":170,"y":60,"wires":[["4e5ba7a5.14dec8"]]},{"id":"4e5ba7a5.14dec8","type":"change","z":"8381c865.236028","name":"keep only table of duplets","rules":[{"t":"set","p":"payload","pt":"msg","to":"payload.variabledata","tot":"msg"}],"action":"","property":"","from":"","to":"","reg":false,"x":430,"y":60,"wires":[["42bc6ed.5b20d9"]]},{"id":"42bc6ed.5b20d9","type":"split","z":"8381c865.236028","name":"Split a table[1..n] of duplets in n msg of single duplet","splt":"\\n","spltType":"str","arraySplt":1,"arraySpltType":"len","stream":false,"addname":"","x":800,"y":60,"wires":[["8b8ddb84.6fb208"]]},{"id":"8b8ddb84.6fb208","type":"delay","z":"8381c865.236028","name":"","pauseType":"rate","timeout":"5","timeoutUnits":"seconds","rate":"10","nbRateUnits":"1","rateUnits":"second","randomFirst":"1","randomLast":"5","randomUnits":"seconds","drop":true,"x":200,"y":140,"wires":[["66397fd3.d8111"]]},{"id":"66397fd3.d8111","type":"change","z":"8381c865.236028","name":"keep only value and delete timestamp","rules":[{"t":"set","p":"payload","pt":"msg","to":"payload.y","tot":"msg"}],"action":"","property":"","from":"","to":"","reg":false,"x":490,"y":140,"wires":[[]]},{"id":"580a90de.64261","type":"comment","z":"baaf425c.2e52f","name":"HOME tab","info":"","x":120,"y":40,"wires":[]},{"id":"108a82f2.18177d","type":"ui_text","z":"baaf425c.2e52f","group":"1326d3e9.6d4ebc","order":1,"width":0,"height":0,"name":"","label":"Please, import flow ffrom GitDepots/project-In-Progress","format":"{{msg.payload}}","layout":"row-spread","x":340,"y":100,"wires":[]},{"id":"ed67754b.e11ec8","type":"ui_text","z":"baaf425c.2e52f","group":"1326d3e9.6d4ebc","order":2,"width":0,"height":0,"name":"","label":"A la fin exporter 'all flows' to GitDepots/project_in-progress","format":"{{msg.payload}}","layout":"row-spread","x":540,"y":180,"wires":[]},{"id":"ede42820.255e78","type":"ui_button","z":"2d126e47.f46862","name":"","group":"95ad7962.75a0a8","order":4,"width":2,"height":1,"passthru":true,"label":"STOP Acq","tooltip":"","color":"","bgcolor":"","icon":"","payload":"","payloadType":"str","topic":"stop","x":380,"y":180,"wires":[["fad3f288.15f28","c05f1fa4.f71c7"]]},{"id":"114a7e24.80fbe2","type":"inject","z":"2d126e47.f46862","name":"AutoStart_true","topic":"","payload":"true","payloadType":"bool","repeat":"","crontab":"","once":true,"onceDelay":"0.1","x":170,"y":140,"wires":[["52d96abf.806d94"]],"info":"Injection 'true' au dÃ©marrage du flow.\nC'est donc un auto start"},{"id":"1cfab1c1.8c386e","type":"comment","z":"2d126e47.f46862","name":"Nucleo_L476RG & Jostick","info":"","x":180,"y":40,"wires":[]},{"id":"52d96abf.806d94","type":"ui_button","z":"2d126e47.f46862","name":"","group":"95ad7962.75a0a8","order":3,"width":2,"height":1,"passthru":true,"label":"START Acq","tooltip":"","color":"","bgcolor":"","icon":"","payload":"","payloadType":"str","topic":"start","x":380,"y":140,"wires":[["fad3f288.15f28","8fe3303e.c58f2"]]},{"id":"b77bf5f2.f89718","type":"comment","z":"2d126e47.f46862","name":"Acquisition Output","info":"","x":1050,"y":100,"wires":[]},{"id":"7e1a5537.f356ac","type":"comment","z":"2d126e47.f46862","name":"Acquisition Input","info":"","x":160,"y":600,"wires":[]},{"id":"7ce0656b.86619c","type":"comment","z":"2d126e47.f46862","name":"Variables Liste","info":"","x":710,"y":100,"wires":[]},{"id":"c23bab81.c0f9c8","type":"comment","z":"2d126e47.f46862","name":"Processing","info":"","x":380,"y":600,"wires":[]},{"id":"fad3f288.15f28","type":"variables","z":"2d126e47.f46862","groupname":"Read01","accesspoint":0,"execonfig":"97aba708.5252a8","variablelist":[],"triggerstartmode":"manual","triggername":"ymx_Coef","triggerthreshold":"","frequency":"","frequencyType":"1","snapshotheader":"","mode":"direct","lastImportedTime":1601035407754,"openStatus":true,"x":710,"y":160,"wires":[["115dd254.59d04e","50140fa1.c0f4e"]]},{"id":"115dd254.59d04e","type":"acquisition out","z":"2d126e47.f46862","name":"L476RG Out1","probeconfig":"b090ccaa.ab526","x":1040,"y":140,"wires":[],"info":"Nucleo-L476RG sur Com7"},{"id":"55a5dd7d.016ae4","type":"acquisition in","z":"2d126e47.f46862","name":"L476RG In1","probeconfig":"b090ccaa.ab526","x":130,"y":640,"wires":[["427e180d.c9ec78"],[]],"info":"Nucleo-L476RG sur Com7"},{"id":"427e180d.c9ec78","type":"processing","z":"2d126e47.f46862","groupname":"Read01","groupid":"fad3f288.15f28","expressions":[],"statistics":[],"logmode":"no","x":380,"y":640,"wires":[["c2e2d3aa.af577","90ce7d2d.5da5c","b29e9414.f81d38","4be26eaa.ce359","94fda4af.433698","d9d1a93.c04d858","828027fe.bd0c78","20dd7b9c.50b8b4","32aede70.639532","40c5906a.3e694","336fc7e0.12a4d8","dee220f7.ef93e","ed5699d4.56f808","424a55b0.9ad33c","99e8fb6d.4f6e78","2e267a91.50fc06"],[]]},{"id":"c2e2d3aa.af577","type":"debug","z":"2d126e47.f46862","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"false","x":660,"y":350,"wires":[]},{"id":"50140fa1.c0f4e","type":"debug","z":"2d126e47.f46862","name":"","active":false,"tosidebar":true,"console":false,"tostatus":true,"complete":"payload","targetType":"msg","x":1030,"y":190,"wires":[]},{"id":"90ce7d2d.5da5c","type":"subflow:8381c865.236028","z":"2d126e47.f46862","name":"ymx_VRx_PV","env":[{"name":"varfilter","value":"ymx_VRx_PV","type":"str"}],"x":670,"y":390,"wires":[["d3c4176b.92cfc8","8693a09d.01b7e"]]},{"id":"d3c4176b.92cfc8","type":"ui_text","z":"2d126e47.f46862","group":"3dfdb3a5.11521c","order":9,"width":2,"height":1,"name":"","label":"ymx_VRx_PV","format":"{{msg.payload.toFixed(2)}}","layout":"col-center","x":860,"y":390,"wires":[]},{"id":"b29e9414.f81d38","type":"subflow:8381c865.236028","z":"2d126e47.f46862","name":"ymx_VRy_PV","env":[{"name":"varfilter","value":"ymx_VRy_PV","type":"str"}],"x":670,"y":460,"wires":[["7a49753a.85b76c","94e900d0.d26d7"]]},{"id":"7a49753a.85b76c","type":"ui_text","z":"2d126e47.f46862","group":"3dfdb3a5.11521c","order":10,"width":2,"height":1,"name":"","label":"ymx_VRy_PV","format":"{{msg.payload.toFixed(2)}}","layout":"col-center","x":860,"y":460,"wires":[]},{"id":"8693a09d.01b7e","type":"ui_slider","z":"2d126e47.f46862","name":"","label":"VRx","tooltip":"","group":"3dfdb3a5.11521c","order":4,"width":5,"height":1,"passthru":true,"outs":"all","topic":"","min":"-100.0","max":"100.0","step":1,"x":840,"y":420,"wires":[[]]},{"id":"94e900d0.d26d7","type":"ui_slider","z":"2d126e47.f46862","name":"","label":"VRy","tooltip":"","group":"3dfdb3a5.11521c","order":1,"width":1,"height":5,"passthru":true,"outs":"all","topic":"","min":"-100.0","max":"100.0","step":1,"x":840,"y":490,"wires":[[]]},{"id":"5bb4d294.4142ac","type":"variables","z":"8b8d2438.d4fab8","groupname":"Write01","accesspoint":0,"execonfig":"97aba708.5252a8","variablelist":[],"triggerstartmode":"manual","triggername":"ymx_Coef","triggerthreshold":"","frequency":"","frequencyType":"1","snapshotheader":"","mode":"direct","lastImportedTime":1601035414408,"openStatus":true,"x":320,"y":80,"wires":[["1c8ec1a8.8a59ee","7c44c82.f534038","830e9ccc.c7e57"]]},{"id":"1c8ec1a8.8a59ee","type":"ui_write","z":"8b8d2438.d4fab8","group":"17e61a5a.2f1f96","name":"","order":1,"width":6,"height":6,"x":550,"y":130,"wires":[["7c44c82.f534038"]]},{"id":"7c44c82.f534038","type":"acquisition out","z":"8b8d2438.d4fab8","name":"L476RG Out2","probeconfig":"b090ccaa.ab526","x":830,"y":80,"wires":[]},{"id":"f68361db.9d3f5","type":"comment","z":"8b8d2438.d4fab8","name":"Liste d'Ã©critures","info":"","x":340,"y":40,"wires":[]},{"id":"392e1591.99528a","type":"acquisition in","z":"8b8d2438.d4fab8","name":"L476RG In2","probeconfig":"b090ccaa.ab526","x":290,"y":390,"wires":[["a9e7d4cc.eba6d8"],[]]},{"id":"a9e7d4cc.eba6d8","type":"processing","z":"8b8d2438.d4fab8","groupname":"Write01","groupid":"5bb4d294.4142ac","expressions":[],"statistics":[],"logmode":"no","x":530,"y":390,"wires":[["2ea9900e.3f705","b16afe21.f9a9c","2ae1ac83.7c5984","17807e71.251752","a82a67d6.b84e78"],[]]},{"id":"8fe3303e.c58f2","type":"link out","z":"2d126e47.f46862","name":"link Start Acq","links":["9de79b78.28f1a8"],"x":505,"y":90,"wires":[]},{"id":"9de79b78.28f1a8","type":"link in","z":"8b8d2438.d4fab8","name":"","links":["8fe3303e.c58f2"],"x":195,"y":60,"wires":[["5bb4d294.4142ac"]]},{"id":"c05f1fa4.f71c7","type":"link out","z":"2d126e47.f46862","name":"Link stop Acq","links":["e841976c.0a3908"],"x":505,"y":220,"wires":[]},{"id":"e841976c.0a3908","type":"link in","z":"8b8d2438.d4fab8","name":"","links":["c05f1fa4.f71c7"],"x":195,"y":110,"wires":[["5bb4d294.4142ac"]]},{"id":"2ea9900e.3f705","type":"subflow:8381c865.236028","z":"8b8d2438.d4fab8","name":"ymx_VRy_Ro","env":[{"name":"varfilter","value":"ymx_VRy_Ro","type":"str"}],"x":750,"y":390,"wires":[["1d7e416d.357ecf"]]},{"id":"b16afe21.f9a9c","type":"subflow:8381c865.236028","z":"8b8d2438.d4fab8","name":"ymx_VRy_Ri","env":[{"name":"varfilter","value":"ymx_VRy_Ri","type":"str"}],"x":740,"y":350,"wires":[["76cc45b6.3a8d9c"]]},{"id":"1d7e416d.357ecf","type":"ui_text","z":"8b8d2438.d4fab8","group":"17e61a5a.2f1f96","order":4,"width":"3","height":1,"name":"","label":"VRy_Ro","format":"{{msg.payload}}","layout":"row-center","x":930,"y":390,"wires":[]},{"id":"76cc45b6.3a8d9c","type":"ui_text","z":"8b8d2438.d4fab8","group":"17e61a5a.2f1f96","order":2,"width":3,"height":1,"name":"","label":"VRy_Ri","format":"{{msg.payload}}","layout":"row-center","x":930,"y":350,"wires":[]},{"id":"2ae1ac83.7c5984","type":"subflow:8381c865.236028","z":"8b8d2438.d4fab8","name":"aRxBuffer[0]","env":[{"name":"varfilter","value":"aRxBuffer[0]","type":"str"}],"x":740,"y":440,"wires":[["dd548903.1547c8"]]},{"id":"dd548903.1547c8","type":"ui_text","z":"8b8d2438.d4fab8","group":"17e61a5a.2f1f96","order":3,"width":3,"height":1,"name":"","label":"aRxBuffer[0]","format":"{{msg.payload}}","layout":"row-center","x":940,"y":440,"wires":[]},{"id":"3f93c791.0da028","type":"ui_text_input","z":"8b8d2438.d4fab8","name":"","label":"Commande","tooltip":"","group":"f5709582.fc06c8","order":3,"width":2,"height":1,"passthru":false,"mode":"text","delay":300,"topic":"Cde","x":170,"y":690,"wires":[["561b6f6a.6285b"]]},{"id":"561b6f6a.6285b","type":"function","z":"8b8d2438.d4fab8","name":"string2ascii_2","func":"/*\n* Converti un caractere en son code ASCII -1er sortie\n* puis charactere vide sur 2e sortie\n*/\n//sortie 1\nvar msg1 = {topic: \"string2ascii\"};\nmsg1.payload=msg.payload.charCodeAt(0);\n//sortie 2\nvar msg2 = {topic: \"toRAZorigin\"};\nmsg2.payload=\"\";\nreturn [msg1, msg2];\n","outputs":2,"noerr":0,"x":370,"y":690,"wires":[["46fabebe.05836"],["729921ba.12caa"]],"inputLabels":["Cde"],"outputLabels":["AsciiCode","RaZ"]},{"id":"39e972a1.89f39e","type":"template","z":"8b8d2438.d4fab8","name":"write_msg","field":"payload","fieldType":"msg","format":"json","syntax":"mustache","template":"{\n    \"variablelist\": [\n        {\n            \"address\": \"{{payload.add}}\",\n            \"type\": 1,\n            \"value\": \"{{payload.code}}\"\n        }\n    ],\n    \"accesspoint\": 0\n}\n","output":"json","x":870,"y":680,"wires":[["97b2b5f0.e98cd8"]],"info":"/*\n* type_nb   ST_type\n*   1       uint8_t\n*   2       8 sign\n*   3       U16\n*   4       16 sign\n*   5       uint32_t\n*   6       S32\n*   9       float\n*   10      double\n*/"},{"id":"97b2b5f0.e98cd8","type":"change","z":"8b8d2438.d4fab8","name":"set topic","rules":[{"t":"set","p":"topic","pt":"msg","to":"write","tot":"str"}],"action":"","property":"","from":"","to":"","reg":false,"x":1040,"y":680,"wires":[["7c44c82.f534038"]]},{"id":"729921ba.12caa","type":"delay","z":"8b8d2438.d4fab8","name":"","pauseType":"delay","timeout":"500","timeoutUnits":"milliseconds","rate":"1","nbRateUnits":"1","rateUnits":"second","randomFirst":"1","randomLast":"5","randomUnits":"seconds","drop":false,"x":540,"y":780,"wires":[["3f93c791.0da028"]]},{"id":"830e9ccc.c7e57","type":"function","z":"8b8d2438.d4fab8","name":"aRxBuffer_adr","func":"/* \n* Recuperer l'address d'une variable\n* linked from 'variable node'\n*/\n// extract address & prepare msg\nfunction myFunction(item) {\n  if (item.name == \"aRxBuffer[0]\") {\n    msg2 = {topic:\"Address\", payload: item.address};\n    msg1 = {topic:\"Name\", payload:item.name};\n  }  \n}\nvar msg1 = {};\nvar msg2 = {};\n// apply to variable list\nmsg.payload.variablelist.forEach(myFunction);\n\nreturn [msg1, msg2];\n","outputs":2,"noerr":0,"x":510,"y":540,"wires":[["d907ba51.47f7d8"],["85447a04.c84118","46fabebe.05836"]],"inputLabels":["FromVariablesNode"],"outputLabels":["Name","Address"],"info":"Recuperer l'address d'une variable.\n\nRenvoi le nom dÃ©fini sur Out1.\n\nRenvoi son address sur Out2.\n\nLes Inputs/Outputs sont nommÃ©s.\n"},{"id":"d907ba51.47f7d8","type":"debug","z":"8b8d2438.d4fab8","name":"","active":false,"tosidebar":true,"console":false,"tostatus":true,"complete":"payload","targetType":"msg","x":720,"y":530,"wires":[]},{"id":"51d00f9d.24f7f","type":"comment","z":"8b8d2438.d4fab8","name":"Envoyer une commande (1 car) via dashboard","info":"","x":230,"y":600,"wires":[]},{"id":"1bf05e09.2329b2","type":"ui_template","z":"8b8d2438.d4fab8","group":"f5709582.fc06c8","name":"Menu choix","order":1,"width":0,"height":0,"format":"<!-- Liste de choix possible -->\n<ul>\n    <li>I (Qqs infos sur Class yMENU)</li>\n    <li>T (bla bla)</li>\n    <li>L (bla bla)</li>\n    <li>R (bla bla)</li>\n    <li>S (bla bla)</li>\n    <li>X (Apply VRx Trim value)</li>\n    <li>Y (Apply VRy Trim value)</li>\n    <li>C (Clean TeraTerm screen)</li>\n    <li>M (Menu)</li>\n</ul>\n","storeOutMessages":true,"fwdInMessages":true,"templateScope":"local","x":170,"y":650,"wires":[[]]},{"id":"85447a04.c84118","type":"debug","z":"8b8d2438.d4fab8","name":"","active":false,"tosidebar":true,"console":false,"tostatus":true,"complete":"payload","targetType":"msg","x":720,"y":580,"wires":[]},{"id":"17807e71.251752","type":"subflow:8381c865.236028","z":"8b8d2438.d4fab8","name":"aRxBuffer[2]","env":[{"name":"varfilter","value":"aRxBuffer[2]","type":"str"}],"x":740,"y":480,"wires":[["a8a19ed4.f6ee8"]]},{"id":"a8a19ed4.f6ee8","type":"ui_text","z":"8b8d2438.d4fab8","group":"17e61a5a.2f1f96","order":5,"width":3,"height":1,"name":"","label":"aRxBuffer[2]","format":"{{msg.payload}}","layout":"row-center","x":940,"y":480,"wires":[]},{"id":"46fabebe.05836","type":"function","z":"8b8d2438.d4fab8","name":"Func_2inputs_objectOut","func":"/*\n* En fonction du topic d'un flow sauver payload ds un contexte.\n* Creer new msg avec object payload contenant 2 valeur nomÃ©es.\n*/\n\nswitch (msg.topic) {\n    case \"string2ascii\":\n        context.set(\"Code\",msg.payload);\n        break;\n    case \"Address\":\n        context.set(\"Address\", msg.payload);\n        break;\n    default:\n        msg = null;\n        break;\n}\n\nvar msg1 = {};\n//msg1.payload = {code:120, add:0x200ff};\nvar temp1 = context.get(\"Code\");\nvar temp2 = context.get(\"Address\");\nmsg1.payload = {code:temp1, add:temp2}; \n\nreturn msg1;","outputs":1,"noerr":0,"x":650,"y":680,"wires":[["39e972a1.89f39e"]],"info":"En fonction du topic d'un flow sauver payload ds un contexte.\n\nCreer new msg avec object payload contenant 2 valeur nommÃ©es.\n\n"},{"id":"731a52d7.3b2b1c","type":"comment","z":"8b8d2438.d4fab8","name":"Un caractere \"\" envoyÃ© apres delai.","info":"","x":290,"y":770,"wires":[]},{"id":"4f7ad576.2a4c9c","type":"switch","z":"2d126e47.f46862","name":"filter VRy_Raw","property":"payload.variablename","propertyType":"msg","rules":[{"t":"eq","v":"ymx_VRy_Raw","vt":"str"}],"checkall":"true","repair":true,"outputs":1,"x":670,"y":700,"wires":[["b2c348bb.3d9668"]]},{"id":"bbe79bf7.40c1b8","type":"ui_button","z":"2d126e47.f46862","name":"","group":"95ad7962.75a0a8","order":6,"width":2,"height":1,"passthru":false,"label":"Clear","tooltip":"","color":"","bgcolor":"","icon":"","payload":"","payloadType":"str","topic":"clear","x":680,"y":670,"wires":[["b2c348bb.3d9668"]]},{"id":"b2c348bb.3d9668","type":"ui_chartst","z":"2d126e47.f46862","group":"95ad7962.75a0a8","name":"","order":1,"width":10,"height":7,"chartType":"line","curveType":"linear","duration":"90","ymin":"","ymax":"","x":1070,"y":700,"wires":[]},{"id":"7e66dec9.d3966","type":"switch","z":"2d126e47.f46862","name":"filter VRy_Raw","property":"payload.variablename","propertyType":"msg","rules":[{"t":"eq","v":"ymx_VRy_Raw","vt":"str"}],"checkall":"true","repair":true,"outputs":1,"x":670,"y":730,"wires":[["b2c348bb.3d9668"]]},{"id":"4be26eaa.ce359","type":"subflow:8381c865.236028","z":"2d126e47.f46862","name":"ymx_Coef Filtre","env":[{"name":"varfilter","value":"ymx_Coef","type":"str"}],"x":670,"y":530,"wires":[["c937856d.2189f8"]]},{"id":"c937856d.2189f8","type":"ui_text","z":"2d126e47.f46862","group":"3dfdb3a5.11521c","order":8,"width":2,"height":1,"name":"","label":"ymx_Coef","format":"{{msg.payload.toFixed(2)}}","layout":"col-center","x":840,"y":530,"wires":[]},{"id":"94fda4af.433698","type":"switch","z":"2d126e47.f46862","name":"filter VRx_PV","property":"payload.variablename","propertyType":"msg","rules":[{"t":"eq","v":"ymx_VRx_PV","vt":"str"}],"checkall":"true","repair":true,"outputs":1,"x":660,"y":760,"wires":[["b2c348bb.3d9668"]]},{"id":"d9d1a93.c04d858","type":"switch","z":"2d126e47.f46862","name":"filter VRy_PV","property":"payload.variablename","propertyType":"msg","rules":[{"t":"eq","v":"ymx_VRy_PV","vt":"str"}],"checkall":"true","repair":true,"outputs":1,"x":660,"y":790,"wires":[["b2c348bb.3d9668"]]},{"id":"69cc0882.b018a8","type":"ui_text","z":"2d126e47.f46862","group":"3dfdb3a5.11521c","order":8,"width":2,"height":1,"name":"","label":"ymx_Ri","format":"{{msg.payload}}","layout":"col-center","x":840,"y":560,"wires":[]},{"id":"bd91226b.a58df","type":"ui_text","z":"2d126e47.f46862","group":"3dfdb3a5.11521c","order":8,"width":2,"height":1,"name":"","label":"ymx_VRx_Ro","format":"{{msg.payload}}","layout":"col-center","x":860,"y":590,"wires":[]},{"id":"828027fe.bd0c78","type":"subflow:8381c865.236028","z":"2d126e47.f46862","name":"ymx_VRy_Ri","env":[{"name":"varfilter","value":"ymx_VRy_Ri","type":"str"}],"x":660,"y":560,"wires":[["69cc0882.b018a8"]]},{"id":"40c5906a.3e694","type":"switch","z":"2d126e47.f46862","name":"filter VRx_Ro","property":"payload.variablename","propertyType":"msg","rules":[{"t":"eq","v":"ymx_VRx_Ro","vt":"str"}],"checkall":"true","repair":true,"outputs":1,"x":660,"y":820,"wires":[["b2c348bb.3d9668"]]},{"id":"336fc7e0.12a4d8","type":"switch","z":"2d126e47.f46862","name":"filter VRy_Ro","property":"payload.variablename","propertyType":"msg","rules":[{"t":"eq","v":"ymx_VRy_Ro","vt":"str"}],"checkall":"true","repair":true,"outputs":1,"x":660,"y":850,"wires":[["b2c348bb.3d9668"]]},{"id":"20dd7b9c.50b8b4","type":"subflow:8381c865.236028","z":"2d126e47.f46862","name":"ymx_VRx_Ro","env":[{"name":"varfilter","value":"ymx_VRx_Ro","type":"str"}],"x":670,"y":590,"wires":[["bd91226b.a58df"]]},{"id":"32aede70.639532","type":"subflow:8381c865.236028","z":"2d126e47.f46862","name":"ymx_VRy_Ro","env":[{"name":"varfilter","value":"ymx_VRy_Ro","type":"str"}],"x":670,"y":620,"wires":[["d412921c.99838"]]},{"id":"d412921c.99838","type":"ui_text","z":"2d126e47.f46862","group":"3dfdb3a5.11521c","order":8,"width":2,"height":1,"name":"","label":"ymx_VRy_Ro","format":"{{msg.payload}}","layout":"col-center","x":860,"y":620,"wires":[]},{"id":"e0ad6ee1.f2205","type":"switch","z":"6cdd2d7c.a92c74","name":"filter variable","property":"payload.variablename","propertyType":"msg","rules":[{"t":"eq","v":"varfilter","vt":"env"}],"checkall":"true","repair":false,"outputs":1,"x":240,"y":110,"wires":[["3aaf53d6.61992c"]]},{"id":"3aaf53d6.61992c","type":"change","z":"6cdd2d7c.a92c74","name":"keep only table of duplets","rules":[{"t":"set","p":"payload","pt":"msg","to":"payload.variabledata","tot":"msg"}],"action":"","property":"","from":"","to":"","reg":false,"x":500,"y":110,"wires":[["38133e32.ab5572"]]},{"id":"38133e32.ab5572","type":"change","z":"6cdd2d7c.a92c74","name":"keep only value and delete timestamp","rules":[{"t":"set","p":"payload","pt":"msg","to":"payload.y","tot":"msg"}],"action":"","property":"","from":"","to":"","reg":false,"x":740,"y":180,"wires":[[]]},{"id":"f6e9381f.abe348","type":"subflow:8381c865.236028","z":"f3572396.ff04b","name":"","env":[],"x":280,"y":170,"wires":[["9ac23244.edc72"]]},{"id":"9ac23244.edc72","type":"ui_text","z":"f3572396.ff04b","group":"381c31c9.1d8f8e","order":14,"width":0,"height":0,"name":"var","label":"var","format":"{{msg.payload}}","layout":"row-spread","x":490,"y":170,"wires":[]},{"id":"dee220f7.ef93e","type":"subflow:8381c865.236028","z":"2d126e47.f46862","name":"Moteur_D.MarArr","env":[{"name":"varfilter","value":"Moteur_D.MarArr","type":"str"}],"x":660,"y":990,"wires":[["9eec60a.6e882a"]]},{"id":"9eec60a.6e882a","type":"ui_text","z":"2d126e47.f46862","group":"81b688ed.ba6248","order":8,"width":"1","height":1,"name":"Moteur_D.MarArr","label":"","format":"{{msg.payload}}","layout":"col-center","x":900,"y":990,"wires":[]},{"id":"5ed37997.bdfe78","type":"ui_template","z":"2d126e47.f46862","group":"81b688ed.ba6248","name":"-----  Moteurs  ------","order":1,"width":0,"height":0,"format":"<!-- Items des structures -->\n<table>\n    <thead>\n        <tr>\n            <th>-- Moteurs --</th>\n        </tr>\n    </thead>\n    <tbody>\n        <tr>\n            <td>MarArr</td>\n            <td>Run</td>\n            <td>Speed SP</td>\n            <td>Speed MV</td>\n        </tr>\n    </tbody>\n</table>\n\n","storeOutMessages":true,"fwdInMessages":true,"resendOnRefresh":false,"templateScope":"local","x":660,"y":930,"wires":[[]]},{"id":"ed5699d4.56f808","type":"subflow:8381c865.236028","z":"2d126e47.f46862","name":"Moteur_D.Run","env":[{"name":"varfilter","value":"Moteur_D.inRun","type":"str"}],"x":650,"y":1030,"wires":[["78f2087f.daf078"]]},{"id":"78f2087f.daf078","type":"ui_text","z":"2d126e47.f46862","group":"81b688ed.ba6248","order":8,"width":"1","height":1,"name":"Moteur_D.inRun","label":"","format":"{{msg.payload.toFixed(2)}}","layout":"col-center","x":890,"y":1030,"wires":[]},{"id":"424a55b0.9ad33c","type":"subflow:8381c865.236028","z":"2d126e47.f46862","name":"Moteur_D.Speed_SP","env":[{"name":"varfilter","value":"Moteur_D.Speed_SP","type":"str"}],"x":670,"y":1070,"wires":[["6dd612af.6ece4c"]]},{"id":"6dd612af.6ece4c","type":"ui_text","z":"2d126e47.f46862","group":"81b688ed.ba6248","order":8,"width":2,"height":1,"name":"Speed_SP","label":"","format":"{{msg.payload.toFixed(2)}}","layout":"col-center","x":880,"y":1070,"wires":[]},{"id":"99e8fb6d.4f6e78","type":"subflow:8381c865.236028","z":"2d126e47.f46862","name":"Moteur_D.Speed_MV","env":[{"name":"varfilter","value":"Moteur_D.Speed_MV","type":"str"}],"x":670,"y":1110,"wires":[["1a9fcbde.281074"]]},{"id":"1a9fcbde.281074","type":"ui_text","z":"2d126e47.f46862","group":"81b688ed.ba6248","order":8,"width":2,"height":1,"name":"Moteur_D.Speed_MV","label":"","format":"{{msg.payload.toFixed(2)}}","layout":"col-center","x":910,"y":1110,"wires":[]},{"id":"63f71494.92afdc","type":"inject","z":"c38b0ce6.66e1c","name":"Go","topic":"","payload":"1","payloadType":"str","repeat":"","crontab":"","once":false,"onceDelay":"","x":250,"y":290,"wires":[["2bb59b18.67f0e4"]]},{"id":"2bb59b18.67f0e4","type":"function","z":"c38b0ce6.66e1c","name":"build array (2)","func":"var arr =[[\"Paul\",\"Doe\",24],[\"Greg\",\"Jones\",31],[\"Able\",\"Smith\",29]];\nmsg.payload = arr;\nreturn msg;","outputs":1,"noerr":0,"x":460,"y":290,"wires":[[]]},{"id":"c81df300.f6936","type":"debug","z":"c38b0ce6.66e1c","name":"","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"false","x":830,"y":130,"wires":[]},{"id":"fa181033.65fb7","type":"ui_template","z":"c38b0ce6.66e1c","group":"59193cc8.916a34","name":"Two dimension array table","order":1,"width":"16","height":"10","format":"<table id=\"table\" border=\"1\">\n <tr>\n <th>ProcNode</th> \n <th>index</th>\n <th>object</th>\n <th>Value</th>\n </tr>\n <tbody>\n <!--\n <tr ng-repeat=\"row in msg.payload\">\n <td ng-repeat=\"item in row\" >{{item}}</td>\n -->\n <!-- vu sur le net!! -->\n <tr ng-repeat=\"row in msg.payload\">\n    <td>{{row.groupname}}</td>\n    <td>{{$index+1}}</td>\n    <td>{{row.variablename}}</td>\n    <td>{{row.variabledata[0].y.toFixed(2)}}</td>\n </tr>\n </tbody>\n</table>\n","storeOutMessages":true,"fwdInMessages":true,"resendOnRefresh":false,"templateScope":"local","x":560,"y":130,"wires":[["c81df300.f6936"]]},{"id":"2e267a91.50fc06","type":"join","z":"2d126e47.f46862","name":"joinProcessing","mode":"custom","build":"array","property":"payload","propertyType":"msg","key":"topic","joiner":"\\n","joinerType":"str","accumulate":false,"timeout":"1","count":"","reduceRight":false,"reduceExp":"","reduceInit":"","reduceInitType":"num","reduceFixup":"","x":640,"y":300,"wires":[["7142d838.2e6518"]]},{"id":"7142d838.2e6518","type":"link out","z":"2d126e47.f46862","name":"link_joinProcRead","links":["5476459b.84c50c"],"x":815,"y":300,"wires":[]},{"id":"5476459b.84c50c","type":"link in","z":"c38b0ce6.66e1c","name":"","links":["7142d838.2e6518"],"x":285,"y":130,"wires":[["fa181033.65fb7"]]},{"id":"a82a67d6.b84e78","type":"join","z":"8b8d2438.d4fab8","name":"joinWrite","mode":"custom","build":"array","property":"payload","propertyType":"msg","key":"topic","joiner":"\\n","joinerType":"str","accumulate":false,"timeout":"1","count":"","reduceRight":false,"reduceExp":"","reduceInit":"","reduceInitType":"","reduceFixup":"","x":720,"y":270,"wires":[["26e46fa.620559"]]},{"id":"26e46fa.620559","type":"link out","z":"8b8d2438.d4fab8","name":"link_ProcWrite","links":["a76394a5.41bea8"],"x":940,"y":270,"wires":[]},{"id":"a76394a5.41bea8","type":"link in","z":"c38b0ce6.66e1c","name":"","links":["26e46fa.620559"],"x":285,"y":80,"wires":[[]]},{"id":"e3115f2a.d727e","type":"comment","z":"2d126e47.f46862","name":"Faire array des data lues","info":"","x":670,"y":270,"wires":[]},{"id":"df2712b9.30f8d","type":"comment","z":"c38b0ce6.66e1c","name":"Example","info":"","x":360,"y":240,"wires":[]},{"id":"8e0b8992.f83208","type":"comment","z":"c38b0ce6.66e1c","name":"Constitution du tableau","info":"","x":540,"y":80,"wires":[]}]
+[
+    {
+        "id": "baaf425c.2e52f",
+        "type": "tab",
+        "label": "Base",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "2d126e47.f46862",
+        "type": "tab",
+        "label": "L476RG_jostick",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "8b8d2438.d4fab8",
+        "type": "tab",
+        "label": "L476RG_Menu",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "c38b0ce6.66e1c",
+        "type": "tab",
+        "label": "L476RG_Data_Read",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "8381c865.236028",
+        "type": "subflow",
+        "name": "Single value",
+        "info": "The 'single value' subflow allows to :\r\n * Filter Data to extract only one variable after the \"processing node\" step .\r\n * Modify the message to fit with standard widgets such as gauges.\r\n * Limit the number of messages to a maximum of 10 msg per second.\r\n\r\n### **Input**\r\n\r\nThe subflow 'single value' takes in input the `msg.payload`\r\nfrom the processing output. All the messages sent by the processing node have the same structure.\r\n\r\n    \"payload\": {\r\n        \"groupname\": \"Snapshot2\",\r\n        \"variabledata\": [\r\n            {\r\n                \"y\": \"9\",\r\n                \"x\": \"1567509421459\"\r\n            },\r\n            {\r\n                \"y\": \"9\",\r\n                \"x\": \"1567509421459\"\r\n            },\r\n            {\r\n                \"y\": \"9\",\r\n                \"x\": \"1567509421459\"\r\n            }\r\n        ],\r\n        \"variablename\": \"int2\"\r\n      }\r\n    }\r\n\r\n### **Filter on selected variable**\r\nSeveral messages are sent by the processing node for each variable, so the first step of this 'single value' subflow is to filter and keep only messages related to the selected variable.\r\nThe 'filter variable' node will only keep messages with the right `variablename` key.\r\n\r\n### **Extract duplets table**\r\n\r\nThe received message is an Object containing {groupname, variabledata[array], variablename}.  \r\nThe array contains two variables :\r\n - `y` the value \r\n - `x` the time\r\n\r\nA single message contains multiple pairs of values extract at a regular time interval.\r\nThe time interval depends on the acquisition frequency.\r\nWith the 'change' node and the `set` property, the `msg.payload` is set to \r\n`msg.payload.variabledata`, only the data variable array is set into msg.payload.\r\n\r\n    \"payload\": {\r\n        \"variabledata\": [\r\n            {\r\n                \"y\": \"9\",\r\n                \"x\": \"1567509421459\"\r\n            },\r\n            {\r\n                \"y\": \"9\",\r\n                \"x\": \"1567509421459\"\r\n            },\r\n            {\r\n                \"y\": \"9\",\r\n                \"x\": \"1567509421459\"\r\n            }\r\n        ]\r\n    }\r\n\r\n### **Split duplets table**\r\n\r\nThe data variable array is split with a length of one in smaller objects by the 'split' node.\r\nEach new object contains two subvariables : `y` and `x`.\r\n\r\n    \"payload\": {\r\n        \"y\": \"9\",\r\n        \"x\": \"1567509421459\"\r\n    }\r\n\r\n\r\n### **Limit the number of messages**\r\n\r\nThe 'delay' node allows to limit the maximum number of message per second.\r\nIn the 'single value' subflow, one message is extracted per second.\r\n\r\n>_Be careful, a dashboard saturation risk exists if too many messages are received per second._\r\n\r\n### **Extract only y values**\r\n\r\nThe `msg.payload` is set to `msg.payload.y` with the `set` property. \r\nOnly `y` variable is set into msg.payload as single value.\r\n\r\n    \"payload\": { \r\n        \"y\": \"9\" \r\n    }\r\n\r\n### **Output** \r\n\r\nSome widgets such as the gauge and the text node are using the `msg.payload` property.  \r\nThe output node is linked to a gauge that allows to see the evolution \r\nof the `y` variable as a function of time.\r\n\r\n\r\n![subflow_gauge](images/subflow_gauge.png)\r\n\r\n### **Details**\r\n\r\nNote : The debug node allows to see clearly and easily the \r\nmessage at the node output.  \r\n\r\n\r\n> More details on [Node-Red][nr]\r\n[nr]: https://nodered.org/docs/user-guide/editor/workspace/subflows\r\n\r\n\r\n-------\r\n\r\n",
+        "category": "",
+        "in": [
+            {
+                "x": 40,
+                "y": 60,
+                "wires": [
+                    {
+                        "id": "3c5ffe0d.9063b2"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 780,
+                "y": 140,
+                "wires": [
+                    {
+                        "id": "66397fd3.d8111",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [
+            {
+                "name": "varfilter",
+                "type": "str",
+                "value": ""
+            }
+        ],
+        "color": "#DDAA99"
+    },
+    {
+        "id": "f3572396.ff04b",
+        "type": "subflow",
+        "name": "Subflow 1",
+        "info": "",
+        "category": "",
+        "in": [
+            {
+                "x": 110,
+                "y": 170,
+                "wires": [
+                    {
+                        "id": "f6e9381f.abe348"
+                    }
+                ]
+            }
+        ],
+        "out": [],
+        "env": [
+            {
+                "name": "var",
+                "type": "str",
+                "value": ""
+            }
+        ],
+        "color": "#DDAA99",
+        "status": {
+            "x": 160,
+            "y": 30,
+            "wires": []
+        }
+    },
+    {
+        "id": "6cdd2d7c.a92c74",
+        "type": "subflow",
+        "name": "Multiply-10",
+        "info": "",
+        "category": "",
+        "in": [
+            {
+                "x": 70,
+                "y": 110,
+                "wires": [
+                    {
+                        "id": "e0ad6ee1.f2205"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 980,
+                "y": 180,
+                "wires": [
+                    {
+                        "id": "38133e32.ab5572",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [
+            {
+                "name": "ValueBy10",
+                "type": "str",
+                "value": ""
+            }
+        ],
+        "color": "#DDAA99",
+        "status": {
+            "x": 160,
+            "y": 30,
+            "wires": []
+        }
+    },
+    {
+        "id": "64574786.2c65d8",
+        "type": "ui_base",
+        "z": "",
+        "theme": {
+            "name": "theme-dark",
+            "lightTheme": {
+                "default": "#0094CE",
+                "baseColor": "#008000",
+                "baseFont": "Arial,Arial,Helvetica,sans-serif",
+                "edited": true,
+                "reset": false
+            },
+            "darkTheme": {
+                "default": "#097479",
+                "baseColor": "#097479",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": true,
+                "reset": false
+            },
+            "customTheme": {
+                "name": "Untitled Theme 1",
+                "default": "#4B7930",
+                "baseColor": "#4B7930",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "reset": false
+            },
+            "themeState": {
+                "base-color": {
+                    "default": "#097479",
+                    "value": "#097479",
+                    "edited": true
+                },
+                "page-titlebar-backgroundColor": {
+                    "value": "#097479",
+                    "edited": false
+                },
+                "page-backgroundColor": {
+                    "value": "#111111",
+                    "edited": false
+                },
+                "page-sidebar-backgroundColor": {
+                    "value": "#000000",
+                    "edited": false
+                },
+                "group-textColor": {
+                    "value": "#0eb8c0",
+                    "edited": false
+                },
+                "group-borderColor": {
+                    "value": "#555555",
+                    "edited": false
+                },
+                "group-backgroundColor": {
+                    "value": "#333333",
+                    "edited": false
+                },
+                "widget-textColor": {
+                    "value": "#eeeeee",
+                    "edited": false
+                },
+                "widget-backgroundColor": {
+                    "value": "#097479",
+                    "edited": false
+                },
+                "widget-borderColor": {
+                    "value": "#333333",
+                    "edited": false
+                },
+                "base-font": {
+                    "value": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+                }
+            },
+            "angularTheme": {
+                "primary": "indigo",
+                "accents": "blue",
+                "warn": "red",
+                "background": "grey"
+            }
+        },
+        "site": {
+            "name": "Node-RED Dashboard",
+            "hideToolbar": "false",
+            "allowSwipe": "false",
+            "lockMenu": "false",
+            "allowTempTheme": "true",
+            "dateFormat": "YYYY/MM/DD",
+            "sizes": {
+                "sx": 48,
+                "sy": 48,
+                "gx": 6,
+                "gy": 6,
+                "cx": 6,
+                "cy": 6,
+                "px": 2,
+                "py": 2
+            }
+        }
+    },
+    {
+        "id": "3dfdb3a5.11521c",
+        "type": "ui_group",
+        "z": "",
+        "name": "Data",
+        "tab": "da9b2906.8948c8",
+        "order": 2,
+        "disp": true,
+        "width": "7",
+        "collapse": false
+    },
+    {
+        "id": "da9b2906.8948c8",
+        "type": "ui_tab",
+        "z": "",
+        "name": "Dashboard",
+        "icon": "dashboard",
+        "order": 2,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "1326d3e9.6d4ebc",
+        "type": "ui_group",
+        "z": "",
+        "name": "Infos",
+        "tab": "3eac6833.ef73e8",
+        "order": 1,
+        "disp": true,
+        "width": "10",
+        "collapse": false
+    },
+    {
+        "id": "97aba708.5252a8",
+        "type": "exe-config",
+        "z": "",
+        "name": "L476RG",
+        "exefile": "D:\\GitDepots\\yRobot\\Debug\\yRobot.elf",
+        "exefolder": "D:\\GitDepots\\yRobot\\Debug",
+        "exevariablelist": [
+            {
+                "address": "0x200037b4",
+                "name": "__env[0]",
+                "type": 5
+            },
+            {
+                "address": "0x2000b4ac",
+                "name": "adcbuf[0]",
+                "type": 5
+            },
+            {
+                "address": "0x08017f4c",
+                "name": "AHBPrescTable[0]",
+                "type": 1
+            },
+            {
+                "address": "0x08017f5c",
+                "name": "APBPrescTable[0]",
+                "type": 1
+            },
+            {
+                "address": "0x20000000",
+                "name": "aRxBuffer[0]",
+                "type": 1,
+                "checked": true
+            },
+            {
+                "address": "0x20002f70",
+                "name": "aTxBuffer[0]",
+                "type": 2
+            },
+            {
+                "address": "0x08017e6c",
+                "name": "defaultTask_attributes.attr_bits",
+                "type": 5
+            },
+            {
+                "address": "0x08017e70",
+                "name": "defaultTask_attributes.cb_mem",
+                "type": 5
+            },
+            {
+                "address": "0x08017e74",
+                "name": "defaultTask_attributes.cb_size",
+                "type": 5
+            },
+            {
+                "address": "0x08017e68",
+                "name": "defaultTask_attributes.name",
+                "type": 5
+            },
+            {
+                "address": "0x08017e80",
+                "name": "defaultTask_attributes.priority",
+                "type": 4
+            },
+            {
+                "address": "0x08017e88",
+                "name": "defaultTask_attributes.reserved",
+                "type": 5
+            },
+            {
+                "address": "0x08017e78",
+                "name": "defaultTask_attributes.stack_mem",
+                "type": 5
+            },
+            {
+                "address": "0x08017e7c",
+                "name": "defaultTask_attributes.stack_size",
+                "type": 5
+            },
+            {
+                "address": "0x08017e84",
+                "name": "defaultTask_attributes.tz_module",
+                "type": 5
+            },
+            {
+                "address": "0x2000af44",
+                "name": "defaultTaskHandle",
+                "type": 5
+            },
+            {
+                "address": "0x2000aee4",
+                "name": "hadc1.DMA_Handle",
+                "type": 5
+            },
+            {
+                "address": "0x2000aef0",
+                "name": "hadc1.ErrorCode",
+                "type": 5
+            },
+            {
+                "address": "0x2000ae9c",
+                "name": "hadc1.Init.ClockPrescaler",
+                "type": 5
+            },
+            {
+                "address": "0x2000aeb1",
+                "name": "hadc1.Init.ContinuousConvMode",
+                "type": 2
+            },
+            {
+                "address": "0x2000aea4",
+                "name": "hadc1.Init.DataAlign",
+                "type": 5
+            },
+            {
+                "address": "0x2000aeb8",
+                "name": "hadc1.Init.DiscontinuousConvMode",
+                "type": 2
+            },
+            {
+                "address": "0x2000aec8",
+                "name": "hadc1.Init.DMAContinuousRequests",
+                "type": 2
+            },
+            {
+                "address": "0x2000aeac",
+                "name": "hadc1.Init.EOCSelection",
+                "type": 5
+            },
+            {
+                "address": "0x2000aec0",
+                "name": "hadc1.Init.ExternalTrigConv",
+                "type": 5
+            },
+            {
+                "address": "0x2000aec4",
+                "name": "hadc1.Init.ExternalTrigConvEdge",
+                "type": 5
+            },
+            {
+                "address": "0x2000aeb0",
+                "name": "hadc1.Init.LowPowerAutoWait",
+                "type": 2
+            },
+            {
+                "address": "0x2000aeb4",
+                "name": "hadc1.Init.NbrOfConversion",
+                "type": 5
+            },
+            {
+                "address": "0x2000aebc",
+                "name": "hadc1.Init.NbrOfDiscConversion",
+                "type": 5
+            },
+            {
+                "address": "0x2000aecc",
+                "name": "hadc1.Init.Overrun",
+                "type": 5
+            },
+            {
+                "address": "0x2000aee0",
+                "name": "hadc1.Init.Oversampling.OversamplingStopReset",
+                "type": 5
+            },
+            {
+                "address": "0x2000aed4",
+                "name": "hadc1.Init.Oversampling.Ratio",
+                "type": 5
+            },
+            {
+                "address": "0x2000aed8",
+                "name": "hadc1.Init.Oversampling.RightBitShift",
+                "type": 5
+            },
+            {
+                "address": "0x2000aedc",
+                "name": "hadc1.Init.Oversampling.TriggeredMode",
+                "type": 5
+            },
+            {
+                "address": "0x2000aed0",
+                "name": "hadc1.Init.OversamplingMode",
+                "type": 2
+            },
+            {
+                "address": "0x2000aea0",
+                "name": "hadc1.Init.Resolution",
+                "type": 5
+            },
+            {
+                "address": "0x2000aea8",
+                "name": "hadc1.Init.ScanConvMode",
+                "type": 5
+            },
+            {
+                "address": "0x2000aef8",
+                "name": "hadc1.InjectionConfig.ChannelCount",
+                "type": 5
+            },
+            {
+                "address": "0x2000aef4",
+                "name": "hadc1.InjectionConfig.ContextQueue",
+                "type": 5
+            },
+            {
+                "address": "0x2000ae98",
+                "name": "hadc1.Instance",
+                "type": 5
+            },
+            {
+                "address": "0x2000aee8",
+                "name": "hadc1.Lock",
+                "type": 2
+            },
+            {
+                "address": "0x2000aeec",
+                "name": "hadc1.State",
+                "type": 5
+            },
+            {
+                "address": "0x2000af40",
+                "name": "hdma_adc1.ChannelIndex",
+                "type": 5
+            },
+            {
+                "address": "0x2000af3c",
+                "name": "hdma_adc1.DmaBaseAddress",
+                "type": 5
+            },
+            {
+                "address": "0x2000af38",
+                "name": "hdma_adc1.ErrorCode",
+                "type": 5
+            },
+            {
+                "address": "0x2000af04",
+                "name": "hdma_adc1.Init.Direction",
+                "type": 5
+            },
+            {
+                "address": "0x2000af14",
+                "name": "hdma_adc1.Init.MemDataAlignment",
+                "type": 5
+            },
+            {
+                "address": "0x2000af0c",
+                "name": "hdma_adc1.Init.MemInc",
+                "type": 5
+            },
+            {
+                "address": "0x2000af18",
+                "name": "hdma_adc1.Init.Mode",
+                "type": 5
+            },
+            {
+                "address": "0x2000af10",
+                "name": "hdma_adc1.Init.PeriphDataAlignment",
+                "type": 5
+            },
+            {
+                "address": "0x2000af08",
+                "name": "hdma_adc1.Init.PeriphInc",
+                "type": 5
+            },
+            {
+                "address": "0x2000af1c",
+                "name": "hdma_adc1.Init.Priority",
+                "type": 5
+            },
+            {
+                "address": "0x2000af00",
+                "name": "hdma_adc1.Init.Request",
+                "type": 5
+            },
+            {
+                "address": "0x2000aefc",
+                "name": "hdma_adc1.Instance",
+                "type": 5
+            },
+            {
+                "address": "0x2000af20",
+                "name": "hdma_adc1.Lock",
+                "type": 2
+            },
+            {
+                "address": "0x2000af24",
+                "name": "hdma_adc1.Parent",
+                "type": 5
+            },
+            {
+                "address": "0x2000af21",
+                "name": "hdma_adc1.State",
+                "type": 2
+            },
+            {
+                "address": "0x2000af34",
+                "name": "hdma_adc1.XferAbortCallback",
+                "type": 5
+            },
+            {
+                "address": "0x2000af28",
+                "name": "hdma_adc1.XferCpltCallback",
+                "type": 5
+            },
+            {
+                "address": "0x2000af30",
+                "name": "hdma_adc1.XferErrorCallback",
+                "type": 5
+            },
+            {
+                "address": "0x2000af2c",
+                "name": "hdma_adc1.XferHalfCpltCallback",
+                "type": 5
+            },
+            {
+                "address": "0x2000b4c8",
+                "name": "hrtc.Init.AsynchPrediv",
+                "type": 5
+            },
+            {
+                "address": "0x2000b4c4",
+                "name": "hrtc.Init.HourFormat",
+                "type": 5
+            },
+            {
+                "address": "0x2000b4d0",
+                "name": "hrtc.Init.OutPut",
+                "type": 5
+            },
+            {
+                "address": "0x2000b4d8",
+                "name": "hrtc.Init.OutPutPolarity",
+                "type": 5
+            },
+            {
+                "address": "0x2000b4d4",
+                "name": "hrtc.Init.OutPutRemap",
+                "type": 5
+            },
+            {
+                "address": "0x2000b4dc",
+                "name": "hrtc.Init.OutPutType",
+                "type": 5
+            },
+            {
+                "address": "0x2000b4cc",
+                "name": "hrtc.Init.SynchPrediv",
+                "type": 5
+            },
+            {
+                "address": "0x2000b4c0",
+                "name": "hrtc.Instance",
+                "type": 5
+            },
+            {
+                "address": "0x2000b4e0",
+                "name": "hrtc.Lock",
+                "type": 2
+            },
+            {
+                "address": "0x2000b4e1",
+                "name": "hrtc.State",
+                "type": 2
+            },
+            {
+                "address": "0x2000b580",
+                "name": "htim1.Channel",
+                "type": 2
+            },
+            {
+                "address": "0x2000b584",
+                "name": "htim1.hdma[0]",
+                "type": 5
+            },
+            {
+                "address": "0x2000b57c",
+                "name": "htim1.Init.AutoReloadPreload",
+                "type": 5
+            },
+            {
+                "address": "0x2000b574",
+                "name": "htim1.Init.ClockDivision",
+                "type": 5
+            },
+            {
+                "address": "0x2000b56c",
+                "name": "htim1.Init.CounterMode",
+                "type": 5
+            },
+            {
+                "address": "0x2000b570",
+                "name": "htim1.Init.Period",
+                "type": 5
+            },
+            {
+                "address": "0x2000b568",
+                "name": "htim1.Init.Prescaler",
+                "type": 5
+            },
+            {
+                "address": "0x2000b578",
+                "name": "htim1.Init.RepetitionCounter",
+                "type": 5
+            },
+            {
+                "address": "0x2000b564",
+                "name": "htim1.Instance",
+                "type": 5
+            },
+            {
+                "address": "0x2000b5a0",
+                "name": "htim1.Lock",
+                "type": 2
+            },
+            {
+                "address": "0x2000b5a1",
+                "name": "htim1.State",
+                "type": 2
+            },
+            {
+                "address": "0x2000b540",
+                "name": "htim4.Channel",
+                "type": 2
+            },
+            {
+                "address": "0x2000b544",
+                "name": "htim4.hdma[0]",
+                "type": 5
+            },
+            {
+                "address": "0x2000b53c",
+                "name": "htim4.Init.AutoReloadPreload",
+                "type": 5
+            },
+            {
+                "address": "0x2000b534",
+                "name": "htim4.Init.ClockDivision",
+                "type": 5
+            },
+            {
+                "address": "0x2000b52c",
+                "name": "htim4.Init.CounterMode",
+                "type": 5
+            },
+            {
+                "address": "0x2000b530",
+                "name": "htim4.Init.Period",
+                "type": 5
+            },
+            {
+                "address": "0x2000b528",
+                "name": "htim4.Init.Prescaler",
+                "type": 5
+            },
+            {
+                "address": "0x2000b538",
+                "name": "htim4.Init.RepetitionCounter",
+                "type": 5
+            },
+            {
+                "address": "0x2000b524",
+                "name": "htim4.Instance",
+                "type": 5
+            },
+            {
+                "address": "0x2000b560",
+                "name": "htim4.Lock",
+                "type": 2
+            },
+            {
+                "address": "0x2000b561",
+                "name": "htim4.State",
+                "type": 2
+            },
+            {
+                "address": "0x2000b500",
+                "name": "htim6.Channel",
+                "type": 2
+            },
+            {
+                "address": "0x2000b504",
+                "name": "htim6.hdma[0]",
+                "type": 5
+            },
+            {
+                "address": "0x2000b4fc",
+                "name": "htim6.Init.AutoReloadPreload",
+                "type": 5
+            },
+            {
+                "address": "0x2000b4f4",
+                "name": "htim6.Init.ClockDivision",
+                "type": 5
+            },
+            {
+                "address": "0x2000b4ec",
+                "name": "htim6.Init.CounterMode",
+                "type": 5
+            },
+            {
+                "address": "0x2000b4f0",
+                "name": "htim6.Init.Period",
+                "type": 5
+            },
+            {
+                "address": "0x2000b4e8",
+                "name": "htim6.Init.Prescaler",
+                "type": 5
+            },
+            {
+                "address": "0x2000b4f8",
+                "name": "htim6.Init.RepetitionCounter",
+                "type": 5
+            },
+            {
+                "address": "0x2000b4e4",
+                "name": "htim6.Instance",
+                "type": 5
+            },
+            {
+                "address": "0x2000b520",
+                "name": "htim6.Lock",
+                "type": 2
+            },
+            {
+                "address": "0x2000b521",
+                "name": "htim6.State",
+                "type": 2
+            },
+            {
+                "address": "0x2000b5c8",
+                "name": "huart2.AdvancedInit.AdvFeatureInit",
+                "type": 5
+            },
+            {
+                "address": "0x2000b5e4",
+                "name": "huart2.AdvancedInit.AutoBaudRateEnable",
+                "type": 5
+            },
+            {
+                "address": "0x2000b5e8",
+                "name": "huart2.AdvancedInit.AutoBaudRateMode",
+                "type": 5
+            },
+            {
+                "address": "0x2000b5d4",
+                "name": "huart2.AdvancedInit.DataInvert",
+                "type": 5
+            },
+            {
+                "address": "0x2000b5e0",
+                "name": "huart2.AdvancedInit.DMADisableonRxError",
+                "type": 5
+            },
+            {
+                "address": "0x2000b5ec",
+                "name": "huart2.AdvancedInit.MSBFirst",
+                "type": 5
+            },
+            {
+                "address": "0x2000b5dc",
+                "name": "huart2.AdvancedInit.OverrunDisable",
+                "type": 5
+            },
+            {
+                "address": "0x2000b5d0",
+                "name": "huart2.AdvancedInit.RxPinLevelInvert",
+                "type": 5
+            },
+            {
+                "address": "0x2000b5d8",
+                "name": "huart2.AdvancedInit.Swap",
+                "type": 5
+            },
+            {
+                "address": "0x2000b5cc",
+                "name": "huart2.AdvancedInit.TxPinLevelInvert",
+                "type": 5
+            },
+            {
+                "address": "0x2000b620",
+                "name": "huart2.ErrorCode",
+                "type": 5
+            },
+            {
+                "address": "0x2000b618",
+                "name": "huart2.gState",
+                "type": 5
+            },
+            {
+                "address": "0x2000b610",
+                "name": "huart2.hdmarx",
+                "type": 5
+            },
+            {
+                "address": "0x2000b60c",
+                "name": "huart2.hdmatx",
+                "type": 5
+            },
+            {
+                "address": "0x2000b5a8",
+                "name": "huart2.Init.BaudRate",
+                "type": 5
+            },
+            {
+                "address": "0x2000b5bc",
+                "name": "huart2.Init.HwFlowCtl",
+                "type": 5
+            },
+            {
+                "address": "0x2000b5b8",
+                "name": "huart2.Init.Mode",
+                "type": 5
+            },
+            {
+                "address": "0x2000b5c4",
+                "name": "huart2.Init.OneBitSampling",
+                "type": 5
+            },
+            {
+                "address": "0x2000b5c0",
+                "name": "huart2.Init.OverSampling",
+                "type": 5
+            },
+            {
+                "address": "0x2000b5b4",
+                "name": "huart2.Init.Parity",
+                "type": 5
+            },
+            {
+                "address": "0x2000b5b0",
+                "name": "huart2.Init.StopBits",
+                "type": 5
+            },
+            {
+                "address": "0x2000b5ac",
+                "name": "huart2.Init.WordLength",
+                "type": 5
+            },
+            {
+                "address": "0x2000b5a4",
+                "name": "huart2.Instance",
+                "type": 5
+            },
+            {
+                "address": "0x2000b614",
+                "name": "huart2.Lock",
+                "type": 2
+            },
+            {
+                "address": "0x2000b600",
+                "name": "huart2.Mask",
+                "type": 3
+            },
+            {
+                "address": "0x2000b5f8",
+                "name": "huart2.pRxBuffPtr",
+                "type": 5
+            },
+            {
+                "address": "0x2000b5f0",
+                "name": "huart2.pTxBuffPtr",
+                "type": 5
+            },
+            {
+                "address": "0x2000b604",
+                "name": "huart2.RxISR",
+                "type": 5
+            },
+            {
+                "address": "0x2000b61c",
+                "name": "huart2.RxState",
+                "type": 5
+            },
+            {
+                "address": "0x2000b5fe",
+                "name": "huart2.RxXferCount",
+                "type": 3
+            },
+            {
+                "address": "0x2000b5fc",
+                "name": "huart2.RxXferSize",
+                "type": 3
+            },
+            {
+                "address": "0x2000b608",
+                "name": "huart2.TxISR",
+                "type": 5
+            },
+            {
+                "address": "0x2000b5f6",
+                "name": "huart2.TxXferCount",
+                "type": 3
+            },
+            {
+                "address": "0x2000b5f4",
+                "name": "huart2.TxXferSize",
+                "type": 3
+            },
+            {
+                "address": "0x20003824",
+                "name": "Idle_Stack[0]",
+                "type": 5
+            },
+            {
+                "address": "0x200037bc",
+                "name": "Idle_TCB.pxDummy1",
+                "type": 5
+            },
+            {
+                "address": "0x20003814",
+                "name": "Idle_TCB.pxDummy14",
+                "type": 5
+            },
+            {
+                "address": "0x200037ec",
+                "name": "Idle_TCB.pxDummy6",
+                "type": 5
+            },
+            {
+                "address": "0x20003800",
+                "name": "Idle_TCB.pxDummy8",
+                "type": 5
+            },
+            {
+                "address": "0x20003820",
+                "name": "Idle_TCB.ucDummy19",
+                "type": 1
+            },
+            {
+                "address": "0x200037f0",
+                "name": "Idle_TCB.ucDummy7[0]",
+                "type": 1
+            },
+            {
+                "address": "0x20003818",
+                "name": "Idle_TCB.ulDummy16",
+                "type": 5
+            },
+            {
+                "address": "0x2000381c",
+                "name": "Idle_TCB.ulDummy18",
+                "type": 5
+            },
+            {
+                "address": "0x20003804",
+                "name": "Idle_TCB.uxDummy10[0]",
+                "type": 5
+            },
+            {
+                "address": "0x2000380c",
+                "name": "Idle_TCB.uxDummy12[0]",
+                "type": 5
+            },
+            {
+                "address": "0x20003821",
+                "name": "Idle_TCB.uxDummy20",
+                "type": 1
+            },
+            {
+                "address": "0x200037e8",
+                "name": "Idle_TCB.uxDummy5",
+                "type": 5
+            },
+            {
+                "address": "0x200037c4",
+                "name": "Idle_TCB.xDummy3[0].pvDummy3[0]",
+                "type": 5
+            },
+            {
+                "address": "0x200037c0",
+                "name": "Idle_TCB.xDummy3[0].xDummy2",
+                "type": 5
+            },
+            {
+                "address": "0x200037b8",
+                "name": "KernelState",
+                "type": 4
+            },
+            {
+                "address": "0x2000aff4",
+                "name": "mnuSTM.Buffer[0]",
+                "type": 2
+            },
+            {
+                "address": "0x2000b410",
+                "name": "mnuSTM.ClearStatusBar",
+                "type": 5
+            },
+            {
+                "address": "0x2000b404",
+                "name": "mnuSTM.Display",
+                "type": 5
+            },
+            {
+                "address": "0x2000b400",
+                "name": "mnuSTM.GetTouche",
+                "type": 5
+            },
+            {
+                "address": "0x2000b408",
+                "name": "mnuSTM.Infos",
+                "type": 5
+            },
+            {
+                "address": "0x2000b40c",
+                "name": "mnuSTM.Init",
+                "type": 5
+            },
+            {
+                "address": "0x2000b3f8",
+                "name": "mnuSTM.m_patch",
+                "type": 6
+            },
+            {
+                "address": "0x2000b3fc",
+                "name": "mnuSTM.m_toto",
+                "type": 6
+            },
+            {
+                "address": "0x2000b3f4",
+                "name": "mnuSTM.m_version",
+                "type": 6
+            },
+            {
+                "address": "0x2000b44d",
+                "name": "Moteur_D._ar",
+                "type": 1,
+                "checked": true
+            },
+            {
+                "address": "0x2000b44c",
+                "name": "Moteur_D._av",
+                "type": 1,
+                "checked": true
+            },
+            {
+                "address": "0x2000b454",
+                "name": "Moteur_D._gpioPinIN1",
+                "type": 3
+            },
+            {
+                "address": "0x2000b45c",
+                "name": "Moteur_D._gpioPinIN2",
+                "type": 3
+            },
+            {
+                "address": "0x2000b450",
+                "name": "Moteur_D._gpioPortIN1",
+                "type": 5
+            },
+            {
+                "address": "0x2000b458",
+                "name": "Moteur_D._gpioPortIN2",
+                "type": 5
+            },
+            {
+                "address": "0x2000b47c",
+                "name": "Moteur_D._htimpwm.Channel",
+                "type": 2
+            },
+            {
+                "address": "0x2000b480",
+                "name": "Moteur_D._htimpwm.hdma[0]",
+                "type": 5
+            },
+            {
+                "address": "0x2000b478",
+                "name": "Moteur_D._htimpwm.Init.AutoReloadPreload",
+                "type": 5
+            },
+            {
+                "address": "0x2000b470",
+                "name": "Moteur_D._htimpwm.Init.ClockDivision",
+                "type": 5
+            },
+            {
+                "address": "0x2000b468",
+                "name": "Moteur_D._htimpwm.Init.CounterMode",
+                "type": 5
+            },
+            {
+                "address": "0x2000b46c",
+                "name": "Moteur_D._htimpwm.Init.Period",
+                "type": 5
+            },
+            {
+                "address": "0x2000b464",
+                "name": "Moteur_D._htimpwm.Init.Prescaler",
+                "type": 5
+            },
+            {
+                "address": "0x2000b474",
+                "name": "Moteur_D._htimpwm.Init.RepetitionCounter",
+                "type": 5,
+                "checked": false
+            },
+            {
+                "address": "0x2000b460",
+                "name": "Moteur_D._htimpwm.Instance",
+                "type": 5
+            },
+            {
+                "address": "0x2000b49c",
+                "name": "Moteur_D._htimpwm.Lock",
+                "type": 2
+            },
+            {
+                "address": "0x2000b49d",
+                "name": "Moteur_D._htimpwm.State",
+                "type": 2
+            },
+            {
+                "address": "0x2000b448",
+                "name": "Moteur_D._pwm",
+                "type": 5,
+                "checked": true
+            },
+            {
+                "address": "0x2000b438",
+                "name": "Moteur_D.DB_memo",
+                "type": 9,
+                "checked": true
+            },
+            {
+                "address": "0x2000b42c",
+                "name": "Moteur_D.DeadBand",
+                "type": 9,
+                "checked": true
+            },
+            {
+                "address": "0x2000b428",
+                "name": "Moteur_D.DutyCycle",
+                "type": 5,
+                "checked": true
+            },
+            {
+                "address": "0x2000b43c",
+                "name": "Moteur_D.FeeWheel",
+                "type": 1,
+                "checked": true
+            },
+            {
+                "address": "0x2000b424",
+                "name": "Moteur_D.inRun",
+                "type": 1,
+                "checked": true
+            },
+            {
+                "address": "0x2000b41c",
+                "name": "Moteur_D.MarArr",
+                "type": 1,
+                "checked": true
+            },
+            {
+                "address": "0x2000b435",
+                "name": "Moteur_D.Run_memo",
+                "type": 1,
+                "checked": true
+            },
+            {
+                "address": "0x2000b444",
+                "name": "Moteur_D.Sens",
+                "type": 2,
+                "checked": true
+            },
+            {
+                "address": "0x2000b434",
+                "name": "Moteur_D.Sens_memo",
+                "type": 2,
+                "checked": true
+            },
+            {
+                "address": "0x2000b430",
+                "name": "Moteur_D.Speed_memo",
+                "type": 9,
+                "checked": true
+            },
+            {
+                "address": "0x2000b440",
+                "name": "Moteur_D.Speed_MV",
+                "type": 5,
+                "checked": true
+            },
+            {
+                "address": "0x2000b420",
+                "name": "Moteur_D.Speed_SP",
+                "type": 9,
+                "checked": true
+            },
+            {
+                "address": "0x08017f1c",
+                "name": "MSIRangeTable[0]",
+                "type": 5
+            },
+            {
+                "address": "0x2000b4a2",
+                "name": "myDate.Date",
+                "type": 1
+            },
+            {
+                "address": "0x2000b4a1",
+                "name": "myDate.Month",
+                "type": 1
+            },
+            {
+                "address": "0x2000b4a0",
+                "name": "myDate.WeekDay",
+                "type": 1
+            },
+            {
+                "address": "0x2000b4a3",
+                "name": "myDate.Year",
+                "type": 1
+            },
+            {
+                "address": "0x2000af54",
+                "name": "myTime.DayLightSaving",
+                "type": 5
+            },
+            {
+                "address": "0x2000af48",
+                "name": "myTime.Hours",
+                "type": 1
+            },
+            {
+                "address": "0x2000af49",
+                "name": "myTime.Minutes",
+                "type": 1
+            },
+            {
+                "address": "0x2000af50",
+                "name": "myTime.SecondFraction",
+                "type": 5
+            },
+            {
+                "address": "0x2000af4a",
+                "name": "myTime.Seconds",
+                "type": 1
+            },
+            {
+                "address": "0x2000af58",
+                "name": "myTime.StoreOperation",
+                "type": 5
+            },
+            {
+                "address": "0x2000af4c",
+                "name": "myTime.SubSeconds",
+                "type": 5
+            },
+            {
+                "address": "0x2000af4b",
+                "name": "myTime.TimeFormat",
+                "type": 1
+            },
+            {
+                "address": "0x00000000",
+                "name": "pcInterruptPriorityRegisters",
+                "type": 5
+            },
+            {
+                "address": "0x2000a85c",
+                "name": "pxCurrentTCB",
+                "type": 5
+            },
+            {
+                "address": "0x2000ad30",
+                "name": "pxCurrentTimerList",
+                "type": 5
+            },
+            {
+                "address": "0x2000acc8",
+                "name": "pxDelayedTaskList",
+                "type": 5
+            },
+            {
+                "address": "0x2000a820",
+                "name": "pxEnd",
+                "type": 5
+            },
+            {
+                "address": "0x2000ad08",
+                "name": "pxOverflowDelayedTaskList",
+                "type": 5
+            },
+            {
+                "address": "0x2000ad34",
+                "name": "pxOverflowTimerList",
+                "type": 5
+            },
+            {
+                "address": "0x2000a864",
+                "name": "pxReadyTasksLists[0].pxIndex",
+                "type": 5
+            },
+            {
+                "address": "0x2000a860",
+                "name": "pxReadyTasksLists[0].uxNumberOfItems",
+                "type": 5
+            },
+            {
+                "address": "0x2000a86c",
+                "name": "pxReadyTasksLists[0].xListEnd.pxNext",
+                "type": 5
+            },
+            {
+                "address": "0x2000a870",
+                "name": "pxReadyTasksLists[0].xListEnd.pxPrevious",
+                "type": 5
+            },
+            {
+                "address": "0x2000a868",
+                "name": "pxReadyTasksLists[0].xListEnd.xItemValue",
+                "type": 5
+            },
+            {
+                "address": "0x08017e3c",
+                "name": "qEvents_attributes.attr_bits",
+                "type": 5
+            },
+            {
+                "address": "0x08017e40",
+                "name": "qEvents_attributes.cb_mem",
+                "type": 5
+            },
+            {
+                "address": "0x08017e44",
+                "name": "qEvents_attributes.cb_size",
+                "type": 5
+            },
+            {
+                "address": "0x08017e48",
+                "name": "qEvents_attributes.mq_mem",
+                "type": 5
+            },
+            {
+                "address": "0x08017e4c",
+                "name": "qEvents_attributes.mq_size",
+                "type": 5
+            },
+            {
+                "address": "0x08017e38",
+                "name": "qEvents_attributes.name",
+                "type": 5
+            },
+            {
+                "address": "0x2000b414",
+                "name": "qEventsHandle",
+                "type": 5
+            },
+            {
+                "address": "0x08017e54",
+                "name": "qVTaffiche_attributes.attr_bits",
+                "type": 5
+            },
+            {
+                "address": "0x08017e58",
+                "name": "qVTaffiche_attributes.cb_mem",
+                "type": 5
+            },
+            {
+                "address": "0x08017e5c",
+                "name": "qVTaffiche_attributes.cb_size",
+                "type": 5
+            },
+            {
+                "address": "0x08017e60",
+                "name": "qVTaffiche_attributes.mq_mem",
+                "type": 5
+            },
+            {
+                "address": "0x08017e64",
+                "name": "qVTaffiche_attributes.mq_size",
+                "type": 5
+            },
+            {
+                "address": "0x08017e50",
+                "name": "qVTaffiche_attributes.name",
+                "type": 5
+            },
+            {
+                "address": "0x2000b4b4",
+                "name": "qVTafficheHandle",
+                "type": 5
+            },
+            {
+                "address": "0x200037ac",
+                "name": "RTC_AlarmA_flag",
+                "type": 1
+            },
+            {
+                "address": "0x200037a8",
+                "name": "sAlarm.Alarm",
+                "type": 5
+            },
+            {
+                "address": "0x200037a4",
+                "name": "sAlarm.AlarmDateWeekDay",
+                "type": 1
+            },
+            {
+                "address": "0x200037a0",
+                "name": "sAlarm.AlarmDateWeekDaySel",
+                "type": 5
+            },
+            {
+                "address": "0x20003794",
+                "name": "sAlarm.AlarmMask",
+                "type": 5
+            },
+            {
+                "address": "0x2000379c",
+                "name": "sAlarm.AlarmSubSecondMask",
+                "type": 5
+            },
+            {
+                "address": "0x2000378c",
+                "name": "sAlarm.AlarmTime.DayLightSaving",
+                "type": 5
+            },
+            {
+                "address": "0x20003780",
+                "name": "sAlarm.AlarmTime.Hours",
+                "type": 1
+            },
+            {
+                "address": "0x20003781",
+                "name": "sAlarm.AlarmTime.Minutes",
+                "type": 1
+            },
+            {
+                "address": "0x20003788",
+                "name": "sAlarm.AlarmTime.SecondFraction",
+                "type": 5
+            },
+            {
+                "address": "0x20003782",
+                "name": "sAlarm.AlarmTime.Seconds",
+                "type": 1
+            },
+            {
+                "address": "0x20003790",
+                "name": "sAlarm.AlarmTime.StoreOperation",
+                "type": 5
+            },
+            {
+                "address": "0x20003784",
+                "name": "sAlarm.AlarmTime.SubSeconds",
+                "type": 5
+            },
+            {
+                "address": "0x20003783",
+                "name": "sAlarm.AlarmTime.TimeFormat",
+                "type": 1
+            },
+            {
+                "address": "0x20003798",
+                "name": "sAlarm.SubSeconds",
+                "type": 5
+            },
+            {
+                "address": "0x08017e0c",
+                "name": "semUART_attributes.attr_bits",
+                "type": 5
+            },
+            {
+                "address": "0x08017e10",
+                "name": "semUART_attributes.cb_mem",
+                "type": 5
+            },
+            {
+                "address": "0x08017e14",
+                "name": "semUART_attributes.cb_size",
+                "type": 5
+            },
+            {
+                "address": "0x08017e08",
+                "name": "semUART_attributes.name",
+                "type": 5
+            },
+            {
+                "address": "0x2000b418",
+                "name": "semUARTHandle",
+                "type": 5
+            },
+            {
+                "address": "0x200028d0",
+                "name": "SystemCoreClock",
+                "type": 5
+            },
+            {
+                "address": "0x08017e1c",
+                "name": "t1s_attributes.attr_bits",
+                "type": 5
+            },
+            {
+                "address": "0x08017e20",
+                "name": "t1s_attributes.cb_mem",
+                "type": 5
+            },
+            {
+                "address": "0x08017e24",
+                "name": "t1s_attributes.cb_size",
+                "type": 5
+            },
+            {
+                "address": "0x08017e18",
+                "name": "t1s_attributes.name",
+                "type": 5
+            },
+            {
+                "address": "0x2000b4bc",
+                "name": "t1sHandle",
+                "type": 5
+            },
+            {
+                "address": "0x08017e2c",
+                "name": "t250ms_attributes.attr_bits",
+                "type": 5
+            },
+            {
+                "address": "0x08017e30",
+                "name": "t250ms_attributes.cb_mem",
+                "type": 5
+            },
+            {
+                "address": "0x08017e34",
+                "name": "t250ms_attributes.cb_size",
+                "type": 5
+            },
+            {
+                "address": "0x08017e28",
+                "name": "t250ms_attributes.name",
+                "type": 5
+            },
+            {
+                "address": "0x2000af60",
+                "name": "t250msHandle",
+                "type": 5
+            },
+            {
+                "address": "0x20003a8c",
+                "name": "Timer_Stack[0]",
+                "type": 5
+            },
+            {
+                "address": "0x20003a24",
+                "name": "Timer_TCB.pxDummy1",
+                "type": 5
+            },
+            {
+                "address": "0x20003a7c",
+                "name": "Timer_TCB.pxDummy14",
+                "type": 5
+            },
+            {
+                "address": "0x20003a54",
+                "name": "Timer_TCB.pxDummy6",
+                "type": 5
+            },
+            {
+                "address": "0x20003a68",
+                "name": "Timer_TCB.pxDummy8",
+                "type": 5
+            },
+            {
+                "address": "0x20003a88",
+                "name": "Timer_TCB.ucDummy19",
+                "type": 1
+            },
+            {
+                "address": "0x20003a58",
+                "name": "Timer_TCB.ucDummy7[0]",
+                "type": 1
+            },
+            {
+                "address": "0x20003a80",
+                "name": "Timer_TCB.ulDummy16",
+                "type": 5
+            },
+            {
+                "address": "0x20003a84",
+                "name": "Timer_TCB.ulDummy18",
+                "type": 5
+            },
+            {
+                "address": "0x20003a6c",
+                "name": "Timer_TCB.uxDummy10[0]",
+                "type": 5
+            },
+            {
+                "address": "0x20003a74",
+                "name": "Timer_TCB.uxDummy12[0]",
+                "type": 5
+            },
+            {
+                "address": "0x20003a89",
+                "name": "Timer_TCB.uxDummy20",
+                "type": 1
+            },
+            {
+                "address": "0x20003a50",
+                "name": "Timer_TCB.uxDummy5",
+                "type": 5
+            },
+            {
+                "address": "0x20003a2c",
+                "name": "Timer_TCB.xDummy3[0].pvDummy3[0]",
+                "type": 5
+            },
+            {
+                "address": "0x20003a28",
+                "name": "Timer_TCB.xDummy3[0].xDummy2",
+                "type": 5
+            },
+            {
+                "address": "0x08017eb4",
+                "name": "tk_CheckVR_attributes.attr_bits",
+                "type": 5
+            },
+            {
+                "address": "0x08017eb8",
+                "name": "tk_CheckVR_attributes.cb_mem",
+                "type": 5
+            },
+            {
+                "address": "0x08017ebc",
+                "name": "tk_CheckVR_attributes.cb_size",
+                "type": 5
+            },
+            {
+                "address": "0x08017eb0",
+                "name": "tk_CheckVR_attributes.name",
+                "type": 5
+            },
+            {
+                "address": "0x08017ec8",
+                "name": "tk_CheckVR_attributes.priority",
+                "type": 4
+            },
+            {
+                "address": "0x08017ed0",
+                "name": "tk_CheckVR_attributes.reserved",
+                "type": 5
+            },
+            {
+                "address": "0x08017ec0",
+                "name": "tk_CheckVR_attributes.stack_mem",
+                "type": 5
+            },
+            {
+                "address": "0x08017ec4",
+                "name": "tk_CheckVR_attributes.stack_size",
+                "type": 5
+            },
+            {
+                "address": "0x08017ecc",
+                "name": "tk_CheckVR_attributes.tz_module",
+                "type": 5
+            },
+            {
+                "address": "0x2000b4b8",
+                "name": "tk_CheckVRHandle",
+                "type": 5
+            },
+            {
+                "address": "0x08017e90",
+                "name": "tk_Init_attributes.attr_bits",
+                "type": 5
+            },
+            {
+                "address": "0x08017e94",
+                "name": "tk_Init_attributes.cb_mem",
+                "type": 5
+            },
+            {
+                "address": "0x08017e98",
+                "name": "tk_Init_attributes.cb_size",
+                "type": 5
+            },
+            {
+                "address": "0x08017e8c",
+                "name": "tk_Init_attributes.name",
+                "type": 5
+            },
+            {
+                "address": "0x08017ea4",
+                "name": "tk_Init_attributes.priority",
+                "type": 4
+            },
+            {
+                "address": "0x08017eac",
+                "name": "tk_Init_attributes.reserved",
+                "type": 5
+            },
+            {
+                "address": "0x08017e9c",
+                "name": "tk_Init_attributes.stack_mem",
+                "type": 5
+            },
+            {
+                "address": "0x08017ea0",
+                "name": "tk_Init_attributes.stack_size",
+                "type": 5
+            },
+            {
+                "address": "0x08017ea8",
+                "name": "tk_Init_attributes.tz_module",
+                "type": 5
+            },
+            {
+                "address": "0x2000af5c",
+                "name": "tk_InitHandle",
+                "type": 5
+            },
+            {
+                "address": "0x08017ed8",
+                "name": "tk_Process_attributes.attr_bits",
+                "type": 5
+            },
+            {
+                "address": "0x08017edc",
+                "name": "tk_Process_attributes.cb_mem",
+                "type": 5
+            },
+            {
+                "address": "0x08017ee0",
+                "name": "tk_Process_attributes.cb_size",
+                "type": 5
+            },
+            {
+                "address": "0x08017ed4",
+                "name": "tk_Process_attributes.name",
+                "type": 5
+            },
+            {
+                "address": "0x08017eec",
+                "name": "tk_Process_attributes.priority",
+                "type": 4
+            },
+            {
+                "address": "0x08017ef4",
+                "name": "tk_Process_attributes.reserved",
+                "type": 5
+            },
+            {
+                "address": "0x08017ee4",
+                "name": "tk_Process_attributes.stack_mem",
+                "type": 5
+            },
+            {
+                "address": "0x08017ee8",
+                "name": "tk_Process_attributes.stack_size",
+                "type": 5
+            },
+            {
+                "address": "0x08017ef0",
+                "name": "tk_Process_attributes.tz_module",
+                "type": 5
+            },
+            {
+                "address": "0x2000afa4",
+                "name": "tk_ProcessHandle",
+                "type": 5
+            },
+            {
+                "address": "0x08017efc",
+                "name": "tk_VTaffiche_attributes.attr_bits",
+                "type": 5
+            },
+            {
+                "address": "0x08017f00",
+                "name": "tk_VTaffiche_attributes.cb_mem",
+                "type": 5
+            },
+            {
+                "address": "0x08017f04",
+                "name": "tk_VTaffiche_attributes.cb_size",
+                "type": 5
+            },
+            {
+                "address": "0x08017ef8",
+                "name": "tk_VTaffiche_attributes.name",
+                "type": 5
+            },
+            {
+                "address": "0x08017f10",
+                "name": "tk_VTaffiche_attributes.priority",
+                "type": 4
+            },
+            {
+                "address": "0x08017f18",
+                "name": "tk_VTaffiche_attributes.reserved",
+                "type": 5
+            },
+            {
+                "address": "0x08017f08",
+                "name": "tk_VTaffiche_attributes.stack_mem",
+                "type": 5
+            },
+            {
+                "address": "0x08017f0c",
+                "name": "tk_VTaffiche_attributes.stack_size",
+                "type": 5
+            },
+            {
+                "address": "0x08017f14",
+                "name": "tk_VTaffiche_attributes.tz_module",
+                "type": 5
+            },
+            {
+                "address": "0x2000b4a4",
+                "name": "tk_VTafficheHandle",
+                "type": 5
+            },
+            {
+                "address": "0x20002f6c",
+                "name": "TkToStart",
+                "type": 1
+            },
+            {
+                "address": "0x2000afa8",
+                "name": "tmpBuffer[0]",
+                "type": 2
+            },
+            {
+                "address": "0x200028cc",
+                "name": "uart2NbCar",
+                "type": 3
+            },
+            {
+                "address": "0x20003ea0",
+                "name": "ucHeap[0]",
+                "type": 1
+            },
+            {
+                "address": "0x20003e98",
+                "name": "ucMaxSysCallPriority",
+                "type": 1
+            },
+            {
+                "address": "0x20003e9c",
+                "name": "ulMaxPRIGROUPValue",
+                "type": 5
+            },
+            {
+                "address": "0x20003e94",
+                "name": "ulStoppedTimerCompensation",
+                "type": 5
+            },
+            {
+                "address": "0x2000ad2c",
+                "name": "ulTaskSwitchedInTime",
+                "type": 5
+            },
+            {
+                "address": "0x20003e90",
+                "name": "ulTimerCountsForOneTick",
+                "type": 5
+            },
+            {
+                "address": "0x00000000",
+                "name": "ulTotalRunTime",
+                "type": 5
+            },
+            {
+                "address": "0x2000b624",
+                "name": "uwTick",
+                "type": 5
+            },
+            {
+                "address": "0x200028d4",
+                "name": "uwTickFreq",
+                "type": 5
+            },
+            {
+                "address": "0x200028d8",
+                "name": "uwTickPrio",
+                "type": 5
+            },
+            {
+                "address": "0x200028dc",
+                "name": "uxCriticalNesting",
+                "type": 5
+            },
+            {
+                "address": "0x2000ad0c",
+                "name": "uxCurrentNumberOfTasks",
+                "type": 5
+            },
+            {
+                "address": "0x2000ad18",
+                "name": "uxDeletedTasksWaitingCleanUp",
+                "type": 5
+            },
+            {
+                "address": "0x2000ad24",
+                "name": "uxPendedTicks",
+                "type": 5
+            },
+            {
+                "address": "0x2000ad1c",
+                "name": "uxSchedulerSuspended",
+                "type": 5
+            },
+            {
+                "address": "0x2000ad14",
+                "name": "uxTaskNumber",
+                "type": 5
+            },
+            {
+                "address": "0x2000a858",
+                "name": "uxTopReadyPriority",
+                "type": 5
+            },
+            {
+                "address": "0x2000afd0",
+                "name": "VRx.A",
+                "type": 9,
+                "checked": false
+            },
+            {
+                "address": "0x2000afd4",
+                "name": "VRx.B",
+                "type": 9,
+                "checked": false
+            },
+            {
+                "address": "0x2000afd8",
+                "name": "VRx.Coef_Filtre",
+                "type": 9
+            },
+            {
+                "address": "0x2000afcc",
+                "name": "VRx.Ech_Maxi",
+                "type": 9,
+                "checked": false
+            },
+            {
+                "address": "0x2000afc8",
+                "name": "VRx.Ech_Mini",
+                "type": 9,
+                "checked": false
+            },
+            {
+                "address": "0x2000afe8",
+                "name": "VRx.Hysteresis",
+                "type": 9
+            },
+            {
+                "address": "0x2000afbc",
+                "name": "VRx.PV",
+                "type": 9,
+                "checked": true
+            },
+            {
+                "address": "0x2000afc0",
+                "name": "VRx.PVa",
+                "type": 9,
+                "checked": true
+            },
+            {
+                "address": "0x2000aff0",
+                "name": "VRx.PVhyst",
+                "type": 9
+            },
+            {
+                "address": "0x2000afec",
+                "name": "VRx.PVmemo",
+                "type": 9,
+                "checked": true
+            },
+            {
+                "address": "0x2000afb4",
+                "name": "VRx.Raw",
+                "type": 5,
+                "checked": false
+            },
+            {
+                "address": "0x2000afb8",
+                "name": "VRx.Ri",
+                "type": 1,
+                "checked": false
+            },
+            {
+                "address": "0x2000afc5",
+                "name": "VRx.Ro",
+                "type": 1,
+                "checked": true
+            },
+            {
+                "address": "0x2000afc4",
+                "name": "VRx.sens",
+                "type": 2,
+                "checked": false
+            },
+            {
+                "address": "0x2000afe0",
+                "name": "VRx.Trim",
+                "type": 9
+            },
+            {
+                "address": "0x2000afe4",
+                "name": "VRx.TrimRaw",
+                "type": 5
+            },
+            {
+                "address": "0x2000afdc",
+                "name": "VRx.UnMoinsCoef",
+                "type": 9
+            },
+            {
+                "address": "0x2000af80",
+                "name": "VRy.A",
+                "type": 9,
+                "checked": true
+            },
+            {
+                "address": "0x2000af84",
+                "name": "VRy.B",
+                "type": 9,
+                "checked": true
+            },
+            {
+                "address": "0x2000af88",
+                "name": "VRy.Coef_Filtre",
+                "type": 9,
+                "checked": true
+            },
+            {
+                "address": "0x2000af7c",
+                "name": "VRy.Ech_Maxi",
+                "type": 9,
+                "checked": true
+            },
+            {
+                "address": "0x2000af78",
+                "name": "VRy.Ech_Mini",
+                "type": 9,
+                "checked": true
+            },
+            {
+                "address": "0x2000af98",
+                "name": "VRy.Hysteresis",
+                "type": 9,
+                "checked": true
+            },
+            {
+                "address": "0x2000af6c",
+                "name": "VRy.PV",
+                "type": 9,
+                "checked": true
+            },
+            {
+                "address": "0x2000af70",
+                "name": "VRy.PVa",
+                "type": 9,
+                "checked": true
+            },
+            {
+                "address": "0x2000afa0",
+                "name": "VRy.PVhyst",
+                "type": 9,
+                "checked": true
+            },
+            {
+                "address": "0x2000af9c",
+                "name": "VRy.PVmemo",
+                "type": 9,
+                "checked": true
+            },
+            {
+                "address": "0x2000af64",
+                "name": "VRy.Raw",
+                "type": 5,
+                "checked": true
+            },
+            {
+                "address": "0x2000af68",
+                "name": "VRy.Ri",
+                "type": 1,
+                "checked": true
+            },
+            {
+                "address": "0x2000af75",
+                "name": "VRy.Ro",
+                "type": 1,
+                "checked": true
+            },
+            {
+                "address": "0x2000af74",
+                "name": "VRy.sens",
+                "type": 2,
+                "checked": true
+            },
+            {
+                "address": "0x2000af90",
+                "name": "VRy.Trim",
+                "type": 9,
+                "checked": true
+            },
+            {
+                "address": "0x2000af94",
+                "name": "VRy.TrimRaw",
+                "type": 5,
+                "checked": true
+            },
+            {
+                "address": "0x2000af8c",
+                "name": "VRy.UnMoinsCoef",
+                "type": 9,
+                "checked": true
+            },
+            {
+                "address": "0x20002800",
+                "name": "VTbuffer.src",
+                "type": 6,
+                "checked": false
+            },
+            {
+                "address": "0x20002804",
+                "name": "VTbuffer.VTbuff[0]",
+                "type": 2,
+                "checked": false
+            },
+            {
+                "address": "0x2000b4a8",
+                "name": "WaitInTk",
+                "type": 3
+            },
+            {
+                "address": "0x2000ad40",
+                "name": "xActiveTimerList1.pxIndex",
+                "type": 5
+            },
+            {
+                "address": "0x2000ad3c",
+                "name": "xActiveTimerList1.uxNumberOfItems",
+                "type": 5
+            },
+            {
+                "address": "0x2000ad48",
+                "name": "xActiveTimerList1.xListEnd.pxNext",
+                "type": 5
+            },
+            {
+                "address": "0x2000ad4c",
+                "name": "xActiveTimerList1.xListEnd.pxPrevious",
+                "type": 5
+            },
+            {
+                "address": "0x2000ad44",
+                "name": "xActiveTimerList1.xListEnd.xItemValue",
+                "type": 5
+            },
+            {
+                "address": "0x2000ad54",
+                "name": "xActiveTimerList2.pxIndex",
+                "type": 5
+            },
+            {
+                "address": "0x2000ad50",
+                "name": "xActiveTimerList2.uxNumberOfItems",
+                "type": 5
+            },
+            {
+                "address": "0x2000ad5c",
+                "name": "xActiveTimerList2.xListEnd.pxNext",
+                "type": 5
+            },
+            {
+                "address": "0x2000ad60",
+                "name": "xActiveTimerList2.xListEnd.pxPrevious",
+                "type": 5
+            },
+            {
+                "address": "0x2000ad58",
+                "name": "xActiveTimerList2.xListEnd.xItemValue",
+                "type": 5
+            },
+            {
+                "address": "0x2000a82c",
+                "name": "xBlockAllocatedBit",
+                "type": 5
+            },
+            {
+                "address": "0x2000acd0",
+                "name": "xDelayedTaskList1.pxIndex",
+                "type": 5
+            },
+            {
+                "address": "0x2000accc",
+                "name": "xDelayedTaskList1.uxNumberOfItems",
+                "type": 5
+            },
+            {
+                "address": "0x2000acd8",
+                "name": "xDelayedTaskList1.xListEnd.pxNext",
+                "type": 5
+            },
+            {
+                "address": "0x2000acdc",
+                "name": "xDelayedTaskList1.xListEnd.pxPrevious",
+                "type": 5
+            },
+            {
+                "address": "0x2000acd4",
+                "name": "xDelayedTaskList1.xListEnd.xItemValue",
+                "type": 5
+            },
+            {
+                "address": "0x2000ace4",
+                "name": "xDelayedTaskList2.pxIndex",
+                "type": 5
+            },
+            {
+                "address": "0x2000ace0",
+                "name": "xDelayedTaskList2.uxNumberOfItems",
+                "type": 5
+            },
+            {
+                "address": "0x2000acec",
+                "name": "xDelayedTaskList2.xListEnd.pxNext",
+                "type": 5
+            },
+            {
+                "address": "0x2000acf0",
+                "name": "xDelayedTaskList2.xListEnd.pxPrevious",
+                "type": 5
+            },
+            {
+                "address": "0x2000ace8",
+                "name": "xDelayedTaskList2.xListEnd.xItemValue",
+                "type": 5
+            },
+            {
+                "address": "0x2000a828",
+                "name": "xFreeBytesRemaining",
+                "type": 5
+            },
+            {
+                "address": "0x00000000",
+                "name": "xHeapStructSize",
+                "type": 5
+            },
+            {
+                "address": "0x00000000",
+                "name": "xIdleTaskHandle",
+                "type": 5
+            },
+            {
+                "address": "0x20003e8c",
+                "name": "xMaximumPossibleSuppressedTicks",
+                "type": 5
+            },
+            {
+                "address": "0x2000a824",
+                "name": "xMinimumEverFreeBytesRemaining",
+                "type": 5
+            },
+            {
+                "address": "0x2000acc0",
+                "name": "xNextTaskUnblockTime",
+                "type": 5
+            },
+            {
+                "address": "0x2000ad20",
+                "name": "xNumOfOverflows",
+                "type": 6
+            },
+            {
+                "address": "0x2000a848",
+                "name": "xPendingReadyList.pxIndex",
+                "type": 5
+            },
+            {
+                "address": "0x2000a844",
+                "name": "xPendingReadyList.uxNumberOfItems",
+                "type": 5
+            },
+            {
+                "address": "0x2000a850",
+                "name": "xPendingReadyList.xListEnd.pxNext",
+                "type": 5
+            },
+            {
+                "address": "0x2000a854",
+                "name": "xPendingReadyList.xListEnd.pxPrevious",
+                "type": 5
+            },
+            {
+                "address": "0x2000a84c",
+                "name": "xPendingReadyList.xListEnd.xItemValue",
+                "type": 5
+            },
+            {
+                "address": "0x2000b628",
+                "name": "xQueueRegistry[0].pcQueueName",
+                "type": 5
+            },
+            {
+                "address": "0x2000b62c",
+                "name": "xQueueRegistry[0].xHandle",
+                "type": 5
+            },
+            {
+                "address": "0x2000ad10",
+                "name": "xSchedulerRunning",
+                "type": 6
+            },
+            {
+                "address": "0x2000a818",
+                "name": "xStart.pxNextFreeBlock",
+                "type": 5
+            },
+            {
+                "address": "0x2000a81c",
+                "name": "xStart.xBlockSize",
+                "type": 5
+            },
+            {
+                "address": "0x2000a834",
+                "name": "xSuspendedTaskList.pxIndex",
+                "type": 5
+            },
+            {
+                "address": "0x2000a830",
+                "name": "xSuspendedTaskList.uxNumberOfItems",
+                "type": 5
+            },
+            {
+                "address": "0x2000a83c",
+                "name": "xSuspendedTaskList.xListEnd.pxNext",
+                "type": 5
+            },
+            {
+                "address": "0x2000a840",
+                "name": "xSuspendedTaskList.xListEnd.pxPrevious",
+                "type": 5
+            },
+            {
+                "address": "0x2000a838",
+                "name": "xSuspendedTaskList.xListEnd.xItemValue",
+                "type": 5
+            },
+            {
+                "address": "0x2000acf8",
+                "name": "xTasksWaitingTermination.pxIndex",
+                "type": 5
+            },
+            {
+                "address": "0x2000acf4",
+                "name": "xTasksWaitingTermination.uxNumberOfItems",
+                "type": 5
+            },
+            {
+                "address": "0x2000ad00",
+                "name": "xTasksWaitingTermination.xListEnd.pxNext",
+                "type": 5
+            },
+            {
+                "address": "0x2000ad04",
+                "name": "xTasksWaitingTermination.xListEnd.pxPrevious",
+                "type": 5
+            },
+            {
+                "address": "0x2000acfc",
+                "name": "xTasksWaitingTermination.xListEnd.xItemValue",
+                "type": 5
+            },
+            {
+                "address": "0x2000acc4",
+                "name": "xTickCount",
+                "type": 5
+            },
+            {
+                "address": "0x2000ad38",
+                "name": "xTimerQueue",
+                "type": 5
+            },
+            {
+                "address": "0x2000ae54",
+                "name": "xTimerTaskHandle",
+                "type": 5
+            },
+            {
+                "address": "0x2000ad28",
+                "name": "xYieldPending",
+                "type": 6
+            },
+            {
+                "address": "0x20003778",
+                "name": "yEvent.PayLoadF",
+                "type": 9
+            },
+            {
+                "address": "0x2000377c",
+                "name": "yEvent.PayloadI",
+                "type": 1
+            },
+            {
+                "address": "0x20003774",
+                "name": "yEvent.Topic",
+                "type": 1
+            },
+            {
+                "address": "0x20000024",
+                "name": "ymx_Coef",
+                "type": 9,
+                "checked": true
+            },
+            {
+                "address": "0x20000004",
+                "name": "ymx_VRx_PV",
+                "type": 9,
+                "checked": true
+            },
+            {
+                "address": "0x20000008",
+                "name": "ymx_VRx_Raw",
+                "type": 5,
+                "checked": true
+            },
+            {
+                "address": "0x2000000c",
+                "name": "ymx_VRx_Ri",
+                "type": 1,
+                "checked": true
+            },
+            {
+                "address": "0x2000000d",
+                "name": "ymx_VRx_Ro",
+                "type": 1,
+                "checked": true
+            },
+            {
+                "address": "0x20000010",
+                "name": "ymx_VRx_trim",
+                "type": 9,
+                "checked": true
+            },
+            {
+                "address": "0x20000014",
+                "name": "ymx_VRy_PV",
+                "type": 9,
+                "checked": true
+            },
+            {
+                "address": "0x20000018",
+                "name": "ymx_VRy_Raw",
+                "type": 5,
+                "checked": true
+            },
+            {
+                "address": "0x2000001c",
+                "name": "ymx_VRy_Ri",
+                "type": 1,
+                "checked": true
+            },
+            {
+                "address": "0x2000001d",
+                "name": "ymx_VRy_Ro",
+                "type": 1,
+                "checked": true
+            },
+            {
+                "address": "0x20000020",
+                "name": "ymx_VRy_trim",
+                "type": 9,
+                "checked": true
+            }
+        ],
+        "expand": false,
+        "filename": "yRobot.elf",
+        "exeModifiedTime": 1602601989949,
+        "configLastUpdate": 1602602094781
+    },
+    {
+        "id": "b090ccaa.ab526",
+        "type": "probe",
+        "z": "",
+        "probeid": "066DFF535752877167095728",
+        "probename": "ST-Link v2-1B (...95728)",
+        "protocol": "SWD",
+        "frequency": "1.8 MHz - Default",
+        "probeproperty": "{\"SWD\":[\"4.6 MHz\",\"1.8 MHz - Default\",\"950 kHz\",\"400 kHz\",\"150 kHz\"],\"JTAG\":[\"18 MHz\",\"9 MHz\",\"4.5 MHz\",\"2.25 MHz\",\"1.12 MHz - Default\",\"560 kHz\",\"280 kHz\",\"140 kHz\"]}",
+        "probeversion": "ST Link firmware version V2.J31",
+        "connectionType": "p2p"
+    },
+    {
+        "id": "3eac6833.ef73e8",
+        "type": "ui_tab",
+        "z": "",
+        "name": "Base",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "17e61a5a.2f1f96",
+        "type": "ui_group",
+        "z": "",
+        "name": "Display",
+        "tab": "dab5031.450db",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "dab5031.450db",
+        "type": "ui_tab",
+        "z": "",
+        "name": "VT100",
+        "icon": "dashboard",
+        "order": 4,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "f5709582.fc06c8",
+        "type": "ui_group",
+        "z": "",
+        "name": "Faire un choix...",
+        "tab": "dab5031.450db",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "95ad7962.75a0a8",
+        "type": "ui_group",
+        "z": "",
+        "name": "Graphique",
+        "tab": "da9b2906.8948c8",
+        "order": 2,
+        "disp": true,
+        "width": 10,
+        "collapse": false
+    },
+    {
+        "id": "cd2430f3.f6b74",
+        "type": "ui_spacer",
+        "name": "spacer",
+        "group": "f5709582.fc06c8",
+        "order": 2,
+        "width": 2,
+        "height": 1
+    },
+    {
+        "id": "48030429.006c0c",
+        "type": "ui_spacer",
+        "name": "spacer",
+        "group": "f5709582.fc06c8",
+        "order": 4,
+        "width": 2,
+        "height": 1
+    },
+    {
+        "id": "72f3f7c0.e6ebb8",
+        "type": "ui_spacer",
+        "name": "spacer",
+        "group": "3dfdb3a5.11521c",
+        "order": 2,
+        "width": 6,
+        "height": 1
+    },
+    {
+        "id": "eed782d1.b4a7",
+        "type": "ui_spacer",
+        "name": "spacer",
+        "group": "3dfdb3a5.11521c",
+        "order": 3,
+        "width": 6,
+        "height": 1
+    },
+    {
+        "id": "68ae55e9.ac2f4c",
+        "type": "ui_spacer",
+        "name": "spacer",
+        "group": "3dfdb3a5.11521c",
+        "order": 5,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "d6ecc8a1.53cca8",
+        "type": "ui_spacer",
+        "name": "spacer",
+        "group": "3dfdb3a5.11521c",
+        "order": 6,
+        "width": 6,
+        "height": 1
+    },
+    {
+        "id": "b1b03e20.34484",
+        "type": "ui_spacer",
+        "name": "spacer",
+        "group": "3dfdb3a5.11521c",
+        "order": 7,
+        "width": 6,
+        "height": 1
+    },
+    {
+        "id": "fec6ed33.35892",
+        "type": "ui_spacer",
+        "name": "spacer",
+        "group": "3dfdb3a5.11521c",
+        "order": 11,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "ed7a5744.2bcd78",
+        "type": "ui_spacer",
+        "name": "spacer",
+        "group": "95ad7962.75a0a8",
+        "order": 2,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "1a5a1614.b2f0ea",
+        "type": "ui_spacer",
+        "name": "spacer",
+        "group": "95ad7962.75a0a8",
+        "order": 5,
+        "width": 2,
+        "height": 1
+    },
+    {
+        "id": "ebbc0e39.4cade",
+        "type": "ui_spacer",
+        "name": "spacer",
+        "group": "95ad7962.75a0a8",
+        "order": 7,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "381c31c9.1d8f8e",
+        "type": "ui_group",
+        "z": "f3572396.ff04b",
+        "name": "Moteurs",
+        "tab": "da9b2906.8948c8",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "81b688ed.ba6248",
+        "type": "ui_group",
+        "z": "",
+        "name": "Moteurs",
+        "tab": "da9b2906.8948c8",
+        "order": 4,
+        "disp": false,
+        "width": "10",
+        "collapse": false
+    },
+    {
+        "id": "59193cc8.916a34",
+        "type": "ui_group",
+        "z": "",
+        "name": "Tableau des variables lues",
+        "tab": "e9875e3d.8cf87",
+        "order": 2,
+        "disp": true,
+        "width": "16",
+        "collapse": false
+    },
+    {
+        "id": "e9875e3d.8cf87",
+        "type": "ui_tab",
+        "z": "",
+        "name": "Toutes les Data",
+        "icon": "dashboard",
+        "order": 3,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "3c5ffe0d.9063b2",
+        "type": "switch",
+        "z": "8381c865.236028",
+        "name": "filter variable",
+        "property": "payload.variablename",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "varfilter",
+                "vt": "env"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 170,
+        "y": 60,
+        "wires": [
+            [
+                "4e5ba7a5.14dec8"
+            ]
+        ]
+    },
+    {
+        "id": "4e5ba7a5.14dec8",
+        "type": "change",
+        "z": "8381c865.236028",
+        "name": "keep only table of duplets",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.variabledata",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 430,
+        "y": 60,
+        "wires": [
+            [
+                "42bc6ed.5b20d9"
+            ]
+        ]
+    },
+    {
+        "id": "42bc6ed.5b20d9",
+        "type": "split",
+        "z": "8381c865.236028",
+        "name": "Split a table[1..n] of duplets in n msg of single duplet",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "x": 800,
+        "y": 60,
+        "wires": [
+            [
+                "8b8ddb84.6fb208"
+            ]
+        ]
+    },
+    {
+        "id": "8b8ddb84.6fb208",
+        "type": "delay",
+        "z": "8381c865.236028",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "10",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "x": 200,
+        "y": 140,
+        "wires": [
+            [
+                "66397fd3.d8111"
+            ]
+        ]
+    },
+    {
+        "id": "66397fd3.d8111",
+        "type": "change",
+        "z": "8381c865.236028",
+        "name": "keep only value and delete timestamp",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.y",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 490,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "580a90de.64261",
+        "type": "comment",
+        "z": "baaf425c.2e52f",
+        "name": "HOME tab",
+        "info": "",
+        "x": 120,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "108a82f2.18177d",
+        "type": "ui_text",
+        "z": "baaf425c.2e52f",
+        "group": "1326d3e9.6d4ebc",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Please, import flow ffrom GitDepots/project-In-Progress",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 340,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "ed67754b.e11ec8",
+        "type": "ui_text",
+        "z": "baaf425c.2e52f",
+        "group": "1326d3e9.6d4ebc",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "A la fin exporter 'all flows' to GitDepots/project_in-progress",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 540,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "ede42820.255e78",
+        "type": "ui_button",
+        "z": "2d126e47.f46862",
+        "name": "",
+        "group": "95ad7962.75a0a8",
+        "order": 4,
+        "width": 2,
+        "height": 1,
+        "passthru": true,
+        "label": "STOP Acq",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "stop",
+        "x": 380,
+        "y": 180,
+        "wires": [
+            [
+                "fad3f288.15f28",
+                "c05f1fa4.f71c7"
+            ]
+        ]
+    },
+    {
+        "id": "114a7e24.80fbe2",
+        "type": "inject",
+        "z": "2d126e47.f46862",
+        "name": "AutoStart_true",
+        "topic": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "0.1",
+        "x": 170,
+        "y": 140,
+        "wires": [
+            [
+                "52d96abf.806d94"
+            ]
+        ],
+        "info": "Injection 'true' au démarrage du flow.\nC'est donc un auto start"
+    },
+    {
+        "id": "1cfab1c1.8c386e",
+        "type": "comment",
+        "z": "2d126e47.f46862",
+        "name": "Nucleo_L476RG & Jostick",
+        "info": "",
+        "x": 180,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "52d96abf.806d94",
+        "type": "ui_button",
+        "z": "2d126e47.f46862",
+        "name": "",
+        "group": "95ad7962.75a0a8",
+        "order": 3,
+        "width": 2,
+        "height": 1,
+        "passthru": true,
+        "label": "START Acq",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "start",
+        "x": 380,
+        "y": 140,
+        "wires": [
+            [
+                "fad3f288.15f28",
+                "8fe3303e.c58f2"
+            ]
+        ]
+    },
+    {
+        "id": "b77bf5f2.f89718",
+        "type": "comment",
+        "z": "2d126e47.f46862",
+        "name": "Acquisition Output",
+        "info": "",
+        "x": 1050,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "7e1a5537.f356ac",
+        "type": "comment",
+        "z": "2d126e47.f46862",
+        "name": "Acquisition Input",
+        "info": "",
+        "x": 160,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "7ce0656b.86619c",
+        "type": "comment",
+        "z": "2d126e47.f46862",
+        "name": "Variables Liste",
+        "info": "",
+        "x": 710,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "c23bab81.c0f9c8",
+        "type": "comment",
+        "z": "2d126e47.f46862",
+        "name": "Processing",
+        "info": "",
+        "x": 380,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "fad3f288.15f28",
+        "type": "variables",
+        "z": "2d126e47.f46862",
+        "groupname": "Read01",
+        "accesspoint": 0,
+        "execonfig": "97aba708.5252a8",
+        "variablelist": [],
+        "triggerstartmode": "manual",
+        "triggername": "ymx_Coef",
+        "triggerthreshold": "",
+        "frequency": "",
+        "frequencyType": "1",
+        "snapshotheader": "",
+        "mode": "direct",
+        "lastImportedTime": 1602602095218,
+        "openStatus": true,
+        "x": 710,
+        "y": 160,
+        "wires": [
+            [
+                "115dd254.59d04e",
+                "50140fa1.c0f4e"
+            ]
+        ]
+    },
+    {
+        "id": "115dd254.59d04e",
+        "type": "acquisition out",
+        "z": "2d126e47.f46862",
+        "name": "L476RG Out1",
+        "probeconfig": "b090ccaa.ab526",
+        "x": 1040,
+        "y": 140,
+        "wires": [],
+        "info": "Nucleo-L476RG sur Com7"
+    },
+    {
+        "id": "55a5dd7d.016ae4",
+        "type": "acquisition in",
+        "z": "2d126e47.f46862",
+        "name": "L476RG In1",
+        "probeconfig": "b090ccaa.ab526",
+        "x": 130,
+        "y": 640,
+        "wires": [
+            [
+                "427e180d.c9ec78"
+            ],
+            []
+        ],
+        "info": "Nucleo-L476RG sur Com7"
+    },
+    {
+        "id": "427e180d.c9ec78",
+        "type": "processing",
+        "z": "2d126e47.f46862",
+        "groupname": "Read01",
+        "groupid": "fad3f288.15f28",
+        "expressions": [],
+        "statistics": [],
+        "logmode": "no",
+        "x": 380,
+        "y": 640,
+        "wires": [
+            [
+                "c2e2d3aa.af577",
+                "90ce7d2d.5da5c",
+                "b29e9414.f81d38",
+                "4be26eaa.ce359",
+                "94fda4af.433698",
+                "d9d1a93.c04d858",
+                "828027fe.bd0c78",
+                "20dd7b9c.50b8b4",
+                "32aede70.639532",
+                "40c5906a.3e694",
+                "336fc7e0.12a4d8",
+                "dee220f7.ef93e",
+                "ed5699d4.56f808",
+                "424a55b0.9ad33c",
+                "99e8fb6d.4f6e78",
+                "2e267a91.50fc06"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "c2e2d3aa.af577",
+        "type": "debug",
+        "z": "2d126e47.f46862",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 660,
+        "y": 350,
+        "wires": []
+    },
+    {
+        "id": "50140fa1.c0f4e",
+        "type": "debug",
+        "z": "2d126e47.f46862",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 1030,
+        "y": 190,
+        "wires": []
+    },
+    {
+        "id": "90ce7d2d.5da5c",
+        "type": "subflow:8381c865.236028",
+        "z": "2d126e47.f46862",
+        "name": "ymx_VRx_PV",
+        "env": [
+            {
+                "name": "varfilter",
+                "value": "ymx_VRx_PV",
+                "type": "str"
+            }
+        ],
+        "x": 670,
+        "y": 390,
+        "wires": [
+            [
+                "d3c4176b.92cfc8",
+                "8693a09d.01b7e"
+            ]
+        ]
+    },
+    {
+        "id": "d3c4176b.92cfc8",
+        "type": "ui_text",
+        "z": "2d126e47.f46862",
+        "group": "3dfdb3a5.11521c",
+        "order": 9,
+        "width": 2,
+        "height": 1,
+        "name": "",
+        "label": "ymx_VRx_PV",
+        "format": "{{msg.payload.toFixed(2)}}",
+        "layout": "col-center",
+        "x": 860,
+        "y": 390,
+        "wires": []
+    },
+    {
+        "id": "b29e9414.f81d38",
+        "type": "subflow:8381c865.236028",
+        "z": "2d126e47.f46862",
+        "name": "ymx_VRy_PV",
+        "env": [
+            {
+                "name": "varfilter",
+                "value": "ymx_VRy_PV",
+                "type": "str"
+            }
+        ],
+        "x": 670,
+        "y": 460,
+        "wires": [
+            [
+                "7a49753a.85b76c",
+                "94e900d0.d26d7"
+            ]
+        ]
+    },
+    {
+        "id": "7a49753a.85b76c",
+        "type": "ui_text",
+        "z": "2d126e47.f46862",
+        "group": "3dfdb3a5.11521c",
+        "order": 10,
+        "width": 2,
+        "height": 1,
+        "name": "",
+        "label": "ymx_VRy_PV",
+        "format": "{{msg.payload.toFixed(2)}}",
+        "layout": "col-center",
+        "x": 860,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "8693a09d.01b7e",
+        "type": "ui_slider",
+        "z": "2d126e47.f46862",
+        "name": "",
+        "label": "VRx",
+        "tooltip": "",
+        "group": "3dfdb3a5.11521c",
+        "order": 4,
+        "width": 5,
+        "height": 1,
+        "passthru": true,
+        "outs": "all",
+        "topic": "",
+        "min": "-100.0",
+        "max": "100.0",
+        "step": 1,
+        "x": 840,
+        "y": 420,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "94e900d0.d26d7",
+        "type": "ui_slider",
+        "z": "2d126e47.f46862",
+        "name": "",
+        "label": "VRy",
+        "tooltip": "",
+        "group": "3dfdb3a5.11521c",
+        "order": 1,
+        "width": 1,
+        "height": 5,
+        "passthru": true,
+        "outs": "all",
+        "topic": "",
+        "min": "-100.0",
+        "max": "100.0",
+        "step": 1,
+        "x": 840,
+        "y": 490,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5bb4d294.4142ac",
+        "type": "variables",
+        "z": "8b8d2438.d4fab8",
+        "groupname": "Write01",
+        "accesspoint": 0,
+        "execonfig": "97aba708.5252a8",
+        "variablelist": [],
+        "triggerstartmode": "manual",
+        "triggername": "ymx_Coef",
+        "triggerthreshold": "",
+        "frequency": "",
+        "frequencyType": "1",
+        "snapshotheader": "",
+        "mode": "direct",
+        "lastImportedTime": 1602594291913,
+        "openStatus": true,
+        "x": 320,
+        "y": 80,
+        "wires": [
+            [
+                "1c8ec1a8.8a59ee",
+                "7c44c82.f534038",
+                "830e9ccc.c7e57"
+            ]
+        ]
+    },
+    {
+        "id": "1c8ec1a8.8a59ee",
+        "type": "ui_write",
+        "z": "8b8d2438.d4fab8",
+        "group": "17e61a5a.2f1f96",
+        "name": "",
+        "order": 1,
+        "width": 6,
+        "height": 6,
+        "x": 550,
+        "y": 130,
+        "wires": [
+            [
+                "7c44c82.f534038"
+            ]
+        ]
+    },
+    {
+        "id": "7c44c82.f534038",
+        "type": "acquisition out",
+        "z": "8b8d2438.d4fab8",
+        "name": "L476RG Out2",
+        "probeconfig": "b090ccaa.ab526",
+        "x": 830,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "f68361db.9d3f5",
+        "type": "comment",
+        "z": "8b8d2438.d4fab8",
+        "name": "Liste d'écritures",
+        "info": "",
+        "x": 340,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "392e1591.99528a",
+        "type": "acquisition in",
+        "z": "8b8d2438.d4fab8",
+        "name": "L476RG In2",
+        "probeconfig": "b090ccaa.ab526",
+        "x": 290,
+        "y": 390,
+        "wires": [
+            [
+                "a9e7d4cc.eba6d8"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "a9e7d4cc.eba6d8",
+        "type": "processing",
+        "z": "8b8d2438.d4fab8",
+        "groupname": "Write01",
+        "groupid": "5bb4d294.4142ac",
+        "expressions": [],
+        "statistics": [],
+        "logmode": "no",
+        "x": 530,
+        "y": 390,
+        "wires": [
+            [
+                "2ea9900e.3f705",
+                "b16afe21.f9a9c",
+                "2ae1ac83.7c5984",
+                "17807e71.251752",
+                "a82a67d6.b84e78"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "8fe3303e.c58f2",
+        "type": "link out",
+        "z": "2d126e47.f46862",
+        "name": "link Start Acq",
+        "links": [
+            "9de79b78.28f1a8"
+        ],
+        "x": 505,
+        "y": 90,
+        "wires": []
+    },
+    {
+        "id": "9de79b78.28f1a8",
+        "type": "link in",
+        "z": "8b8d2438.d4fab8",
+        "name": "",
+        "links": [
+            "8fe3303e.c58f2"
+        ],
+        "x": 195,
+        "y": 60,
+        "wires": [
+            [
+                "5bb4d294.4142ac"
+            ]
+        ]
+    },
+    {
+        "id": "c05f1fa4.f71c7",
+        "type": "link out",
+        "z": "2d126e47.f46862",
+        "name": "Link stop Acq",
+        "links": [
+            "e841976c.0a3908"
+        ],
+        "x": 505,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "e841976c.0a3908",
+        "type": "link in",
+        "z": "8b8d2438.d4fab8",
+        "name": "",
+        "links": [
+            "c05f1fa4.f71c7"
+        ],
+        "x": 195,
+        "y": 110,
+        "wires": [
+            [
+                "5bb4d294.4142ac"
+            ]
+        ]
+    },
+    {
+        "id": "2ea9900e.3f705",
+        "type": "subflow:8381c865.236028",
+        "z": "8b8d2438.d4fab8",
+        "name": "ymx_VRy_Ro",
+        "env": [
+            {
+                "name": "varfilter",
+                "value": "ymx_VRy_Ro",
+                "type": "str"
+            }
+        ],
+        "x": 750,
+        "y": 390,
+        "wires": [
+            [
+                "1d7e416d.357ecf"
+            ]
+        ]
+    },
+    {
+        "id": "b16afe21.f9a9c",
+        "type": "subflow:8381c865.236028",
+        "z": "8b8d2438.d4fab8",
+        "name": "ymx_VRy_Ri",
+        "env": [
+            {
+                "name": "varfilter",
+                "value": "ymx_VRy_Ri",
+                "type": "str"
+            }
+        ],
+        "x": 740,
+        "y": 350,
+        "wires": [
+            [
+                "76cc45b6.3a8d9c"
+            ]
+        ]
+    },
+    {
+        "id": "1d7e416d.357ecf",
+        "type": "ui_text",
+        "z": "8b8d2438.d4fab8",
+        "group": "17e61a5a.2f1f96",
+        "order": 4,
+        "width": "3",
+        "height": 1,
+        "name": "",
+        "label": "VRy_Ro",
+        "format": "{{msg.payload}}",
+        "layout": "row-center",
+        "x": 930,
+        "y": 390,
+        "wires": []
+    },
+    {
+        "id": "76cc45b6.3a8d9c",
+        "type": "ui_text",
+        "z": "8b8d2438.d4fab8",
+        "group": "17e61a5a.2f1f96",
+        "order": 2,
+        "width": 3,
+        "height": 1,
+        "name": "",
+        "label": "VRy_Ri",
+        "format": "{{msg.payload}}",
+        "layout": "row-center",
+        "x": 930,
+        "y": 350,
+        "wires": []
+    },
+    {
+        "id": "2ae1ac83.7c5984",
+        "type": "subflow:8381c865.236028",
+        "z": "8b8d2438.d4fab8",
+        "name": "aRxBuffer[0]",
+        "env": [
+            {
+                "name": "varfilter",
+                "value": "aRxBuffer[0]",
+                "type": "str"
+            }
+        ],
+        "x": 740,
+        "y": 440,
+        "wires": [
+            [
+                "dd548903.1547c8"
+            ]
+        ]
+    },
+    {
+        "id": "dd548903.1547c8",
+        "type": "ui_text",
+        "z": "8b8d2438.d4fab8",
+        "group": "17e61a5a.2f1f96",
+        "order": 3,
+        "width": 3,
+        "height": 1,
+        "name": "",
+        "label": "aRxBuffer[0]",
+        "format": "{{msg.payload}}",
+        "layout": "row-center",
+        "x": 940,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "3f93c791.0da028",
+        "type": "ui_text_input",
+        "z": "8b8d2438.d4fab8",
+        "name": "",
+        "label": "Commande",
+        "tooltip": "",
+        "group": "f5709582.fc06c8",
+        "order": 3,
+        "width": 2,
+        "height": 1,
+        "passthru": false,
+        "mode": "text",
+        "delay": 300,
+        "topic": "Cde",
+        "x": 170,
+        "y": 690,
+        "wires": [
+            [
+                "561b6f6a.6285b"
+            ]
+        ]
+    },
+    {
+        "id": "561b6f6a.6285b",
+        "type": "function",
+        "z": "8b8d2438.d4fab8",
+        "name": "string2ascii_2",
+        "func": "/*\n* Converti un caractere en son code ASCII -1er sortie\n* puis charactere vide sur 2e sortie\n*/\n//sortie 1\nvar msg1 = {topic: \"string2ascii\"};\nmsg1.payload=msg.payload.charCodeAt(0);\n//sortie 2\nvar msg2 = {topic: \"toRAZorigin\"};\nmsg2.payload=\"\";\nreturn [msg1, msg2];\n",
+        "outputs": 2,
+        "noerr": 0,
+        "x": 370,
+        "y": 690,
+        "wires": [
+            [
+                "46fabebe.05836"
+            ],
+            [
+                "729921ba.12caa"
+            ]
+        ],
+        "inputLabels": [
+            "Cde"
+        ],
+        "outputLabels": [
+            "AsciiCode",
+            "RaZ"
+        ]
+    },
+    {
+        "id": "39e972a1.89f39e",
+        "type": "template",
+        "z": "8b8d2438.d4fab8",
+        "name": "write_msg",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "json",
+        "syntax": "mustache",
+        "template": "{\n    \"variablelist\": [\n        {\n            \"address\": \"{{payload.add}}\",\n            \"type\": 1,\n            \"value\": \"{{payload.code}}\"\n        }\n    ],\n    \"accesspoint\": 0\n}\n",
+        "output": "json",
+        "x": 870,
+        "y": 680,
+        "wires": [
+            [
+                "97b2b5f0.e98cd8"
+            ]
+        ],
+        "info": "/*\n* type_nb   ST_type\n*   1       uint8_t\n*   2       8 sign\n*   3       U16\n*   4       16 sign\n*   5       uint32_t\n*   6       S32\n*   9       float\n*   10      double\n*/"
+    },
+    {
+        "id": "97b2b5f0.e98cd8",
+        "type": "change",
+        "z": "8b8d2438.d4fab8",
+        "name": "set topic",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "write",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1040,
+        "y": 680,
+        "wires": [
+            [
+                "7c44c82.f534038"
+            ]
+        ]
+    },
+    {
+        "id": "729921ba.12caa",
+        "type": "delay",
+        "z": "8b8d2438.d4fab8",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "500",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 540,
+        "y": 780,
+        "wires": [
+            [
+                "3f93c791.0da028"
+            ]
+        ]
+    },
+    {
+        "id": "830e9ccc.c7e57",
+        "type": "function",
+        "z": "8b8d2438.d4fab8",
+        "name": "aRxBuffer_adr",
+        "func": "/* \n* Recuperer l'address d'une variable\n* linked from 'variable node'\n*/\n// extract address & prepare msg\nfunction myFunction(item) {\n  if (item.name == \"aRxBuffer[0]\") {\n    msg2 = {topic:\"Address\", payload: item.address};\n    msg1 = {topic:\"Name\", payload:item.name};\n  }  \n}\nvar msg1 = {};\nvar msg2 = {};\n// apply to variable list\nmsg.payload.variablelist.forEach(myFunction);\n\nreturn [msg1, msg2];\n",
+        "outputs": 2,
+        "noerr": 0,
+        "x": 510,
+        "y": 540,
+        "wires": [
+            [
+                "d907ba51.47f7d8"
+            ],
+            [
+                "85447a04.c84118",
+                "46fabebe.05836"
+            ]
+        ],
+        "inputLabels": [
+            "FromVariablesNode"
+        ],
+        "outputLabels": [
+            "Name",
+            "Address"
+        ],
+        "info": "Recuperer l'address d'une variable.\n\nRenvoi le nom défini sur Out1.\n\nRenvoi son address sur Out2.\n\nLes Inputs/Outputs sont nommés.\n"
+    },
+    {
+        "id": "d907ba51.47f7d8",
+        "type": "debug",
+        "z": "8b8d2438.d4fab8",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 720,
+        "y": 530,
+        "wires": []
+    },
+    {
+        "id": "51d00f9d.24f7f",
+        "type": "comment",
+        "z": "8b8d2438.d4fab8",
+        "name": "Envoyer une commande (1 car) via dashboard",
+        "info": "",
+        "x": 230,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "1bf05e09.2329b2",
+        "type": "ui_template",
+        "z": "8b8d2438.d4fab8",
+        "group": "f5709582.fc06c8",
+        "name": "Menu choix",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "format": "<!-- Liste de choix possible -->\n<ul>\n    <li>I (Qqs infos sur Class yMENU)</li>\n    <li>T (bla bla)</li>\n    <li>L (bla bla)</li>\n    <li>R (bla bla)</li>\n    <li>S (bla bla)</li>\n    <li>X (Apply VRx Trim value)</li>\n    <li>Y (Apply VRy Trim value)</li>\n    <li>C (Clean TeraTerm screen)</li>\n    <li>M (Menu)</li>\n</ul>\n",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "templateScope": "local",
+        "x": 170,
+        "y": 650,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "85447a04.c84118",
+        "type": "debug",
+        "z": "8b8d2438.d4fab8",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 720,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "17807e71.251752",
+        "type": "subflow:8381c865.236028",
+        "z": "8b8d2438.d4fab8",
+        "name": "aRxBuffer[2]",
+        "env": [
+            {
+                "name": "varfilter",
+                "value": "aRxBuffer[2]",
+                "type": "str"
+            }
+        ],
+        "x": 740,
+        "y": 480,
+        "wires": [
+            [
+                "a8a19ed4.f6ee8"
+            ]
+        ]
+    },
+    {
+        "id": "a8a19ed4.f6ee8",
+        "type": "ui_text",
+        "z": "8b8d2438.d4fab8",
+        "group": "17e61a5a.2f1f96",
+        "order": 5,
+        "width": 3,
+        "height": 1,
+        "name": "",
+        "label": "aRxBuffer[2]",
+        "format": "{{msg.payload}}",
+        "layout": "row-center",
+        "x": 940,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "46fabebe.05836",
+        "type": "function",
+        "z": "8b8d2438.d4fab8",
+        "name": "Func_2inputs_objectOut",
+        "func": "/*\n* En fonction du topic d'un flow sauver payload ds un contexte.\n* Creer new msg avec object payload contenant 2 valeur nomées.\n*/\n\nswitch (msg.topic) {\n    case \"string2ascii\":\n        context.set(\"Code\",msg.payload);\n        break;\n    case \"Address\":\n        context.set(\"Address\", msg.payload);\n        break;\n    default:\n        msg = null;\n        break;\n}\n\nvar msg1 = {};\n//msg1.payload = {code:120, add:0x200ff};\nvar temp1 = context.get(\"Code\");\nvar temp2 = context.get(\"Address\");\nmsg1.payload = {code:temp1, add:temp2}; \n\nreturn msg1;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 650,
+        "y": 680,
+        "wires": [
+            [
+                "39e972a1.89f39e"
+            ]
+        ],
+        "info": "En fonction du topic d'un flow sauver payload ds un contexte.\n\nCreer new msg avec object payload contenant 2 valeur nommées.\n\n"
+    },
+    {
+        "id": "731a52d7.3b2b1c",
+        "type": "comment",
+        "z": "8b8d2438.d4fab8",
+        "name": "Un caractere \"\" envoyé apres delai.",
+        "info": "",
+        "x": 290,
+        "y": 770,
+        "wires": []
+    },
+    {
+        "id": "4f7ad576.2a4c9c",
+        "type": "switch",
+        "z": "2d126e47.f46862",
+        "name": "filter VRy_Raw",
+        "property": "payload.variablename",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "ymx_VRy_Raw",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": true,
+        "outputs": 1,
+        "x": 670,
+        "y": 700,
+        "wires": [
+            [
+                "b2c348bb.3d9668"
+            ]
+        ]
+    },
+    {
+        "id": "bbe79bf7.40c1b8",
+        "type": "ui_button",
+        "z": "2d126e47.f46862",
+        "name": "",
+        "group": "95ad7962.75a0a8",
+        "order": 6,
+        "width": 2,
+        "height": 1,
+        "passthru": false,
+        "label": "Clear",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "clear",
+        "x": 680,
+        "y": 670,
+        "wires": [
+            [
+                "b2c348bb.3d9668"
+            ]
+        ]
+    },
+    {
+        "id": "b2c348bb.3d9668",
+        "type": "ui_chartst",
+        "z": "2d126e47.f46862",
+        "group": "95ad7962.75a0a8",
+        "name": "",
+        "order": 1,
+        "width": 10,
+        "height": 7,
+        "chartType": "line",
+        "curveType": "linear",
+        "duration": "90",
+        "ymin": "",
+        "ymax": "",
+        "x": 1070,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "7e66dec9.d3966",
+        "type": "switch",
+        "z": "2d126e47.f46862",
+        "name": "filter VRy_Raw",
+        "property": "payload.variablename",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "ymx_VRy_Raw",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": true,
+        "outputs": 1,
+        "x": 670,
+        "y": 730,
+        "wires": [
+            [
+                "b2c348bb.3d9668"
+            ]
+        ]
+    },
+    {
+        "id": "4be26eaa.ce359",
+        "type": "subflow:8381c865.236028",
+        "z": "2d126e47.f46862",
+        "name": "ymx_Coef Filtre",
+        "env": [
+            {
+                "name": "varfilter",
+                "value": "ymx_Coef",
+                "type": "str"
+            }
+        ],
+        "x": 670,
+        "y": 530,
+        "wires": [
+            [
+                "c937856d.2189f8"
+            ]
+        ]
+    },
+    {
+        "id": "c937856d.2189f8",
+        "type": "ui_text",
+        "z": "2d126e47.f46862",
+        "group": "3dfdb3a5.11521c",
+        "order": 8,
+        "width": 2,
+        "height": 1,
+        "name": "",
+        "label": "ymx_Coef",
+        "format": "{{msg.payload.toFixed(2)}}",
+        "layout": "col-center",
+        "x": 840,
+        "y": 530,
+        "wires": []
+    },
+    {
+        "id": "94fda4af.433698",
+        "type": "switch",
+        "z": "2d126e47.f46862",
+        "name": "filter VRx_PV",
+        "property": "payload.variablename",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "ymx_VRx_PV",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": true,
+        "outputs": 1,
+        "x": 660,
+        "y": 760,
+        "wires": [
+            [
+                "b2c348bb.3d9668"
+            ]
+        ]
+    },
+    {
+        "id": "d9d1a93.c04d858",
+        "type": "switch",
+        "z": "2d126e47.f46862",
+        "name": "filter VRy_PV",
+        "property": "payload.variablename",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "ymx_VRy_PV",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": true,
+        "outputs": 1,
+        "x": 660,
+        "y": 790,
+        "wires": [
+            [
+                "b2c348bb.3d9668"
+            ]
+        ]
+    },
+    {
+        "id": "69cc0882.b018a8",
+        "type": "ui_text",
+        "z": "2d126e47.f46862",
+        "group": "3dfdb3a5.11521c",
+        "order": 8,
+        "width": 2,
+        "height": 1,
+        "name": "",
+        "label": "ymx_Ri",
+        "format": "{{msg.payload}}",
+        "layout": "col-center",
+        "x": 840,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "bd91226b.a58df",
+        "type": "ui_text",
+        "z": "2d126e47.f46862",
+        "group": "3dfdb3a5.11521c",
+        "order": 8,
+        "width": 2,
+        "height": 1,
+        "name": "",
+        "label": "ymx_VRx_Ro",
+        "format": "{{msg.payload}}",
+        "layout": "col-center",
+        "x": 860,
+        "y": 590,
+        "wires": []
+    },
+    {
+        "id": "828027fe.bd0c78",
+        "type": "subflow:8381c865.236028",
+        "z": "2d126e47.f46862",
+        "name": "ymx_VRy_Ri",
+        "env": [
+            {
+                "name": "varfilter",
+                "value": "ymx_VRy_Ri",
+                "type": "str"
+            }
+        ],
+        "x": 660,
+        "y": 560,
+        "wires": [
+            [
+                "69cc0882.b018a8"
+            ]
+        ]
+    },
+    {
+        "id": "40c5906a.3e694",
+        "type": "switch",
+        "z": "2d126e47.f46862",
+        "name": "filter VRx_Ro",
+        "property": "payload.variablename",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "ymx_VRx_Ro",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": true,
+        "outputs": 1,
+        "x": 660,
+        "y": 820,
+        "wires": [
+            [
+                "b2c348bb.3d9668"
+            ]
+        ]
+    },
+    {
+        "id": "336fc7e0.12a4d8",
+        "type": "switch",
+        "z": "2d126e47.f46862",
+        "name": "filter VRy_Ro",
+        "property": "payload.variablename",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "ymx_VRy_Ro",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": true,
+        "outputs": 1,
+        "x": 660,
+        "y": 850,
+        "wires": [
+            [
+                "b2c348bb.3d9668"
+            ]
+        ]
+    },
+    {
+        "id": "20dd7b9c.50b8b4",
+        "type": "subflow:8381c865.236028",
+        "z": "2d126e47.f46862",
+        "name": "ymx_VRx_Ro",
+        "env": [
+            {
+                "name": "varfilter",
+                "value": "ymx_VRx_Ro",
+                "type": "str"
+            }
+        ],
+        "x": 670,
+        "y": 590,
+        "wires": [
+            [
+                "bd91226b.a58df"
+            ]
+        ]
+    },
+    {
+        "id": "32aede70.639532",
+        "type": "subflow:8381c865.236028",
+        "z": "2d126e47.f46862",
+        "name": "ymx_VRy_Ro",
+        "env": [
+            {
+                "name": "varfilter",
+                "value": "ymx_VRy_Ro",
+                "type": "str"
+            }
+        ],
+        "x": 670,
+        "y": 620,
+        "wires": [
+            [
+                "d412921c.99838"
+            ]
+        ]
+    },
+    {
+        "id": "d412921c.99838",
+        "type": "ui_text",
+        "z": "2d126e47.f46862",
+        "group": "3dfdb3a5.11521c",
+        "order": 8,
+        "width": 2,
+        "height": 1,
+        "name": "",
+        "label": "ymx_VRy_Ro",
+        "format": "{{msg.payload}}",
+        "layout": "col-center",
+        "x": 860,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "e0ad6ee1.f2205",
+        "type": "switch",
+        "z": "6cdd2d7c.a92c74",
+        "name": "filter variable",
+        "property": "payload.variablename",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "varfilter",
+                "vt": "env"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 240,
+        "y": 110,
+        "wires": [
+            [
+                "3aaf53d6.61992c"
+            ]
+        ]
+    },
+    {
+        "id": "3aaf53d6.61992c",
+        "type": "change",
+        "z": "6cdd2d7c.a92c74",
+        "name": "keep only table of duplets",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.variabledata",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 500,
+        "y": 110,
+        "wires": [
+            [
+                "38133e32.ab5572"
+            ]
+        ]
+    },
+    {
+        "id": "38133e32.ab5572",
+        "type": "change",
+        "z": "6cdd2d7c.a92c74",
+        "name": "keep only value and delete timestamp",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.y",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 740,
+        "y": 180,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f6e9381f.abe348",
+        "type": "subflow:8381c865.236028",
+        "z": "f3572396.ff04b",
+        "name": "",
+        "env": [],
+        "x": 280,
+        "y": 170,
+        "wires": [
+            [
+                "9ac23244.edc72"
+            ]
+        ]
+    },
+    {
+        "id": "9ac23244.edc72",
+        "type": "ui_text",
+        "z": "f3572396.ff04b",
+        "group": "381c31c9.1d8f8e",
+        "order": 14,
+        "width": 0,
+        "height": 0,
+        "name": "var",
+        "label": "var",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 490,
+        "y": 170,
+        "wires": []
+    },
+    {
+        "id": "dee220f7.ef93e",
+        "type": "subflow:8381c865.236028",
+        "z": "2d126e47.f46862",
+        "name": "Moteur_D.MarArr",
+        "env": [
+            {
+                "name": "varfilter",
+                "value": "Moteur_D.MarArr",
+                "type": "str"
+            }
+        ],
+        "x": 660,
+        "y": 990,
+        "wires": [
+            [
+                "9eec60a.6e882a"
+            ]
+        ]
+    },
+    {
+        "id": "9eec60a.6e882a",
+        "type": "ui_text",
+        "z": "2d126e47.f46862",
+        "group": "81b688ed.ba6248",
+        "order": 8,
+        "width": "1",
+        "height": 1,
+        "name": "Moteur_D.MarArr",
+        "label": "",
+        "format": "{{msg.payload}}",
+        "layout": "col-center",
+        "x": 900,
+        "y": 990,
+        "wires": []
+    },
+    {
+        "id": "5ed37997.bdfe78",
+        "type": "ui_template",
+        "z": "2d126e47.f46862",
+        "group": "81b688ed.ba6248",
+        "name": "-----  Moteurs  ------",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "format": "<!-- Items des structures -->\n<table>\n    <thead>\n        <tr>\n            <th>-- Moteurs --</th>\n        </tr>\n    </thead>\n    <tbody>\n        <tr>\n            <td>MarArr</td>\n            <td>Run</td>\n            <td>Speed SP</td>\n            <td>Speed MV</td>\n        </tr>\n    </tbody>\n</table>\n\n",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "x": 660,
+        "y": 930,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ed5699d4.56f808",
+        "type": "subflow:8381c865.236028",
+        "z": "2d126e47.f46862",
+        "name": "Moteur_D.Run",
+        "env": [
+            {
+                "name": "varfilter",
+                "value": "Moteur_D.inRun",
+                "type": "str"
+            }
+        ],
+        "x": 650,
+        "y": 1030,
+        "wires": [
+            [
+                "78f2087f.daf078"
+            ]
+        ]
+    },
+    {
+        "id": "78f2087f.daf078",
+        "type": "ui_text",
+        "z": "2d126e47.f46862",
+        "group": "81b688ed.ba6248",
+        "order": 8,
+        "width": "1",
+        "height": 1,
+        "name": "Moteur_D.inRun",
+        "label": "",
+        "format": "{{msg.payload.toFixed(2)}}",
+        "layout": "col-center",
+        "x": 890,
+        "y": 1030,
+        "wires": []
+    },
+    {
+        "id": "424a55b0.9ad33c",
+        "type": "subflow:8381c865.236028",
+        "z": "2d126e47.f46862",
+        "name": "Moteur_D.Speed_SP",
+        "env": [
+            {
+                "name": "varfilter",
+                "value": "Moteur_D.Speed_SP",
+                "type": "str"
+            }
+        ],
+        "x": 670,
+        "y": 1070,
+        "wires": [
+            [
+                "6dd612af.6ece4c"
+            ]
+        ]
+    },
+    {
+        "id": "6dd612af.6ece4c",
+        "type": "ui_text",
+        "z": "2d126e47.f46862",
+        "group": "81b688ed.ba6248",
+        "order": 8,
+        "width": 2,
+        "height": 1,
+        "name": "Speed_SP",
+        "label": "",
+        "format": "{{msg.payload.toFixed(2)}}",
+        "layout": "col-center",
+        "x": 880,
+        "y": 1070,
+        "wires": []
+    },
+    {
+        "id": "99e8fb6d.4f6e78",
+        "type": "subflow:8381c865.236028",
+        "z": "2d126e47.f46862",
+        "name": "Moteur_D.Speed_MV",
+        "env": [
+            {
+                "name": "varfilter",
+                "value": "Moteur_D.Speed_MV",
+                "type": "str"
+            }
+        ],
+        "x": 670,
+        "y": 1110,
+        "wires": [
+            [
+                "1a9fcbde.281074"
+            ]
+        ]
+    },
+    {
+        "id": "1a9fcbde.281074",
+        "type": "ui_text",
+        "z": "2d126e47.f46862",
+        "group": "81b688ed.ba6248",
+        "order": 8,
+        "width": 2,
+        "height": 1,
+        "name": "Moteur_D.Speed_MV",
+        "label": "",
+        "format": "{{msg.payload.toFixed(2)}}",
+        "layout": "col-center",
+        "x": 910,
+        "y": 1110,
+        "wires": []
+    },
+    {
+        "id": "63f71494.92afdc",
+        "type": "inject",
+        "z": "c38b0ce6.66e1c",
+        "name": "Go",
+        "topic": "",
+        "payload": "1",
+        "payloadType": "str",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "x": 250,
+        "y": 290,
+        "wires": [
+            [
+                "2bb59b18.67f0e4"
+            ]
+        ]
+    },
+    {
+        "id": "2bb59b18.67f0e4",
+        "type": "function",
+        "z": "c38b0ce6.66e1c",
+        "name": "build array (2)",
+        "func": "var arr =[[\"Paul\",\"Doe\",24],[\"Greg\",\"Jones\",31],[\"Able\",\"Smith\",29]];\nmsg.payload = arr;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 460,
+        "y": 290,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c81df300.f6936",
+        "type": "debug",
+        "z": "c38b0ce6.66e1c",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 830,
+        "y": 130,
+        "wires": []
+    },
+    {
+        "id": "fa181033.65fb7",
+        "type": "ui_template",
+        "z": "c38b0ce6.66e1c",
+        "group": "59193cc8.916a34",
+        "name": "Two dimension array table",
+        "order": 1,
+        "width": "16",
+        "height": "10",
+        "format": "<table id=\"table\" border=\"1\">\n <tr>\n <th>ProcNode</th> \n <th>index</th>\n <th>object</th>\n <th>Value</th>\n </tr>\n <tbody>\n <!--\n <tr ng-repeat=\"row in msg.payload\">\n <td ng-repeat=\"item in row\" >{{item}}</td>\n -->\n <!-- vu sur le net!! -->\n <tr ng-repeat=\"row in msg.payload\">\n    <td>{{row.groupname}}</td>\n    <td>{{$index+1}}</td>\n    <td>{{row.variablename}}</td>\n    <td>{{row.variabledata[0].y.toFixed(2)}}</td>\n </tr>\n </tbody>\n</table>\n",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "x": 560,
+        "y": 130,
+        "wires": [
+            [
+                "c81df300.f6936"
+            ]
+        ]
+    },
+    {
+        "id": "2e267a91.50fc06",
+        "type": "join",
+        "z": "2d126e47.f46862",
+        "name": "joinProcessing",
+        "mode": "custom",
+        "build": "array",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": false,
+        "timeout": "1",
+        "count": "",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "num",
+        "reduceFixup": "",
+        "x": 640,
+        "y": 300,
+        "wires": [
+            [
+                "7142d838.2e6518"
+            ]
+        ]
+    },
+    {
+        "id": "7142d838.2e6518",
+        "type": "link out",
+        "z": "2d126e47.f46862",
+        "name": "link_joinProcRead",
+        "links": [
+            "5476459b.84c50c"
+        ],
+        "x": 815,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "5476459b.84c50c",
+        "type": "link in",
+        "z": "c38b0ce6.66e1c",
+        "name": "",
+        "links": [
+            "7142d838.2e6518"
+        ],
+        "x": 285,
+        "y": 130,
+        "wires": [
+            [
+                "fa181033.65fb7"
+            ]
+        ]
+    },
+    {
+        "id": "a82a67d6.b84e78",
+        "type": "join",
+        "z": "8b8d2438.d4fab8",
+        "name": "joinWrite",
+        "mode": "custom",
+        "build": "array",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": false,
+        "timeout": "1",
+        "count": "",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "",
+        "reduceFixup": "",
+        "x": 720,
+        "y": 270,
+        "wires": [
+            [
+                "26e46fa.620559"
+            ]
+        ]
+    },
+    {
+        "id": "26e46fa.620559",
+        "type": "link out",
+        "z": "8b8d2438.d4fab8",
+        "name": "link_ProcWrite",
+        "links": [
+            "a76394a5.41bea8"
+        ],
+        "x": 940,
+        "y": 270,
+        "wires": []
+    },
+    {
+        "id": "a76394a5.41bea8",
+        "type": "link in",
+        "z": "c38b0ce6.66e1c",
+        "name": "",
+        "links": [
+            "26e46fa.620559"
+        ],
+        "x": 285,
+        "y": 80,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e3115f2a.d727e",
+        "type": "comment",
+        "z": "2d126e47.f46862",
+        "name": "Faire array des data lues",
+        "info": "",
+        "x": 670,
+        "y": 270,
+        "wires": []
+    },
+    {
+        "id": "df2712b9.30f8d",
+        "type": "comment",
+        "z": "c38b0ce6.66e1c",
+        "name": "Example",
+        "info": "",
+        "x": 360,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "8e0b8992.f83208",
+        "type": "comment",
+        "z": "c38b0ce6.66e1c",
+        "name": "Constitution du tableau",
+        "info": "",
+        "x": 540,
+        "y": 80,
+        "wires": []
+    }
+]

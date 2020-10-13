@@ -45,6 +45,7 @@ void yMOTOR_Init(yMOTOR* this,
 	this->Sens_memo = 0;
 	this->Run_memo = 0;
 	this->DB_memo = DEADBAND_DEFAULT;
+	this->FeeWheel = 0U;
     //--- Virtual outputs
 	this->Speed_MV = 0;
 	this->Sens = 0;
@@ -63,11 +64,11 @@ void yMOTOR_Init(yMOTOR* this,
 void yMOTOR_MarArr(yMOTOR* this, uint8_t mararr) {
     if (mararr == yMARCHE) {
         this->inRun = 1;     // état 'enMarche'
-        //Speed(this->m_speed);   // appliquer la vitesse demandée
     }
     else if (mararr == yARRET) {
         this->inRun = 0;    // état 'enArret'
         this->Speed_MV = 0;
+        this->Sens = 0;
     }
 	//-- re exec motor
 	yMOTOR_Exec(this);
@@ -76,22 +77,27 @@ void yMOTOR_MarArr(yMOTOR* this, uint8_t mararr) {
 /** Speed_SP request */
 void yMOTOR_Speed(yMOTOR* this, float speed) {
 	//TODO check speed limits!
-	this->Speed_SP = speed;
-	// check SP outside Deaband
-	if (this->Speed_SP >= this->DeadBand) {
-		this->Speed_MV = (uint32_t)(this->Speed_SP + 0.5);
-		this->Sens = 1;
-	} else if (this->Speed_SP <= -this->DeadBand) {
-		this->Speed_MV = (uint32_t)(- this->Speed_SP - 0.5);
-		this->Sens = -1;
-	} else {
+	//-- take it only if motor running
+	if (this->inRun == 1) {
+		this->Speed_SP = speed;
+		//-- check SP outside Deaband
+		if (this->Speed_SP >= this->DeadBand) {
+			this->Speed_MV = (uint32_t)(this->Speed_SP + 0.5);
+			this->Sens = 1;
+		} else if (this->Speed_SP <= -this->DeadBand) {
+			this->Speed_MV = (uint32_t)(- this->Speed_SP - 0.5);
+			this->Sens = -1;
+		} else {
+			this->Speed_MV = 0;
+			//on ne sait pas si on va changer de sens
+		}
+		//-- memoriser
+		this->Speed_memo = this->Speed_SP;
+		//this->Sens_memo = this->Sens;
+	}else {	//not in run
 		this->Speed_MV = 0;
 		this->Sens = 0;
 	}
-	//memoriser
-	this->Speed_memo = this->Speed_MV;
-	this->Sens_memo = this->Sens;
-
 	//-- re exec motor
 	yMOTOR_Exec(this);
 }
@@ -100,79 +106,67 @@ void yMOTOR_Speed(yMOTOR* this, float speed) {
 void yMOTOR_VirtualOutputs(yMOTOR* this) {
 	if (this->inRun == 1) {
 		switch (this->Sens) {
-			case 1:
-				this->_av = 1;
-				this->_ar = 0;
-				break;
-			case 0:
-				this->_av = 0;
-				this->_ar = 0;
-				break;
-			case -1:
-				this->_av = 0;
-				this->_ar = 1;
-				break;
-			default:
-				break;
+		case 1:
+			this->_av = 1;
+			this->_ar = 0;
+			break;
+		case 0:
+			this->_av = 0;
+			this->_ar = 0;
+			break;
+		case -1:
+			this->_av = 0;
+			this->_ar = 1;
+			break;
+		default:
+			break;
 		}
 		this->_pwm = this->Speed_MV;
-	} else {
+	} else {	// inRun=0
 		this->_ar = 0;
 		this->_av = 0;
 		this->_pwm = 0;
-		//this->Speed_memo = 0.0;
-		//this->Sens_memo = 0;
-	}
-
+	} //if inRun
 }
 
 /** calcul Real Outputs */
 void yMOTOR_RealOutputs(yMOTOR* this) {
-	uint8_t tmp_in1 = this->_av & !this->_ar;
+	uint8_t tmp_in1 = this->_av & !(this->_ar);
 	HAL_GPIO_WritePin((uint32_t)this->_gpioPortIN1, (uint16_t)this->_gpioPinIN1, tmp_in1);
 
-	uint8_t tmp_in2 = !this->_av & this->_ar;
+	uint8_t tmp_in2 = (!this->_av) & this->_ar;
 	HAL_GPIO_WritePin(this->_gpioPortIN2, this->_gpioPinIN2, tmp_in2);
 
-	this->_htimpwm.Instance->CCR2 = this->_pwm;
-
-	//	if (this->inRun == 1) {
-	//		HAL_GPIO_WritePin((uint32_t)this->_gpioPortIN1, (uint16_t)this->_gpioPinIN1, GPIO_PIN_SET);
-	//		HAL_GPIO_WritePin(this->_gpioPortIN2, this->_gpioPinIN2, GPIO_PIN_RESET);
-	//		this->_htimpwm.Instance->CCR2 = this->Speed_MV;
-	//	} else {
-	//		HAL_GPIO_WritePin(this->_gpioPortIN1, this->_gpioPinIN1, GPIO_PIN_RESET);
-	//		HAL_GPIO_WritePin(this->_gpioPortIN2, this->_gpioPinIN2, GPIO_PIN_SET);
-	//		this->_htimpwm.Instance->CCR2 = 0;
-	//	}
+	this->_htimpwm.Instance->CCR2 = this->_pwm;		// duty cycle du timer
 }
 
 /** calcul moteur */
 void yMOTOR_Exec(yMOTOR* this) {
 	//--- a faire apres que qq chose ait changé!
-//	osDelay(pdMS_TO_TICKS(10));	// test d'une fnc FreeRTOS ds s/fnc: OK
+	//	osDelay(pdMS_TO_TICKS(10));	// test d'une fnc FreeRTOS ds s/fnc: OK
 	yMOTOR_VirtualOutputs(this);
-	yMOTOR_RealOutputs(this);
-}
+	//-- check sens de marche
+	if (((this->Sens == 1) && (this->Sens_memo == -1))
+			|| ((this->Sens == -1) && (this->Sens_memo == 1))
+			|| this->Sens == 0) {	//-- sens de marche a changé ou passage en deadband
+		//-- marquer un temps en roue libre
+		this->_ar = 0;
+		this->_av = 0;
+		this->_pwm = 0;
+		this->FeeWheel = 1U;
+		yMOTOR_RealOutputs(this);
+		osDelay(pdMS_TO_TICKS(2000));	//laisser le temps au courant de s'inverser
+		this->FeeWheel = 0U;
+		yMOTOR_VirtualOutputs(this);
+		yMOTOR_RealOutputs(this);
+	} else {	// sens de marche inchangé
+		this->FeeWheel = 0U;
+		yMOTOR_RealOutputs(this);
+	} //if sens
 
-/**
- *
-  	if (this.inRun == 1) {
-		if (this->Speed_SP >= 0.0) {
-			this->Speed_MV = (uint32_t)(this->Speed_SP + 0.5);
-			this->Sens = 1;
-		} else {
-			this->Speed_MV = (uint32_t)(- this->Speed_SP - 0.5);
-			this->Sens = -1;
-		}
-	} else {
-		this->Speed_MV = 0;
-        this->_ar = 0;      // mettre les 2 cdes a zero
-        this->_av = 0;
-        this->_pwm = 0;		// ==> arret rotation
-	}
-  *
- */
+	//-- memoriser le sens de marche
+	this->Sens_memo = this->Sens;
+}
 
 /**
  * @note \n

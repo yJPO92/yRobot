@@ -45,16 +45,6 @@
  * Structure d'un motor
  *--------------------*/
 
-/*
- * yARRET ==> av = ar = 0
- * yMARCHE ==> av & ar = sign of speed
-
- * Vitesse effective
- * float [-100.0,+100.0]
- * negative ==> reverse, positive ==> forward
- *
- */
-
 typedef struct {
 	//--- Inputs
 	uint8_t MarArr;		// Marche/Arret request
@@ -67,9 +57,10 @@ typedef struct {
 	float DeadBand;		// dead band (around 0.0 not action)
 	//--- memories
     float Speed_memo;	// speed memory
-    uint8_t Sens_memo;	// sens memory
+    int8_t Sens_memo;	// sens memory
     uint8_t Run_memo;	// running memory
     float DB_memo;		// deadband
+    uint8_t FeeWheel;	// en Roue libre (0|1)
     //--- Virtual outputs
     uint32_t Speed_MV;	// commande vitesse vers sortie
     int8_t Sens;		// sens de marche (AR/0/AV ; -1/0/+1)
@@ -147,15 +138,12 @@ void yMOTOR_RealOutputs(yMOTOR* this);
 //     * @param db
 //     * modify the default dead band (around 0.0 not action)
 //     */
-//    void DeadBand(float db);
     
 //    /** Marche/Arret request
 //     * yARRET ==> av = ar = 0
 //     * yMARCHE ==> av & ar = sign of speed
 //     */
-//    //void mararr(int mararr = yARRET);
-//    void MarArr(int mararr);
-    
+
 
 
 #endif	//_yMOTOR_H
