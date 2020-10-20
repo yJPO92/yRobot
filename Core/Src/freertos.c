@@ -89,6 +89,7 @@ yVTbuff_t VTbuffer = { .src = SrcNone, .VTbuff = "...\0" };
 
 /* objet d'echange d'event via la queue */
 yEvent_t yEvent = {.Topic = TopicNone, .PayLoadF = 0.0, .PayloadI = 0};
+yVR_t yVR = {.Topic = TopicNone, .PayLoadF = 0.0, .PayloadI = 0};
 
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
@@ -126,6 +127,13 @@ const osThreadAttr_t tk_VTaffiche_attributes = {
   .priority = (osPriority_t) osPriorityLow,
   .stack_size = 1024 * 4
 };
+/* Definitions for tk_MoteurD */
+osThreadId_t tk_MoteurDHandle;
+const osThreadAttr_t tk_MoteurD_attributes = {
+  .name = "tk_MoteurD",
+  .priority = (osPriority_t) osPriorityLow,
+  .stack_size = 1024 * 4
+};
 /* Definitions for qEvents */
 osMessageQueueId_t qEventsHandle;
 const osMessageQueueAttr_t qEvents_attributes = {
@@ -135,6 +143,11 @@ const osMessageQueueAttr_t qEvents_attributes = {
 osMessageQueueId_t qVTafficheHandle;
 const osMessageQueueAttr_t qVTaffiche_attributes = {
   .name = "qVTaffiche"
+};
+/* Definitions for qMotD */
+osMessageQueueId_t qMotDHandle;
+const osMessageQueueAttr_t qMotD_attributes = {
+  .name = "qMotD"
 };
 /* Definitions for t1s */
 osTimerId_t t1sHandle;
@@ -163,6 +176,7 @@ void tk_Init_Fnc(void *argument);
 void tk_CheckVR_Fnc(void *argument);
 void tk_Process_Fnc(void *argument);
 void tk_VTaffiche_Fnc(void *argument);
+void tk_MoteurD_Fnc(void *argument);
 void t1s_Callback(void *argument);
 void t250ms_Callback(void *argument);
 
@@ -274,7 +288,10 @@ void MX_FREERTOS_Init(void) {
   qEventsHandle = osMessageQueueNew (8, sizeof(yEvent_t), &qEvents_attributes);
 
   /* creation of qVTaffiche */
-  qVTafficheHandle = osMessageQueueNew (15, sizeof(yVTbuff_t), &qVTaffiche_attributes);
+  qVTafficheHandle = osMessageQueueNew (10, sizeof(yVTbuff_t), &qVTaffiche_attributes);
+
+  /* creation of qMotD */
+  qMotDHandle = osMessageQueueNew (4, sizeof(yVR_t), &qMotD_attributes);
 
   /* USER CODE BEGIN RTOS_QUEUES */
 	/* add queues, ... */
@@ -296,6 +313,9 @@ void MX_FREERTOS_Init(void) {
   /* creation of tk_VTaffiche */
   tk_VTafficheHandle = osThreadNew(tk_VTaffiche_Fnc, NULL, &tk_VTaffiche_attributes);
 
+  /* creation of tk_MoteurD */
+  tk_MoteurDHandle = osThreadNew(tk_MoteurD_Fnc, NULL, &tk_MoteurD_attributes);
+
   /* USER CODE BEGIN RTOS_THREADS */
 	/* add threads, ... */
 
@@ -305,7 +325,7 @@ void MX_FREERTOS_Init(void) {
 	HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 	osSemaphoreRelease(semUARTHandle);
 
-	WaitInTk = Wait500ms;
+	WaitInTk = 10;		//Wait500ms;
 	osDelay(pdMS_TO_TICKS(WaitInTk));
 	TkToStart = TkInit;
   /* USER CODE END RTOS_THREADS */
@@ -318,7 +338,7 @@ void MX_FREERTOS_Init(void) {
  * @param  argument: Not used
  * @retval None
  */
-//yDOC: task 5 default
+//yDOC: task 6 default
 /* USER CODE END Header_StartDefaultTask */
 void StartDefaultTask(void *argument)
 {
@@ -365,6 +385,8 @@ void StartDefaultTask(void *argument)
 		}
 
 		//--- debug yMOTOR
+		//TODO futur trace to tk_MoteurD & tk_MoteurG
+		//move
 		//--- trace via LD2
 		HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, Moteur_D.inRun);
 		//--- trace via VT
@@ -419,6 +441,7 @@ void tk_Init_Fnc(void *argument)
 	HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 	osSemaphoreRelease(semUARTHandle);
 
+	//osDelay(pdMS_TO_TICKS(WaitInTk));
 
 	/* Initialize menu structure & Message de Bienvenue*/
 	mnuSTM.Init =Init_fnc;	//assigne function
@@ -445,6 +468,7 @@ void tk_Init_Fnc(void *argument)
 	yANALOG_SetTrimRaw(&VRy, 101);
 
 	//--- initialize Moteurs
+	//TODO futur à voir si doit etre ds tk_MoteurD
 	yMOTOR_Init(&Moteur_D, (uint32_t)MotDin1_GPIO_Port, (uint16_t)MotDin1_Pin,
 					  (uint32_t)MotDin2_GPIO_Port, (uint16_t)MotDin2_Pin, htim4);
 
@@ -532,7 +556,7 @@ void tk_CheckVR_Fnc(void *argument)
  * @param argument: Not used
  * @retval None
  */
-//yDOC task 4 Process
+//yDOC task 5 Process
 /* USER CODE END Header_tk_Process_Fnc */
 void tk_Process_Fnc(void *argument)
 {
@@ -570,19 +594,26 @@ void tk_Process_Fnc(void *argument)
 			case SWXY:
 				snprintf(VTbuffer.VTbuff, 50, CUP(10,50) "--(tk_Proc) Swxy Interrupt");
 				osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
-				//-- request moteur Run or not
+				//-- request moteurs Run or not
 				(Moteur_D.inRun == 1U) ? (yMOTOR_MarArr(&Moteur_D, yARRET)) : (yMOTOR_MarArr(&Moteur_D, yMARCHE));
+				//TODO futur
+				//use queue to send to tk_MoteurD & tk_MoteurG
 				break;
 			case Kbd:
 				//-- request moteur Run
 				yMOTOR_MarArr(&Moteur_D, EvtRecu.PayloadI);
+				//TODO futur
+				//use queue to send to tk_MoteurD & tk_MoteurG
 				break;
 			case VRX:	//Direction
 				//-- action ?
+				//use queue to send to tk_MoteurD & tk_MoteurG
 				break;
 			case VRY:	//Vitesse
 				//-- request moteur consigne vitesse
 				yMOTOR_Speed(&Moteur_D, EvtRecu.PayLoadF);
+				//TODO futur
+				//use queue to send to tk_MoteurD & tk_MoteurG
 				break;
 			default:
 				snprintf(VTbuffer.VTbuff, 50, DECRC "\ttk_Process: unknow event" ERASELINE);
@@ -597,6 +628,40 @@ void tk_Process_Fnc(void *argument)
 		}
 	}
   /* USER CODE END tk_Process_Fnc */
+}
+
+/* USER CODE BEGIN Header_tk_MoteurD_Fnc */
+/**
+* @brief Function implementing the tk_MoteurD thread.
+* @param argument: Not used
+* @retval None
+*/
+//yDOC task 4 MoteurD
+/* USER CODE END Header_tk_MoteurD_Fnc */
+void tk_MoteurD_Fnc(void *argument)
+{
+  /* USER CODE BEGIN tk_MoteurD_Fnc */
+	yVR_t EvtRecu;
+	osStatus_t status;
+	//-- Is it to me to start?
+	while (TkToStart != TkMoteurD) {
+		osDelay(pdMS_TO_TICKS(WaitInTk));
+	}
+	snprintf(aTxBuffer, 1024, DECRC "\n tk_MoteurD\t initialised" DECSC);
+	osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
+	HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+	osSemaphoreRelease(semUARTHandle);
+
+	TkToStart++;
+	osDelay(pdMS_TO_TICKS(WaitInTk));
+	/* Infinite loop */
+	for(;;)
+	{
+		/* wait for message in queue */
+		status = osMessageQueueGet(qEventsHandle, &EvtRecu, NULL, portMAX_DELAY);
+		osDelay(10000);
+	}
+  /* USER CODE END tk_MoteurD_Fnc */
 }
 
 /* t1s_Callback function */

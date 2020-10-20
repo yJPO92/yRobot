@@ -1,5 +1,7 @@
 *** yRobot ***
 
+le 18/10/2020: v3.0 (mx 6.0): new branch 'tkMotD', creation task de gestion du moteur Droit
+                mais task vide avec queue en amont.
 le 13/10/2020: v2.9 (mx 5.7): yMOTOR real outputs freewheeling
                 suivi version de yRobot-FreeRTOS.xml (updated on 18/10)
 le 11/10/2020: v2.8 (mx 5.7): yMOTOR deadband sur Speed_SP, virtual outputs, real outputs

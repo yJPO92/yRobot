@@ -23,6 +23,12 @@ typedef struct {
 	uint8_t PayloadI;
 } yEvent_t;
 
+typedef struct {
+	uint8_t Topic;
+	float	PayLoadF;
+	uint8_t PayloadI;
+} yVR_t;
+
 /* Define structure to pass texte to display via VTdisplay */
 typedef struct {
 	int src;			// identifier l'emetteur
@@ -44,7 +50,7 @@ typedef enum {
 
 /* Flag de démarrage des taches */
 typedef enum  {
-	TkNone = 0, TkInit, TkVTaffiche, TkCheckVR, TkProcess, TkDefault, TkAll,
+	TkNone = 0, TkInit, TkVTaffiche, TkCheckVR, TkMoteurD, TkProcess, TkDefault, TkAll,
 } yTkOrder;
 
 /* differents wait time for tasks */

@@ -68,7 +68,7 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define yCubeMX "rtosV5.7"
+#define yCubeMX "RTOS v6.0"
 #define B1_Pin GPIO_PIN_13
 #define B1_GPIO_Port GPIOC
 #define B1_EXTI_IRQn EXTI15_10_IRQn
@@ -99,7 +99,7 @@ void Error_Handler(void);
 #define MotDpwm_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 #define yPROG "*** yRobot ***"
-#define yVER  "V2.9"
+#define yVER  "v3.0"
 #define yDATE "xx-Oct-2020"
 //#define yDBG_tk 1        //debug display on terminal (ou commenter ligne)
 
