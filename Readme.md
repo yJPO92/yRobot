@@ -25,6 +25,11 @@ STM32CubeMonitor (Node-RED)
 6 task (inclus default)  
 3 queue
 
+##Program design
+
+Program organization is describe in drawing 'yRobotFreeRTOS.xml' done with draw.io  
+ [https://app.diagrams.net/](https://app.diagrams.net/)
+
 ## Authors
 
 * **JPO** - *FreeRTOS, C in TrueStudio*

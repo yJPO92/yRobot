@@ -47,7 +47,7 @@ extern osSemaphoreId_t semUARTHandle;
  * @param argument: Not used
  * @retval None
  */
-//yDOC task 2 VT Affiche
+//yDOC task 8 VT Affiche
 /* USER CODE END Header_tk_VTaffiche_Fnc */
 void tk_VTaffiche_Fnc(void *argument)
 {

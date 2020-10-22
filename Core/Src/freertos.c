@@ -89,7 +89,7 @@ yVTbuff_t VTbuffer = { .src = SrcNone, .VTbuff = "...\0" };
 
 /* objet d'echange d'event via la queue */
 yEvent_t yEvent = {.Topic = TopicNone, .PayLoadF = 0.0, .PayloadI = 0};
-yVR_t yVR = {.Topic = TopicNone, .PayLoadF = 0.0, .PayloadI = 0};
+//yEvent_t yVR = {.Topic = TopicNone, .PayLoadF = 0.0, .PayloadI = 0}; //pas utile de définir un nouvel event puisque c'est le meme formt ds des queue differentes
 
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
@@ -103,35 +103,35 @@ const osThreadAttr_t defaultTask_attributes = {
 osThreadId_t tk_InitHandle;
 const osThreadAttr_t tk_Init_attributes = {
   .name = "tk_Init",
-  .priority = (osPriority_t) osPriorityLow,
+  .priority = (osPriority_t) osPriorityNormal,
   .stack_size = 1024 * 4
 };
 /* Definitions for tk_CheckVR */
 osThreadId_t tk_CheckVRHandle;
 const osThreadAttr_t tk_CheckVR_attributes = {
   .name = "tk_CheckVR",
-  .priority = (osPriority_t) osPriorityLow,
+  .priority = (osPriority_t) osPriorityNormal,
   .stack_size = 1024 * 4
 };
 /* Definitions for tk_Process */
 osThreadId_t tk_ProcessHandle;
 const osThreadAttr_t tk_Process_attributes = {
   .name = "tk_Process",
-  .priority = (osPriority_t) osPriorityLow,
+  .priority = (osPriority_t) osPriorityNormal,
   .stack_size = 1024 * 4
 };
 /* Definitions for tk_VTaffiche */
 osThreadId_t tk_VTafficheHandle;
 const osThreadAttr_t tk_VTaffiche_attributes = {
   .name = "tk_VTaffiche",
-  .priority = (osPriority_t) osPriorityLow,
+  .priority = (osPriority_t) osPriorityBelowNormal,
   .stack_size = 1024 * 4
 };
 /* Definitions for tk_MoteurD */
 osThreadId_t tk_MoteurDHandle;
 const osThreadAttr_t tk_MoteurD_attributes = {
   .name = "tk_MoteurD",
-  .priority = (osPriority_t) osPriorityLow,
+  .priority = (osPriority_t) osPriorityNormal,
   .stack_size = 1024 * 4
 };
 /* Definitions for qEvents */
@@ -175,7 +175,7 @@ void StartDefaultTask(void *argument);
 void tk_Init_Fnc(void *argument);
 void tk_CheckVR_Fnc(void *argument);
 void tk_Process_Fnc(void *argument);
-void tk_VTaffiche_Fnc(void *argument);
+extern void tk_VTaffiche_Fnc(void *argument);
 void tk_MoteurD_Fnc(void *argument);
 void t1s_Callback(void *argument);
 void t250ms_Callback(void *argument);
@@ -291,7 +291,7 @@ void MX_FREERTOS_Init(void) {
   qVTafficheHandle = osMessageQueueNew (10, sizeof(yVTbuff_t), &qVTaffiche_attributes);
 
   /* creation of qMotD */
-  qMotDHandle = osMessageQueueNew (4, sizeof(yVR_t), &qMotD_attributes);
+  qMotDHandle = osMessageQueueNew (4, sizeof(yEvent_t), &qMotD_attributes);
 
   /* USER CODE BEGIN RTOS_QUEUES */
 	/* add queues, ... */
@@ -338,7 +338,7 @@ void MX_FREERTOS_Init(void) {
  * @param  argument: Not used
  * @retval None
  */
-//yDOC: task 6 default
+//yDOC: task 2 default
 /* USER CODE END Header_StartDefaultTask */
 void StartDefaultTask(void *argument)
 {
@@ -495,7 +495,7 @@ void tk_Init_Fnc(void *argument)
  * @param argument: Not used
  * @retval None
  */
-//yDOC task 3 check VR
+//yDOC task 7 check VR
 /* USER CODE END Header_tk_CheckVR_Fnc */
 void tk_CheckVR_Fnc(void *argument)
 {
@@ -556,7 +556,7 @@ void tk_CheckVR_Fnc(void *argument)
  * @param argument: Not used
  * @retval None
  */
-//yDOC task 5 Process
+//yDOC task 6 Process
 /* USER CODE END Header_tk_Process_Fnc */
 void tk_Process_Fnc(void *argument)
 {
@@ -584,12 +584,15 @@ void tk_Process_Fnc(void *argument)
 			snprintf(VTbuffer.VTbuff, 100, DECRC "\tEventRec: %d %6.2f %d" ERASELINE,
 					EvtRecu.Topic, EvtRecu.PayLoadF, EvtRecu.PayloadI);
 			osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
-
+			//-- analyser le msg par le Topic
 			switch (EvtRecu.Topic) {
 			case BP1:
 				snprintf(VTbuffer.VTbuff, 50, CUP(9,50) "--(tk_Proc) BP1 Interrupt");
 				osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
 				//-- action?
+				//-- debug envoyer msg à tk_MoteurD via qMotD
+				yEvent_t yEvent = {.Topic= BP1, .PayLoadF = 0.0, .PayloadI =0};
+				osMessageQueuePut(qMotDHandle,&yEvent, 0U, portMAX_DELAY);
 				break;
 			case SWXY:
 				snprintf(VTbuffer.VTbuff, 50, CUP(10,50) "--(tk_Proc) Swxy Interrupt");
@@ -636,12 +639,12 @@ void tk_Process_Fnc(void *argument)
 * @param argument: Not used
 * @retval None
 */
-//yDOC task 4 MoteurD
+//yDOC task 3 MoteurD
 /* USER CODE END Header_tk_MoteurD_Fnc */
 void tk_MoteurD_Fnc(void *argument)
 {
-  /* USER CODE BEGIN tk_MoteurD_Fnc */
-	yVR_t EvtRecu;
+	/* USER CODE BEGIN tk_MoteurD_Fnc */
+	yEvent_t EvtRecu;
 	osStatus_t status;
 	//-- Is it to me to start?
 	while (TkToStart != TkMoteurD) {
@@ -658,10 +661,36 @@ void tk_MoteurD_Fnc(void *argument)
 	for(;;)
 	{
 		/* wait for message in queue */
-		status = osMessageQueueGet(qEventsHandle, &EvtRecu, NULL, portMAX_DELAY);
-		osDelay(10000);
+		status = osMessageQueueGet(qMotDHandle, &EvtRecu, NULL, portMAX_DELAY);
+		if (status == osOK) {
+			//-- tracer l'event recu
+			snprintf(VTbuffer.VTbuff, 100, DECRC "\tEventRec: %d %6.2f %d" ERASELINE,
+					EvtRecu.Topic, EvtRecu.PayLoadF, EvtRecu.PayloadI);
+			osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
+			//-- en fonction du Topic faire...
+			switch (EvtRecu.Topic) {
+			case BP1:
+				//-- action?
+				break;
+				//TODO traiter les Topic pour faire action yMOTOR
+			default:
+				snprintf(VTbuffer.VTbuff, 50, DECRC "\ttk_MoteurD: unknow event" ERASELINE);
+				osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
+				break;
+			}	// switch EvtRecu
+			//-- puis envoyer un msg à l'afficheur
+			snprintf(VTbuffer.VTbuff, 50, CUP(18,50) "--Mot_D: TODO msg!!");
+			osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
+		} else {
+			snprintf(aTxBuffer, 512, DECRC "Queue qMotD empty" DECRC);
+			osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
+			HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+			osSemaphoreRelease(semUARTHandle);
+		}	//if status
+
+		//osDelay(10000);
 	}
-  /* USER CODE END tk_MoteurD_Fnc */
+	/* USER CODE END tk_MoteurD_Fnc */
 }
 
 /* t1s_Callback function */

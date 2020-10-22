@@ -23,11 +23,11 @@ typedef struct {
 	uint8_t PayloadI;
 } yEvent_t;
 
-typedef struct {
-	uint8_t Topic;
-	float	PayLoadF;
-	uint8_t PayloadI;
-} yVR_t;
+//typedef struct {
+//	uint8_t Topic;
+//	float	PayLoadF;
+//	uint8_t PayloadI;
+//} yVR_t;
 
 /* Define structure to pass texte to display via VTdisplay */
 typedef struct {
@@ -44,13 +44,17 @@ typedef enum {
 /* Nommer les Topics des messages ds les queues */
 typedef enum {
   TopicNone = 0,  BP1 = 1, SWXY = 2, Kbd =3,
+  	  	  	  	  Mar = 4, Arr = 5,
   	  	  	  	  VRX = 11, VRY = 12,
+				  DIR = 13, SP = 14,
 				  MotD = 21, MotG = 22,
+				  Ro    = 31,
 } yTopic;
 
 /* Flag de démarrage des taches */
 typedef enum  {
-	TkNone = 0, TkInit, TkVTaffiche, TkCheckVR, TkMoteurD, TkProcess, TkDefault, TkAll,
+	TkNone = 0, TkInit, TkDefault, TkMoteurD, TkProcess, TkCheckVR, TkVTaffiche, TkAll,
+	//TkNone = 0, TkInit, TkDefault, TkMoteurD, TkMoteurG, TkTrain, TkProcess, TkCheckVR, TkVTaffiche, TkAll,
 } yTkOrder;
 
 /* differents wait time for tasks */

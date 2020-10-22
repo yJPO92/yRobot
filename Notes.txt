@@ -1,5 +1,8 @@
 *** yRobot ***
 
+le 21/10/2020: v3.1 (mx 6.1): qq additions pour préparer transformation gestio yMOTOR into a task
+                envoie d'un msg a tk_MoteurD via qMotD depuis tk_Process = OK
+                envoie msg VT depuis tk_MoteurD après traitement du Topic = OK
 le 18/10/2020: v3.0 (mx 6.0): new branch 'tkMotD', creation task de gestion du moteur Droit
                 mais task vide avec queue en amont.
 le 13/10/2020: v2.9 (mx 5.7): yMOTOR real outputs freewheeling
