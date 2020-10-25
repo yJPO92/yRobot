@@ -40,9 +40,6 @@
 \n\
  A (Arret yMOTOR) \n\
  B (start/speed 0 yMOTOR)\n\
- D (speed +15.5)\n\
- E (speed -20.2)\n\
- F (speed VRx)\n\
  H (display Horloge zone)\n\
  \n\
  0-9|a|b (affiche le chiffre)\n\

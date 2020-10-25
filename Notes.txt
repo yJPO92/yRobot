@@ -1,5 +1,9 @@
 *** yRobot ***
 
+le 23/10/2020: v3.2 (mx 6.2): ajout task 'tk_Train' & queue 'qTrain' & module 'yTRAIN'
+                squelettes de 'tk_Train' & 'tk_MotD' = OK
+                ajout fichier 'VTaffichage.txt' indiquant les lignes d'affiichage de debug
+                modif 'yMENU'
 le 21/10/2020: v3.1 (mx 6.1): qq additions pour préparer transformation gestio yMOTOR into a task
                 envoie d'un msg a tk_MoteurD via qMotD depuis tk_Process = OK
                 envoie msg VT depuis tk_MoteurD après traitement du Topic = OK

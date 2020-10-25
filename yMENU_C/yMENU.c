@@ -94,17 +94,20 @@ void GetTouche_fnc(struct yMENU_t *self) {
 			break;
 
 		case 'C': case 'c':		/* Clear Status Bar & +++ */
-			snprintf(self->Buffer, 1024, CUP(9,50) ERASELINE		/*BP1*/
-					  	  	  	  	  	 CUP(10,50) ERASELINE		/*SWxy*/
-										 CUP(11,50) ERASELINE		/*ADC1*/
-										 CUP(12,50) ERASELINE		/*VRx VRy*/
-										 CUP(7,50) ERASELINE		/*AlarmA*/
-										 CUP(13,50) ERASELINE		/*VRx Ro*/
-										 CUP(14,50) ERASELINE		/*VRy Ro*/
-										 CUP(17,50) ERASELINE		/*Mot D*/
-										 CUP(18,50) ERASELINE		/*Mot G*/
-									     DECRC ERASELINE			/*Status line*/
-									     DECRC );
+			snprintf(self->Buffer, 1024,
+					CUP(7,50) ERASELINE		/*AlarmA*/
+					CUP(9,50) ERASELINE		/*BP1*/
+					CUP(10,50) ERASELINE	/*SWxy*/
+					CUP(11,50) ERASELINE	/*ADC1*/
+					CUP(12,50) ERASELINE	/*VRx VRy*/
+					CUP(13,50) ERASELINE	/*VRx Ro*/
+					CUP(14,50) ERASELINE	/*VRy Ro*/
+					CUP(17,50) ERASELINE	/*Mot D*/
+					CUP(18,50) ERASELINE	/*Mot D*/
+					CUP(19,50) ERASELINE	/*Mot G*/
+					CUP(20,50) ERASELINE	/*Train*/
+					DECRC ERASELINE			/*Status line*/
+					DECRC );
 			break;
 
 		case 'A': case 'a':		/* yMOTOR arret */
@@ -121,17 +124,17 @@ void GetTouche_fnc(struct yMENU_t *self) {
 			break;
 			}
 
-		case 'D': case 'd':		/* yMOTOR speed pos */
-			yMOTOR_Speed(&Moteur_D, 15.5);
-			break;
-
-		case 'E': case 'e':		/* yMOTOR speed neg */
-			yMOTOR_Speed(&Moteur_D, -20.2);
-			break;
-
-		case 'F': case 'f':		/* yMOTOR ??? */
-			yMOTOR_Speed(&Moteur_D, VRy.PV);
-			break;
+//		case 'D': case 'd':		/* yMOTOR speed pos */
+//			yMOTOR_Speed(&Moteur_D, 15.5);
+//			break;
+//
+//		case 'E': case 'e':		/* yMOTOR speed neg */
+//			yMOTOR_Speed(&Moteur_D, -20.2);
+//			break;
+//
+//		case 'F': case 'f':		/* yMOTOR ??? */
+//			yMOTOR_Speed(&Moteur_D, VRy.PV);
+//			break;
 
 		case 'h': case 'H':		/* affiche cadre pour horloge */
 			snprintf(self->Buffer, 1024, screen1);
@@ -143,12 +146,16 @@ void GetTouche_fnc(struct yMENU_t *self) {
 
 		case 'S': case 's':		/* ?????? */
 			snprintf(self->Buffer, 1024, DECRC ERASELINE "\tFrom Node-RED (S) %d     ", aRxBuffer[0]);
-			yMOTOR_MarArr(&Moteur_D, yMARCHE);
-			yMOTOR_Speed(&Moteur_D, 10.5);
+//			yMOTOR_MarArr(&Moteur_D, yMARCHE);
+//			yMOTOR_Speed(&Moteur_D, 10.5);
 			break;
 
 		case 'M': case 'm':		/* Display menu */
 //			yMenuClearVT();	 yMenuWelcome();  yMenuDisplay();
+			snprintf(self->Buffer, 1024, clrscr homescr
+					"\n   " REVERSE " " yPROG  " \n" OFF
+					mmenu1
+					mmenu2  DECSC);
 			break;
 
 		case 'X': case 'x':		/* adjust VRx Trim */
@@ -189,7 +196,6 @@ void GetTouche_fnc(struct yMENU_t *self) {
 void ClearStatusBar_fnc(struct yMENU_t *self) {
 	//erase trace du BP1 jusqu'a fin de ligne
 	//erase trace du SWxy  jusqu'a fin de ligne
-	//erase trace ADC  jusqu'a fin de ligne
 	//puis go to status line
 	//erase status line
 	snprintf(self->Buffer, 1024,
@@ -221,8 +227,8 @@ void Init_fnc(struct yMENU_t *self)
 							"\n" DECSC);
 
 	self->m_version = 6;
-	self->m_patch = 0;
-	self->m_toto = 60;
+	self->m_patch = 1;
+	self->m_toto = 61;
 	self->GetTouche = GetTouche_fnc;
 	self->Display = Display_fnc;
 	self->Infos = Infos_fnc;

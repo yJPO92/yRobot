@@ -41,6 +41,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/yMENU_C}&quot;" />
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/yANALOG_C}&quot;" />
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/yMOTOR_C}&quot;" />
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/yTRAIN}&quot;" />
 								</option>
 								<inputType id="com.atollic.truestudio.as.input.1436338862" name="Input" superClass="com.atollic.truestudio.as.input" />
 							</tool>
@@ -65,6 +66,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/yMENU_C}&quot;" />
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/yANALOG_C}&quot;" />
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/yMOTOR_C}&quot;" />
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/yTRAIN}&quot;" />
 								</option>
 								<option id="com.atollic.truestudio.common_options.target.endianess.968931351" name="Endianess" superClass="com.atollic.truestudio.common_options.target.endianess" useByScannerDiscovery="false" />
 								<option id="com.atollic.truestudio.common_options.target.mcpu.244550117" name="Microcontroller" superClass="com.atollic.truestudio.common_options.target.mcpu" useByScannerDiscovery="false" value="STM32L476RG" valueType="enumerated" />
@@ -155,6 +157,7 @@
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="yANALOG_C" />
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="yMENU_C" />
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="yMOTOR_C" />
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="yTRAIN" />
 					</sourceEntries>
 				</configuration>
 			</storageModule>

@@ -1,0 +1,28 @@
+<=colonne 50
+       Horloge de Jean92
++---------+---------+---------+
+|          23-10-20           |
+|          16:41:32           |
++-----------------------------+
+RTC Alarm A flag
+
+--(tk_Proc) BP1 Interrupt
+--(tk_Proc) Swxy Interrupt
+--ADC1 : 1902   1945
+--VR   : (1)   0.09     (-1)   0.07
+--VRx  : 10
+--VRy  : 7
+
+
+--Mot_D: r 0, SP   0.00, s 0, MV   0, rl 0
+--Mot_D: TODO msg!!
+
+--Train: TODO msg!!
+
+
+
+
+
+
+
+

@@ -53,7 +53,7 @@ typedef enum {
 
 /* Flag de démarrage des taches */
 typedef enum  {
-	TkNone = 0, TkInit, TkDefault, TkMoteurD, TkProcess, TkCheckVR, TkVTaffiche, TkAll,
+	TkNone = 0, TkInit, TkDefault, TkMoteurD, TkTrain, TkProcess, TkCheckVR, TkVTaffiche, TkAll,
 	//TkNone = 0, TkInit, TkDefault, TkMoteurD, TkMoteurG, TkTrain, TkProcess, TkCheckVR, TkVTaffiche, TkAll,
 } yTkOrder;
 

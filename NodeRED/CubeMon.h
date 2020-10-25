@@ -27,6 +27,7 @@
 
 #include "yANALOG.h"
 #include "yMOTOR.h"
+#include "yTRAIN.h"
 
 /* Variables pour Mode-RED/STM32CubeMonitor */
 #ifndef NR_VAR_GLO_		//for CubeMon.c

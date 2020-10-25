@@ -161,7 +161,6 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
-  /* ne vient jamais ICI car détourné vers C++ ds user code 2 */
 
   while (1)
   {

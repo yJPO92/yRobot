@@ -27,6 +27,7 @@
 #include "yMENU.h"
 #include "yANALOG.h"
 #include "yMOTOR.h"
+#include "yTRAIN.h"
 
 #define NR_VAR_GLO_
 #include "CubeMon.h"
