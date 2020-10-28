@@ -44,7 +44,7 @@ typedef enum {
 /* Nommer les Topics des messages ds les queues */
 typedef enum {
   TopicNone = 0,  BP1 = 1, SWXY = 2, Kbd =3,
-  	  	  	  	  Mar = 4, Arr = 5,
+  	  	  	  	  Mar = 4, Arr = 5, MarArr = 6,
   	  	  	  	  VRX = 11, VRY = 12,
 				  DIR = 13, SP = 14,
 				  MotD = 21, MotG = 22,

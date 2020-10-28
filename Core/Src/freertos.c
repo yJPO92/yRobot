@@ -66,7 +66,6 @@ uint8_t aRxBuffer[3] __attribute__((section(".myvars")));		//buffer de reception
 char tmpBuffer[10];		    	//buffer temporaire pour switch/case
 //----- buffer DMA / ADC1
 uint32_t adcbuf[2];
-//uint32_t adc1_value[2];	//TO CHECK: utile???
 
 uint8_t TkToStart = TkNone;		//pour scheduler le démarrage des taches
 uint16_t WaitInTk;
@@ -83,12 +82,11 @@ extern TIM_HandleTypeDef htim4;
 
 yMENU_t mnuSTM;		// pour Menu VT100
 yANALOG VRx, VRy;	// pour Joystick
-yMOTOR Moteur_D;	// les moteurs
 
 /* objet d'echange d'affichage via la queue */
 yVTbuff_t VTbuffer = { .src = SrcNone, .VTbuff = "...\0" };
 
-/* objet d'echange d'event via la queue */
+/* objet d'echange d'event via les queues */
 yEvent_t yEvent = {.Topic = TopicNone, .PayLoadF = 0.0, .PayloadI = 0};
 
 /* USER CODE END Variables */
@@ -124,7 +122,7 @@ const osThreadAttr_t tk_Process_attributes = {
 osThreadId_t tk_VTafficheHandle;
 const osThreadAttr_t tk_VTaffiche_attributes = {
   .name = "tk_VTaffiche",
-  .priority = (osPriority_t) osPriorityBelowNormal,
+  .priority = (osPriority_t) osPriorityNormal,
   .stack_size = 1024 * 4
 };
 /* Definitions for tk_MoteurD */
@@ -304,10 +302,10 @@ void MX_FREERTOS_Init(void) {
   qVTafficheHandle = osMessageQueueNew (10, sizeof(yVTbuff_t), &qVTaffiche_attributes);
 
   /* creation of qMotD */
-  qMotDHandle = osMessageQueueNew (4, sizeof(yEvent_t), &qMotD_attributes);
+  qMotDHandle = osMessageQueueNew (8, sizeof(yEvent_t), &qMotD_attributes);
 
   /* creation of qTrain */
-  qTrainHandle = osMessageQueueNew (6, sizeof(yEvent_t), &qTrain_attributes);
+  qTrainHandle = osMessageQueueNew (8, sizeof(yEvent_t), &qTrain_attributes);
 
   /* USER CODE BEGIN RTOS_QUEUES */
 	/* add queues, ... */
@@ -403,17 +401,6 @@ void StartDefaultTask(void *argument)
 			RTC_AlarmModify();	//relancer alarme ds qq sec
 		}
 
-		//--- debug yMOTOR
-		//TODO futur trace to tk_MoteurD & tk_MoteurG
-		//move
-		//--- trace via LD2
-		HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, Moteur_D.inRun);
-		//--- trace via VT
-		snprintf(VTbuffer.VTbuff, 60, CUP(17,50) "--Mot_D: r %d, SP %6.2f, s %d, MV %3ld, rl %d  ",
-											Moteur_D.inRun, Moteur_D.Speed_SP, Moteur_D.Sens,
-											Moteur_D.Speed_MV, Moteur_D.FeeWheel);
-		osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);	//envoi vers task afficahge
-
 		//--- get/set data for STM32CubeMonitor
 		yCopy2CubeMonitor(1U);		//set data
 		yCopy2CubeMonitor(0U);		//get data
@@ -486,11 +473,7 @@ void tk_Init_Fnc(void *argument)
 	yANALOG_Init(&VRy);
 	yANALOG_SetTrimRaw(&VRy, 101);
 
-	//--- initialize Moteurs
-	//TODO futur à voir si doit etre ds tk_MoteurD
-	yMOTOR_Init(&Moteur_D, (uint32_t)MotDin1_GPIO_Port, (uint16_t)MotDin1_Pin,
-					  (uint32_t)MotDin2_GPIO_Port, (uint16_t)MotDin2_Pin, htim4);
-
+	//--- Train & Moteurs managed by their own tasks
 
 	//--- initialize interrupts
 	Interrputs_Init();
@@ -600,46 +583,51 @@ void tk_Process_Fnc(void *argument)
 		status = osMessageQueueGet(qEventsHandle, &EvtRecu, NULL, portMAX_DELAY);
 		if (status == osOK) {
 			//-- tracer l'event recu
-			snprintf(VTbuffer.VTbuff, 100, DECRC "\tEventRec: %d %6.2f %d" ERASELINE,
-					EvtRecu.Topic, EvtRecu.PayLoadF, EvtRecu.PayloadI);
-			osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
+//			snprintf(VTbuffer.VTbuff, 100, DECRC "\tEventRec: %d %6.2f %d" ERASELINE,
+//					EvtRecu.Topic, EvtRecu.PayLoadF, EvtRecu.PayloadI);
+//			osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
 			//-- analyser le msg par le Topic
+			//en attendant le traitement
+			snprintf(VTbuffer.VTbuff, 50, CUP(18,50) "--(tk_Train) pass Event");
+			osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
+//			//transmettre le msg à la tache suivante 'tk_Train'!!!
+//			yEvent = EvtRecu;
+//			osMessageQueuePut(qTrainHandle,&yEvent, 0U, portMAX_DELAY);
+
 			switch (EvtRecu.Topic) {
-			case BP1:
-				snprintf(VTbuffer.VTbuff, 50, CUP(9,50) "--(tk_Proc) BP1 Interrupt");
-				osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
-				//-- action?
-				//-- debug envoyer msg à tk_Train via qTrain
-				yEvent_t yEvent = {.Topic= BP1, .PayLoadF = 0.0, .PayloadI = 0};
+//			case BP1:
+//				snprintf(VTbuffer.VTbuff, 50, CUP(17,50) "--(tk_Proc) Interrupt BP1  ");
+//				osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
+//				//-- action?
+//				//-- debug envoyer msg à tk_Train via qTrain
+//				yEvent_t yEvent = {.Topic= BP1, .PayLoadF = 0.0, .PayloadI = 0};
+//				osMessageQueuePut(qTrainHandle,&yEvent, 0U, portMAX_DELAY);
+//				break;
+//			case SWXY:
+//				snprintf(VTbuffer.VTbuff, 50, CUP(17,50) "--(tk_Proc) Interrupt SWxy  ");
+//				osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
+//				break;
+			case Kbd:
+				//-- request Train Run or not
+				__NOP();
+				yEvent_t yEvent = {.Topic = MarArr, .PayLoadF = 0.0, .PayloadI = EvtRecu.PayloadI};
 				osMessageQueuePut(qTrainHandle,&yEvent, 0U, portMAX_DELAY);
 				break;
-			case SWXY:
-				snprintf(VTbuffer.VTbuff, 50, CUP(10,50) "--(tk_Proc) Swxy Interrupt");
-				osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
-				//-- request moteurs Run or not
-				(Moteur_D.inRun == 1U) ? (yMOTOR_MarArr(&Moteur_D, yARRET)) : (yMOTOR_MarArr(&Moteur_D, yMARCHE));
-				//TODO futur
-				//use queue to send to tk_MoteurD & tk_MoteurG
-				break;
-			case Kbd:
-				//-- request moteur Run
-				yMOTOR_MarArr(&Moteur_D, EvtRecu.PayloadI);
-				//TODO futur
-				//use queue to send to tk_MoteurD & tk_MoteurG
-				break;
-			case VRX:	//Direction
-				//-- action ?
-				//use queue to send to tk_MoteurD & tk_MoteurG
-				break;
-			case VRY:	//Vitesse
-				//-- request moteur consigne vitesse
-				yMOTOR_Speed(&Moteur_D, EvtRecu.PayLoadF);
-				//TODO futur
-				//use queue to send to tk_MoteurD & tk_MoteurG
-				break;
+//			case VRX:	//Direction
+//				//-- action ?
+//				//use queue to send to tk_Train
+//				break;
+//			case VRY:	//Vitesse
+//				//-- request moteur consigne vitesse
+//				//TODO futur
+//				//use queue to send to tk_Train
+//				break;
 			default:
-				snprintf(VTbuffer.VTbuff, 50, DECRC "\ttk_Process: unknow event" ERASELINE);
+				snprintf(VTbuffer.VTbuff, 50, DECRC "\ttk_Process: pass event" ERASELINE);
 				osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
+				//transmettre le msg à la tache suivante 'tk_Train'!!!
+				yEvent = EvtRecu;
+				osMessageQueuePut(qTrainHandle,&yEvent, 0U, portMAX_DELAY);
 				break;
 			}	// switch EvtRecu
 		} else {
@@ -665,10 +653,16 @@ void tk_MoteurD_Fnc(void *argument)
   /* USER CODE BEGIN tk_MoteurD_Fnc */
 	yEvent_t EvtRecu;
 	osStatus_t status;
+	//-- Declare structure du Moteur_D
+	yMOTOR Moteur_D;
 	//-- Is it to me to start?
 	while (TkToStart != TkMoteurD) {
 		osDelay(pdMS_TO_TICKS(WaitInTk));
 	}
+	//-- Initialize structure of Moteur_D
+	yMOTOR_Init(&Moteur_D, (uint32_t)MotDin1_GPIO_Port, (uint16_t)MotDin1_Pin,
+					  (uint32_t)MotDin2_GPIO_Port, (uint16_t)MotDin2_Pin, htim4);
+	//-- msg on VT
 	snprintf(aTxBuffer, 1024, DECRC "\n tk_MoteurD\t initialised" DECSC);
 	osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
 	HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
@@ -683,22 +677,44 @@ void tk_MoteurD_Fnc(void *argument)
 		status = osMessageQueueGet(qMotDHandle, &EvtRecu, NULL, portMAX_DELAY);
 		if (status == osOK) {
 			//-- tracer l'event recu
-			snprintf(VTbuffer.VTbuff, 100, DECRC "\tEventRec: %d %6.2f %d" ERASELINE,
-								EvtRecu.Topic, EvtRecu.PayLoadF, EvtRecu.PayloadI);
-			osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
+//			snprintf(VTbuffer.VTbuff, 100, DECRC "\tEventRec: %d %6.2f %d" ERASELINE,
+//								EvtRecu.Topic, EvtRecu.PayLoadF, EvtRecu.PayloadI);
+//			osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
 			//-- en fonction du Topic faire...
+			//TODO traiter les Topic pour faire action yMOTOR
 			switch (EvtRecu.Topic) {
-			case BP1:
+			case Mar:
 				//-- action?
+				//-- request moteurs Run or not
+				yMOTOR_MarArr(&Moteur_D, yMARCHE);
+				//-- msg to VT
+				snprintf(VTbuffer.VTbuff, 50, CUP(19,50) "--(tk_MotD) Marche request   ");
+				osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
 				break;
-				//TODO traiter les Topic pour faire action yMOTOR
+			case Arr:
+				//-- action?
+				//-- request moteurs Run or not
+				yMOTOR_MarArr(&Moteur_D, yARRET);
+				//-- msg to VT
+				snprintf(VTbuffer.VTbuff, 50, CUP(19,50) "--(tk_MotD) Arret request   ");
+				osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
+				break;
+			case SP:
+				//-- action?
+				yMOTOR_Speed(&Moteur_D, EvtRecu.PayLoadF);
+				//-- msg to VT
+				snprintf(VTbuffer.VTbuff, 50, CUP(19,50) "--(tk_MotD) speed request   ");
+				osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
+				break;
 			default:
 				snprintf(VTbuffer.VTbuff, 50, DECRC "\ttk_MoteurD: unknow event" ERASELINE);
 				osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
 				break;
 			}	// switch EvtRecu
-			//-- puis envoyer un msg à l'afficheur
-			snprintf(VTbuffer.VTbuff, 50, CUP(18,50) "--Mot_D: TODO msg!!");
+			//-- puis envoyer un msg d'état du moteur à l'afficheur
+			snprintf(VTbuffer.VTbuff, 100, CUP(23,50) "--Mot_D: r %d, SP %6.2f, s %d, MV %3ld, rl %d  ",
+												Moteur_D.inRun, Moteur_D.Speed_SP, Moteur_D.Sens,
+												Moteur_D.Speed_MV, Moteur_D.FeeWheel);
 			osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
 		} else {
 			snprintf(aTxBuffer, 512, DECRC "Queue qMotD empty" DECRC);
@@ -725,10 +741,15 @@ void tk_Train_Fnc(void *argument)
   /* USER CODE BEGIN tk_Train_Fnc */
 	yEvent_t EvtRecu;
 	osStatus_t status;
+	//-- Declare structure du Train
+	yTRAIN TrainDG;
 	//-- Is it to me to start?
 	while (TkToStart != TkTrain) {
 		osDelay(pdMS_TO_TICKS(WaitInTk));
 	}
+	//-- Initialize structure of Moteur_D
+	yTRAIN_Init(&TrainDG);
+	//-- msg on VT
 	snprintf(aTxBuffer, 1024, DECRC "\n tk_Train\t initialised" DECSC);
 	osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
 	HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
@@ -743,36 +764,69 @@ void tk_Train_Fnc(void *argument)
 		status = osMessageQueueGet(qTrainHandle, &EvtRecu, NULL, portMAX_DELAY);
 		if (status == osOK) {
 			//-- tracer l'event recu
-			snprintf(VTbuffer.VTbuff, 100, DECRC "\tEventRec: %d %6.2f %d" ERASELINE,
-								EvtRecu.Topic, EvtRecu.PayLoadF, EvtRecu.PayloadI);
-			osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
+//			snprintf(VTbuffer.VTbuff, 100, DECRC "\tEventRec: %d %6.2f %d" ERASELINE,
+//								EvtRecu.Topic, EvtRecu.PayLoadF, EvtRecu.PayloadI);
+//			osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
 			//-- en fonction du Topic faire...
 			switch (EvtRecu.Topic) {
-			case BP1:
-				//-- action?
+//			case BP1:
+//				//-- action?
+//				__NOP();
+//				//TODO traiter les Topic pour faire action yTRAIN
+//				//-- debug envoyer msg à tk_MoteurD via qMotD
+//				//yEvent_t yEvent = {.Topic= BP1, .PayLoadF = 0.0, .PayloadI = 0};
+//				yEvent_t yEvent = {.Topic = BP1, .PayLoadF = 0.0, .PayloadI = 0};
+//				osMessageQueuePut(qMotDHandle,&yEvent, 0U, portMAX_DELAY);
+//				break;
+			case SWXY:
+			case MarArr:
+				snprintf(VTbuffer.VTbuff, 50, CUP(17,50) "--(tk_Proc) Interrupt SWxy  ");
+				osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
+				//-- state of 'Train'
+				TrainDG.inRun = EvtRecu.PayloadI;
+				//-- following Train running state prepare event marche/arret to send to tk_MoteurD & tk_MoteurG
+				if (TrainDG.inRun == 0U) {
+					yEvent_t yEvent = {.Topic = Arr, .PayLoadF = 0.0, .PayloadI = 0};
+					osMessageQueuePut(qMotDHandle, &yEvent, 0U, portMAX_DELAY);
+					//osMessageQueuePut(qMotGHandle, &yEvent, 0U, portMAX_DELAY);
+				} else {
+					yEvent_t yEvent = {.Topic = Mar, .PayLoadF = 0.0, .PayloadI = 1};
+					osMessageQueuePut(qMotDHandle, &yEvent, 0U, portMAX_DELAY);
+					//osMessageQueuePut(qMotGHandle, &yEvent, 0U, portMAX_DELAY);
+				}
+				break;
+//			case VRX:	//Direction
+//				//-- action ?
+//				//use queue to send to tk_MoteurD & tk_MoteurG
+//				break;
+			case VRY:	//Vitesse
 				__NOP();
-				//TODO traiter les Topic pour faire action yTRAIN
-				//-- debug envoyer msg à tk_MoteurD via qMotD
-				//yEvent_t yEvent = {.Topic= BP1, .PayLoadF = 0.0, .PayloadI = 0};
-				yEvent_t yEvent = {.Topic = BP1, .PayLoadF = 0.0, .PayloadI = 0};
-				osMessageQueuePut(qMotDHandle,&yEvent, 0U, portMAX_DELAY);
+				//-- prepare event vitesse to send to tk_MoteurD & tk_MoteurG
+				yEvent_t yEvent = {.Topic = SP, .PayLoadF = EvtRecu.PayLoadF, .PayloadI = 0};
+				osMessageQueuePut(qMotDHandle, &yEvent, 0U, portMAX_DELAY);
 				break;
 			default:
 				snprintf(VTbuffer.VTbuff, 50, DECRC "\ttk_Train: unknow event" ERASELINE);
 				osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
+				osMessageQueuePut(qMotDHandle, &yEvent, 0U, portMAX_DELAY);
 				break;
 			}	// switch EvtRecu
+
 			//-- puis envoyer un msg à l'afficheur
-			snprintf(VTbuffer.VTbuff, 50, CUP(20,50) "--Train: TODO msg!!");
+			snprintf(VTbuffer.VTbuff, 100, CUP(22,50) "--Train: r %d, Vit %6.2f, Dir %6.2f  ",
+												TrainDG.inRun, TrainDG.Vitesse, TrainDG.Direction);
 			osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
+
+			//--- trace via LD2
+			//TODO LD2 as running motors how???
+			HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, TrainDG.inRun);
+
 		} else {
 			snprintf(aTxBuffer, 512, DECRC "Queue qTrain empty" DECRC);
 			osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
 			HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 			osSemaphoreRelease(semUARTHandle);
 		}	//if status
-
-		//osDelay(10000);
   }
   /* USER CODE END tk_Train_Fnc */
 }

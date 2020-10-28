@@ -4,20 +4,24 @@
 |          23-10-20           |
 |          16:41:32           |
 +-----------------------------+
-RTC Alarm A flag
 
---(tk_Proc) BP1 Interrupt
---(tk_Proc) Swxy Interrupt
+  RTC Alarm A flag
+
+
 --ADC1 : 1902   1945
 --VR   : (1)   0.09     (-1)   0.07
---VRx  : 10
+--VRx  : 7
 --VRy  : 7
 
+--(tk_CheckVR)
+--(tk_Proc) Interrupt SWxy|BP1
+--(tk_Train) pass Event
+--(tk_MotD) Marche|Arret|speed request
 
+
+--Train: Ma|Ar|Sp recu!
 --Mot_D: r 0, SP   0.00, s 0, MV   0, rl 0
---Mot_D: TODO msg!!
 
---Train: TODO msg!!
 
 
 

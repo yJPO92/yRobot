@@ -1,5 +1,9 @@
 *** yRobot ***
 
+le 25/10/2020: v3.4 (mx 6.3): tk_Process passe msg a tk_Train qui transmmet à tk_MoteurD
+                structures Moteur_D & TrainDG ds leur task!
+                renommer yTaskFncDisplay.c
+                all task same priority
 le 23/10/2020: v3.2 (mx 6.2): ajout task 'tk_Train' & queue 'qTrain' & module 'yTRAIN'
                 squelettes de 'tk_Train' & 'tk_MotD' = OK
                 ajout fichier 'VTaffichage.txt' indiquant les lignes d'affiichage de debug

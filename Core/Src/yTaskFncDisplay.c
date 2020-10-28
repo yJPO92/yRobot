@@ -1,11 +1,11 @@
 /**
  *******************************************************************************
- * @file    yTaskFnc.c
+ * @file    yTaskFncDisplay.c
  * @author  Jean
- * @brief   
- * @version    
+ * @brief   Taches relatives aux affichages
+ * @version 1.1
  *******************************************************************************
- * Modified :
+ * Modified : 26-oct-2020  renommage
  * Created  : 23 sept. 2020
  *******************************************************************************
  * @note    
@@ -41,6 +41,8 @@ extern UART_HandleTypeDef huart2;
 extern osThreadId_t tk_VTafficheHandle;
 extern osMessageQueueId_t qVTafficheHandle;
 extern osSemaphoreId_t semUARTHandle;
+
+/* Tasks ---------------------------------------------------------------------*/
 
 /* USER CODE BEGIN Header_tk_VTaffiche_Fnc */
 /**

@@ -95,17 +95,24 @@ void GetTouche_fnc(struct yMENU_t *self) {
 
 		case 'C': case 'c':		/* Clear Status Bar & +++ */
 			snprintf(self->Buffer, 1024,
-					CUP(7,50) ERASELINE		/*AlarmA*/
-					CUP(9,50) ERASELINE		/*BP1*/
-					CUP(10,50) ERASELINE	/*SWxy*/
+					CUP(9,50) ERASELINE		/*AlarmA*/
+					//CUP(9,50) ERASELINE		/*BP1*/
+					//CUP(10,50) ERASELINE	/*SWxy*/
 					CUP(11,50) ERASELINE	/*ADC1*/
 					CUP(12,50) ERASELINE	/*VRx VRy*/
 					CUP(13,50) ERASELINE	/*VRx Ro*/
 					CUP(14,50) ERASELINE	/*VRy Ro*/
-					CUP(17,50) ERASELINE	/*Mot D*/
-					CUP(18,50) ERASELINE	/*Mot D*/
-					CUP(19,50) ERASELINE	/*Mot G*/
-					CUP(20,50) ERASELINE	/*Train*/
+
+					CUP(16,50) ERASELINE	/*tk_??*/
+					CUP(17,50) ERASELINE	/*tk_??*/
+					CUP(18,50) ERASELINE	/*tk_??*/
+					CUP(19,50) ERASELINE	/*tk_??*/
+
+					CUP(22,50) ERASELINE	/*Train*/
+					CUP(23,50) ERASELINE	/*Mot D*/
+					CUP(24,50) ERASELINE	/*Mot G*/
+
+					CUP(27,50) ERASELINE	/*debug Mot_D*/
 					DECRC ERASELINE			/*Status line*/
 					DECRC );
 			break;
@@ -124,16 +131,13 @@ void GetTouche_fnc(struct yMENU_t *self) {
 			break;
 			}
 
-//		case 'D': case 'd':		/* yMOTOR speed pos */
-//			yMOTOR_Speed(&Moteur_D, 15.5);
+//		case 'D': case 'd':		/* ???? */
 //			break;
 //
-//		case 'E': case 'e':		/* yMOTOR speed neg */
-//			yMOTOR_Speed(&Moteur_D, -20.2);
+//		case 'E': case 'e':		/* ???? */
 //			break;
 //
-//		case 'F': case 'f':		/* yMOTOR ??? */
-//			yMOTOR_Speed(&Moteur_D, VRy.PV);
+//		case 'F': case 'f':		/* ??? */
 //			break;
 
 		case 'h': case 'H':		/* affiche cadre pour horloge */
@@ -146,8 +150,6 @@ void GetTouche_fnc(struct yMENU_t *self) {
 
 		case 'S': case 's':		/* ?????? */
 			snprintf(self->Buffer, 1024, DECRC ERASELINE "\tFrom Node-RED (S) %d     ", aRxBuffer[0]);
-//			yMOTOR_MarArr(&Moteur_D, yMARCHE);
-//			yMOTOR_Speed(&Moteur_D, 10.5);
 			break;
 
 		case 'M': case 'm':		/* Display menu */
@@ -199,9 +201,9 @@ void ClearStatusBar_fnc(struct yMENU_t *self) {
 	//puis go to status line
 	//erase status line
 	snprintf(self->Buffer, 1024,
-							CUP(7,50) ERASELINE			/*AlarmA*/
-							CUP(9,50) ERASELINE			/*BP1*/
-							CUP(10,50) ERASELINE		/*SWxy*/
+							CUP(8,50) ERASELINE			/*AlarmA*/
+							//CUP(9,50) ERASELINE		/*BP1*/
+							//CUP(10,50) ERASELINE		/*SWxy*/
 							/*CUP(11,50) ERASELINE*/	/*ADC1*/
 							/*CUP(13,50) ERASELINE*/		/*VRx Ro*/
 							/*CUP(14,50) ERASELINE*/		/*VRy Ro*/

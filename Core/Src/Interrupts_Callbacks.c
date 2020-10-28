@@ -133,7 +133,7 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
 void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 {
 	//---reveillé par RTC AlarmA
-	snprintf(mnuSTM.Buffer, 1024, CUP(7,50) "RTC Alarm A flag");
+	snprintf(mnuSTM.Buffer, 1024, CUP(8,50) "  RTC Alarm A flag");
 	osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
 	HAL_UART_Transmit(&huart2,(uint8_t *) mnuSTM.Buffer, strlen(mnuSTM.Buffer), 5000);
 	osSemaphoreRelease(semUARTHandle);
