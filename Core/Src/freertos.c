@@ -70,10 +70,6 @@ uint32_t adcbuf[2];
 uint8_t TkToStart = TkNone;		//pour scheduler le démarrage des taches
 uint16_t WaitInTk;
 
-/* Real Time Clock */
-RTC_TimeTypeDef myTime;
-RTC_DateTypeDef myDate;
-
 extern UART_HandleTypeDef huart2;
 extern ADC_HandleTypeDef hadc1;
 extern DMA_HandleTypeDef hdma_adc1;
@@ -82,6 +78,11 @@ extern TIM_HandleTypeDef htim4;
 
 yMENU_t mnuSTM;		// pour Menu VT100
 yANALOG VRx, VRy;	// pour Joystick
+
+//-- global data to view by STM32CubeMonitor
+// TODO v34a DBG a supprimer
+yMOTOR Moteur_D;
+yTRAIN TrainDG;
 
 /* objet d'echange d'affichage via la queue */
 yVTbuff_t VTbuffer = { .src = SrcNone, .VTbuff = "...\0" };
@@ -384,15 +385,6 @@ void StartDefaultTask(void *argument)
 	{
 		osDelay(pdMS_TO_TICKS(241));
 
-		//--- Récupérer date & heure
-		HAL_RTC_GetTime(&hrtc, &myTime, RTC_FORMAT_BIN);
-		HAL_RTC_GetDate(&hrtc, &myDate, RTC_FORMAT_BIN);	//need to read also the date!!!
-		//--- afficher date & heure ds zone encadrée et mettre curseur sur ligne status
-		snprintf(VTbuffer.VTbuff, 50, CUP(4,61) "%02d-%02d-%02d" CUP(5,61) "%02d:%02d:%02d",
-									myDate.Date, myDate.Month, myDate.Year,
-									myTime.Hours, myTime.Minutes, myTime.Seconds);
-		osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);	//envoi vers task afficahge
-
 		//--- Clear Status Bar & traces
 		if (RTC_AlarmA_flag == 1) {
 			mnuSTM.ClearStatusBar(&mnuSTM);	//CLS Bar
@@ -612,6 +604,12 @@ void tk_Process_Fnc(void *argument)
 				__NOP();
 				yEvent_t yEvent = {.Topic = MarArr, .PayLoadF = 0.0, .PayloadI = EvtRecu.PayloadI};
 				osMessageQueuePut(qTrainHandle,&yEvent, 0U, portMAX_DELAY);
+				//TODO v3.4a DBG debug test
+				__NOP();
+				yEvent.Topic = VRY;
+				yEvent.PayLoadF = 15.0;
+				osMessageQueuePut(qTrainHandle,&yEvent, 0U, portMAX_DELAY);
+
 				break;
 //			case VRX:	//Direction
 //				//-- action ?
@@ -654,7 +652,8 @@ void tk_MoteurD_Fnc(void *argument)
 	yEvent_t EvtRecu;
 	osStatus_t status;
 	//-- Declare structure du Moteur_D
-	yMOTOR Moteur_D;
+	//TODO v3.4a global for debug
+	//yMOTOR Moteur_D;
 	//-- Is it to me to start?
 	while (TkToStart != TkMoteurD) {
 		osDelay(pdMS_TO_TICKS(WaitInTk));
@@ -712,10 +711,15 @@ void tk_MoteurD_Fnc(void *argument)
 				break;
 			}	// switch EvtRecu
 			//-- puis envoyer un msg d'état du moteur à l'afficheur
-			snprintf(VTbuffer.VTbuff, 100, CUP(23,50) "--Mot_D: r %d, SP %6.2f, s %d, MV %3ld, rl %d  ",
-												Moteur_D.inRun, Moteur_D.Speed_SP, Moteur_D.Sens,
-												Moteur_D.Speed_MV, Moteur_D.FeeWheel);
+			snprintf(VTbuffer.VTbuff, 100, CUP(23,50) "--Mot_D: ma %d, r %d, SP %6.1f, s %d, MV %3ld, rl %d ",
+												Moteur_D.MarArr, Moteur_D.inRun, Moteur_D.Speed_SP,
+												Moteur_D.Sens, Moteur_D.Speed_MV, Moteur_D.FeeWheel);
 			osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
+
+			//--- trace via LD2
+			//TODO LD2 as running motors how???
+			HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, Moteur_D.inRun);
+
 		} else {
 			snprintf(aTxBuffer, 512, DECRC "Queue qMotD empty" DECRC);
 			osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
@@ -723,7 +727,8 @@ void tk_MoteurD_Fnc(void *argument)
 			osSemaphoreRelease(semUARTHandle);
 		}	//if status
 
-		//osDelay(10000);
+		//-- send data to STM32CubeMonitor
+		ymx_MotD = Moteur_D;
 	}
   /* USER CODE END tk_MoteurD_Fnc */
 }
@@ -742,7 +747,8 @@ void tk_Train_Fnc(void *argument)
 	yEvent_t EvtRecu;
 	osStatus_t status;
 	//-- Declare structure du Train
-	yTRAIN TrainDG;
+	//TODO v3.4a global for debug
+	//yTRAIN TrainDG;
 	//-- Is it to me to start?
 	while (TkToStart != TkTrain) {
 		osDelay(pdMS_TO_TICKS(WaitInTk));
@@ -779,13 +785,27 @@ void tk_Train_Fnc(void *argument)
 //				osMessageQueuePut(qMotDHandle,&yEvent, 0U, portMAX_DELAY);
 //				break;
 			case SWXY:
-			case MarArr:
 				snprintf(VTbuffer.VTbuff, 50, CUP(17,50) "--(tk_Proc) Interrupt SWxy  ");
 				osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
-				//-- state of 'Train'
-				TrainDG.inRun = EvtRecu.PayloadI;
+				(TrainDG.MaAr == 1) ? (TrainDG.MaAr = 0) : (TrainDG.MaAr = 1);	//toggle running request of TrainDG
 				//-- following Train running state prepare event marche/arret to send to tk_MoteurD & tk_MoteurG
-				if (TrainDG.inRun == 0U) {
+				if (TrainDG.MaAr == 0U) {
+					yEvent_t yEvent = {.Topic = Arr, .PayLoadF = 0.0, .PayloadI = 0};
+					osMessageQueuePut(qMotDHandle, &yEvent, 0U, portMAX_DELAY);
+					//osMessageQueuePut(qMotGHandle, &yEvent, 0U, portMAX_DELAY);
+				} else {
+					yEvent_t yEvent = {.Topic = Mar, .PayLoadF = 0.0, .PayloadI = 1};
+					osMessageQueuePut(qMotDHandle, &yEvent, 0U, portMAX_DELAY);
+					//osMessageQueuePut(qMotGHandle, &yEvent, 0U, portMAX_DELAY);
+				}
+				break;
+			case MarArr:
+				snprintf(VTbuffer.VTbuff, 50, CUP(17,50) "--(tk_Proc) recu MarArr  ");
+				osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
+				//-- state of 'Train'
+				TrainDG.MaAr = EvtRecu.PayloadI;
+				//-- following Train running state prepare event marche/arret to send to tk_MoteurD & tk_MoteurG
+				if (TrainDG.MaAr == 0U) {
 					yEvent_t yEvent = {.Topic = Arr, .PayLoadF = 0.0, .PayloadI = 0};
 					osMessageQueuePut(qMotDHandle, &yEvent, 0U, portMAX_DELAY);
 					//osMessageQueuePut(qMotGHandle, &yEvent, 0U, portMAX_DELAY);
@@ -813,13 +833,13 @@ void tk_Train_Fnc(void *argument)
 			}	// switch EvtRecu
 
 			//-- puis envoyer un msg à l'afficheur
-			snprintf(VTbuffer.VTbuff, 100, CUP(22,50) "--Train: r %d, Vit %6.2f, Dir %6.2f  ",
-												TrainDG.inRun, TrainDG.Vitesse, TrainDG.Direction);
+			snprintf(VTbuffer.VTbuff, 100, CUP(22,50) "--Train: ma %d, r %d, Vit %6.1f, Dir %6.1f  ",
+												TrainDG.MaAr ,TrainDG.inRun, TrainDG.Vitesse, TrainDG.Direction);
 			osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
 
-			//--- trace via LD2
-			//TODO LD2 as running motors how???
-			HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, TrainDG.inRun);
+//			//--- trace via LD2
+//			//TODO LD2 as running motors how???
+//			HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, TrainDG.inRun);
 
 		} else {
 			snprintf(aTxBuffer, 512, DECRC "Queue qTrain empty" DECRC);

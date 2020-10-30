@@ -42,6 +42,8 @@ void yCopy2CubeMonitor(uint8_t rw){
 		//ymx_VRy_HystP = VRy.PVmemo + VRy.Hysteresis;
 		//ymx_VRy_HystM = VRy.PVmemo - VRy.Hysteresis;
 
+		//ymx_MotD = Moteur_D;	//!!! ne fonctionne qu'avec des var glo
+
 	} else {	//read data from Node-red
 		//VRy.m_Ri = ymx_VRy_Ri;
 		//VRx.Coef_Filtre = ymx_Coef;

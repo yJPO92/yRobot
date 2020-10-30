@@ -63,11 +63,13 @@ void yMOTOR_Init(yMOTOR* this,
 /** Marche/Arret request */
 void yMOTOR_MarArr(yMOTOR* this, uint8_t mararr) {
     if (mararr == yMARCHE) {
-        this->inRun = 1;     // état 'enMarche'
+    	this->MarArr = 1;	// request Marche
+        //this->inRun = 1;	// état 'enMarche'
     }
     else if (mararr == yARRET) {
-        this->inRun = 0;    // état 'enArret'
-        this->Speed_MV = 0;
+    	this->MarArr = 0;	// request Arret
+        //this->inRun = 0;    // état 'enArret'
+        this->Speed_SP = 0;
         this->Sens = 0;
     }
 	//-- re exec motor
@@ -77,18 +79,21 @@ void yMOTOR_MarArr(yMOTOR* this, uint8_t mararr) {
 /** Speed_SP request */
 void yMOTOR_Speed(yMOTOR* this, float speed) {
 	//TODO check speed limits!
-	//-- take it only if motor running
-	if (this->inRun == 1) {
+	//-- take it only if motor requested to run
+	if (this->MarArr == 1) {
 		this->Speed_SP = speed;
 		//-- check SP outside Deaband
 		if (this->Speed_SP >= this->DeadBand) {
-			this->Speed_MV = (uint32_t)(this->Speed_SP + 0.5);
+			this->Speed_MV = (uint32_t)(this->Speed_SP + 0.5);	//ABS
 			this->Sens = 1;
+			this->inRun = 1;		//etat 'enMarche'
 		} else if (this->Speed_SP <= -this->DeadBand) {
-			this->Speed_MV = (uint32_t)(- this->Speed_SP - 0.5);
+			this->Speed_MV = (uint32_t)(- this->Speed_SP - 0.5);	//ABS
 			this->Sens = -1;
+			this->inRun = 1;		//etat 'enMarche'
 		} else {
 			this->Speed_MV = 0;
+			this->inRun = 0;		//etat 'enArret'
 			//on ne sait pas si on va changer de sens
 		}
 		//-- memoriser
@@ -97,6 +102,7 @@ void yMOTOR_Speed(yMOTOR* this, float speed) {
 	}else {	//not in run
 		this->Speed_MV = 0;
 		this->Sens = 0;
+		this->inRun = 0;		//etat 'enArret'
 	}
 	//-- re exec motor
 	yMOTOR_Exec(this);
@@ -155,7 +161,8 @@ void yMOTOR_Exec(yMOTOR* this) {
 		this->_pwm = 0;
 		this->FeeWheel = 1U;
 		yMOTOR_RealOutputs(this);
-		osDelay(pdMS_TO_TICKS(2000));	//laisser le temps au courant de s'inverser
+		//osDelay(pdMS_TO_TICKS(2000));	//laisser le temps au courant de s'inverser
+		osDelay(pdMS_TO_TICKS(2));	//TODO v3.4a DBG a supprimer
 		this->FeeWheel = 0U;
 		yMOTOR_VirtualOutputs(this);
 		yMOTOR_RealOutputs(this);

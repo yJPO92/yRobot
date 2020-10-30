@@ -1,5 +1,11 @@
 *** yRobot ***
 
+le 28/10/2020: v3.4a: tests Moteur_D & Train as global var for CubeMonitor =>ok
+                tk_Process case kbd envoi SP pour test run motor en meme tps que run train =>ok
+                reduction tmps chgt sens =>ok
+                update STM32CubeMonitor =>ok
+                ds tk_MoteurD copy structure Moteur_D en ymx_MotD pour Node-RED=>ok
+                move affiche heure ds timer 1s=>ok
 le 25/10/2020: v3.4 (mx 6.3): tk_Process passe msg a tk_Train qui transmmet à tk_MoteurD
                 structures Moteur_D & TrainDG ds leur task!
                 renommer yTaskFncDisplay.c

@@ -44,6 +44,10 @@ extern uint32_t adcbuf[];
 extern yANALOG VRx, VRy;
 extern uint8_t aRxBuffer[];
 
+/* Real Time Clock */
+RTC_TimeTypeDef myTime;
+RTC_DateTypeDef myDate;
+
 /*
   * @brief  Initialiser routes les interrupts du projet
   * @param  none
@@ -149,16 +153,14 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 void t1s_Callback(void *argument)
 {
   /* USER CODE BEGIN t1s_Callback */
-	//debug/test timer
-	//snprintf(VTbuffer.VTbuff, 50, DECRC "\t--FreeRTOS timer 1s");
-	//osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);	//envoi vers task afficahge
-	//--- gestion menu STM32Monitor
-//	if (aRxBuffer[0] != aRxBuffer[2]) {
-//		mnuSTM.GetTouche(&mnuSTM);		//utilise aRxBuffer
-//		snprintf(VTbuffer.VTbuff, 50, DECRC "%s", mnuSTM.Buffer);
-//		osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);	//envoi vers task afficahge
-//		aRxBuffer[2] = aRxBuffer[0];		//memoriser la cde pour ne l'appliquer qu'une seule fois!
-//	}
+	//--- Récupérer date & heure
+	HAL_RTC_GetTime(&hrtc, &myTime, RTC_FORMAT_BIN);
+	HAL_RTC_GetDate(&hrtc, &myDate, RTC_FORMAT_BIN);	//need to read also the date!!!
+	//--- afficher date & heure ds zone encadrée et mettre curseur sur ligne status
+	snprintf(VTbuffer.VTbuff, 50, CUP(4,61) "%02d-%02d-%02d" CUP(5,61) "%02d:%02d:%02d",
+								myDate.Date, myDate.Month, myDate.Year,
+								myTime.Hours, myTime.Minutes, myTime.Seconds);
+	osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);	//envoi vers task afficahge
 
 	/* toggle LD2 */
 	//HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);

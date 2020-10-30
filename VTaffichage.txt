@@ -1,4 +1,4 @@
-<=colonne 50
+<=colonne 50 à 100 (+50!)
        Horloge de Jean92
 +---------+---------+---------+
 |          23-10-20           |
@@ -21,6 +21,7 @@
 
 --Train: Ma|Ar|Sp recu!
 --Mot_D: r 0, SP   0.00, s 0, MV   0, rl 0
+--Mot_D: ma 0, r 0, SP   0.0, s 0, MV   0, rl 0  
 
 
 

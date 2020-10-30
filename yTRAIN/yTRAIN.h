@@ -36,7 +36,7 @@ typedef struct {
 	//--- Outputs
 	uint8_t inRun;		// Etat marche (running state)
 	uint8_t MaAr_D;		// Moteur Droit Marche/Arret order
-	float Vitesse_D;		// Moteur Droit Vitesse order
+	float Vitesse_D;	// Moteur Droit Vitesse order
 	uint8_t MaAr_G;		// Moteur Gauche Marche/Arret order
 	float Vitesse_G;	// Moteur Gauche Vitesse order
 	//--- Parameters
@@ -45,8 +45,8 @@ typedef struct {
 	//--- memories
 	float Vitesse_memo;		// speed memory
 	float Direction_memo;   // direction memory
-	uint8_t Sens_memo;	// sens smemory
-	uint8_t Run_memo;	// running memory
+	uint8_t Sens_memo;		// sens smemory
+	uint8_t Run_memo;		// running memory
 	//--- Virtual outputs
 	//none
 	//--- Real outputs
