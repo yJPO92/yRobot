@@ -17,11 +17,11 @@
 --(tk_Proc) Interrupt SWxy|BP1
 --(tk_Train) pass Event
 --(tk_MotD) Marche|Arret|speed request
+--(tk_MotG) Marche|Arret|speed request
 
-
---Train: Ma|Ar|Sp recu!
---Mot_D: r 0, SP   0.00, s 0, MV   0, rl 0
+--Train: ma 0, r 0, Vit  0.0, Dir  0.0  
 --Mot_D: ma 0, r 0, SP   0.0, s 0, MV   0, rl 0  
+--Mot_G: ma 0, r 0, SP   0.0, s 0, MV   0, rl 0  
 
 
 

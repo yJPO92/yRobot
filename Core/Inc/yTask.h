@@ -53,11 +53,11 @@ typedef enum {
 
 /* Flag de démarrage des taches */
 typedef enum  {
-	TkNone = 0, TkInit, TkDefault, TkMoteurD, TkTrain, TkProcess, TkCheckVR, TkVTaffiche, TkAll,
-	//TkNone = 0, TkInit, TkDefault, TkMoteurD, TkMoteurG, TkTrain, TkProcess, TkCheckVR, TkVTaffiche, TkAll,
+	TkNone = 0, TkInit, TkDefault, TkMoteurD, TkMoteurG, TkTrain, TkProcess, TkCheckVR, TkVTaffiche, TkAll,
 } yTkOrder;
 
 /* differents wait time for tasks */
+#define Wait10ms	((uint32_t)10)		//10msec
 #define Wait500ms	((uint32_t)500)		//0.5sec
 #define Wait1s		((uint32_t)1000)	//1sec
 #define Wait5s		((uint32_t)5000)	//5sec

@@ -107,12 +107,12 @@ void GetTouche_fnc(struct yMENU_t *self) {
 					CUP(17,50) ERASELINE	/*tk_??*/
 					CUP(18,50) ERASELINE	/*tk_??*/
 					CUP(19,50) ERASELINE	/*tk_??*/
+					CUP(20,50) ERASELINE	/*tk_??*/
 
 					CUP(22,50) ERASELINE	/*Train*/
 					CUP(23,50) ERASELINE	/*Mot D*/
 					CUP(24,50) ERASELINE	/*Mot G*/
 
-					CUP(27,50) ERASELINE	/*debug Mot_D*/
 					DECRC ERASELINE			/*Status line*/
 					DECRC );
 			break;
@@ -126,7 +126,7 @@ void GetTouche_fnc(struct yMENU_t *self) {
 
 		case 'B': case 'b':		/* yMOTOR start */
 			{
-			yEvent_t yEvent = {.Topic= Kbd, .PayloadI= 1U};
+			yEvent_t yEvent = {.Topic = Kbd, .PayloadI= 1U};
 			osMessageQueuePut(qEventsHandle, &yEvent, 0U, 0U);
 			break;
 			}

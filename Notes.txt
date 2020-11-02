@@ -1,5 +1,9 @@
 *** yRobot ***
 
+
+le 31/10/2020: v3.5a (mx 6.4): ajout tk_MoteurG & qMotG
+                update Node-Red, ebauche tk_Train
+                move task robot in separate file 'yTaskFncRobot.c'
 le 28/10/2020: v3.4a: tests Moteur_D & Train as global var for CubeMonitor =>ok
                 tk_Process case kbd envoi SP pour test run motor en meme tps que run train =>ok
                 reduction tmps chgt sens =>ok
