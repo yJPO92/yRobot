@@ -11,19 +11,36 @@ Mixed STM32CubeMX, FreeRTOS, C
 
 Cr&eacute;ation de l'appli.  
 
-## Fonctionnalit&eacute;es
+## Fonctionnalities
+Manage 2 driving motors  
+Use Jostick  
+*future* Receive order from PocketBeagle in Node-Red  
 
-BP1 interrupt  
+##### Inputs
+BP1 (interrupt) : ???  
 Jostick VRx, VRy, SWxy
-* VRx direction
-* VRy vitesse 
-* SWxy Marche/Arret 
+* VRx : direction
+* VRy : vitesse 
+* SWxy : Marche/Arret  
 
-Menu VT100, display & envoie de commandes  
+*future* 5 GPio order from PocketBeagle (F,R,D,G,S)
+
+Menu VT100 : envoie de commandes  
+* key A|B : Arrêt|Marche
+
+##### Outputs
+Onboard led LD2 : running  
+Menu VT100, display status  
 STM32CubeMonitor (Node-RED)
 
+##### 
 6 task (inclus default)  
-3 queue
+6 queue
+
+## Version
+##### v3.x: update Node-red 
+##### v2.x: ebauche tasks
+##### v1.x: creation à partir de NewCpp + FreeRTOS
 
 ##Program design
 
@@ -32,7 +49,7 @@ Program organization is describe in drawing 'yRobotFreeRTOS.xml' done with draw.
 
 ## Authors
 
-* **JPO** - *FreeRTOS, C in TrueStudio*
+**JPO** - *FreeRTOS, C in TrueStudio*
 
 ## License
 

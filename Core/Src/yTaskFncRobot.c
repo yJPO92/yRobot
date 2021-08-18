@@ -453,7 +453,7 @@ void tk_MoteurG_Fnc(void *argument)
 
 			//--- trace via LD2
 			//TODO LD2 as running motors how???
-			//HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, Moteur_D.inRun);
+			//HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, Moteur_G.inRun);
 
 		} else {
 			snprintf(aTxBuffer, 512, DECRC "Queue qMotG empty" DECRC);

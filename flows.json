@@ -111,7 +111,6 @@
     {
         "id": "64574786.2c65d8",
         "type": "ui_base",
-        "z": "",
         "theme": {
             "name": "theme-dark",
             "lightTheme": {
@@ -150,7 +149,7 @@
                     "edited": false
                 },
                 "page-sidebar-backgroundColor": {
-                    "value": "#000000",
+                    "value": "#333333",
                     "edited": false
                 },
                 "group-textColor": {
@@ -192,7 +191,7 @@
             "name": "Node-RED Dashboard",
             "hideToolbar": "false",
             "allowSwipe": "false",
-            "lockMenu": "false",
+            "lockMenu": "true",
             "allowTempTheme": "true",
             "dateFormat": "YYYY/MM/DD",
             "sizes": {
@@ -202,15 +201,14 @@
                 "gy": 6,
                 "cx": 6,
                 "cy": 6,
-                "px": 2,
-                "py": 2
+                "px": 0,
+                "py": 0
             }
         }
     },
     {
         "id": "3dfdb3a5.11521c",
         "type": "ui_group",
-        "z": "",
         "name": "Data",
         "tab": "da9b2906.8948c8",
         "order": 2,
@@ -221,7 +219,6 @@
     {
         "id": "da9b2906.8948c8",
         "type": "ui_tab",
-        "z": "",
         "name": "Dashboard",
         "icon": "dashboard",
         "order": 2,
@@ -231,7 +228,6 @@
     {
         "id": "1326d3e9.6d4ebc",
         "type": "ui_group",
-        "z": "",
         "name": "TrainDG",
         "tab": "da9b2906.8948c8",
         "order": 3,
@@ -242,7 +238,6 @@
     {
         "id": "97aba708.5252a8",
         "type": "exe-config",
-        "z": "",
         "name": "L476RG",
         "exefile": "D:\\GitDepots\\yRobot\\Debug\\yRobot.elf",
         "exefolder": "D:\\GitDepots\\yRobot\\Debug",
@@ -3316,7 +3311,6 @@
     {
         "id": "b090ccaa.ab526",
         "type": "probe",
-        "z": "",
         "probeid": "066DFF535752877167095728",
         "probename": "ST-Link v2-1B (...95728)",
         "protocol": "SWD",
@@ -3328,7 +3322,6 @@
     {
         "id": "3eac6833.ef73e8",
         "type": "ui_tab",
-        "z": "",
         "name": "Base",
         "icon": "dashboard",
         "order": 1,
@@ -3338,7 +3331,6 @@
     {
         "id": "17e61a5a.2f1f96",
         "type": "ui_group",
-        "z": "",
         "name": "Display",
         "tab": "dab5031.450db",
         "order": 1,
@@ -3349,7 +3341,6 @@
     {
         "id": "dab5031.450db",
         "type": "ui_tab",
-        "z": "",
         "name": "VT100",
         "icon": "dashboard",
         "order": 4,
@@ -3359,7 +3350,6 @@
     {
         "id": "f5709582.fc06c8",
         "type": "ui_group",
-        "z": "",
         "name": "Faire un choix...",
         "tab": "dab5031.450db",
         "order": 2,
@@ -3370,7 +3360,6 @@
     {
         "id": "95ad7962.75a0a8",
         "type": "ui_group",
-        "z": "",
         "name": "Graphique",
         "tab": "da9b2906.8948c8",
         "order": 1,
@@ -3399,7 +3388,6 @@
     {
         "id": "81b688ed.ba6248",
         "type": "ui_group",
-        "z": "",
         "name": "Moteur_D",
         "tab": "da9b2906.8948c8",
         "order": 4,
@@ -3410,7 +3398,6 @@
     {
         "id": "59193cc8.916a34",
         "type": "ui_group",
-        "z": "",
         "name": "Tableau des variables lues",
         "tab": "e9875e3d.8cf87",
         "order": 2,
@@ -3421,8 +3408,7 @@
     {
         "id": "e9875e3d.8cf87",
         "type": "ui_tab",
-        "z": "",
-        "name": "Toutes les Data",
+        "name": "Les Data",
         "icon": "dashboard",
         "order": 3,
         "disabled": false,
@@ -3431,7 +3417,6 @@
     {
         "id": "80c776ca.96d668",
         "type": "ui_group",
-        "z": "",
         "name": "Infos",
         "tab": "3eac6833.ef73e8",
         "order": 1,
@@ -3442,7 +3427,6 @@
     {
         "id": "f1b308fe.edae38",
         "type": "ui_group",
-        "z": "",
         "name": "Moteur_G",
         "tab": "da9b2906.8948c8",
         "order": 5,
@@ -3539,6 +3523,17 @@
         "order": 5,
         "width": 2,
         "height": 1
+    },
+    {
+        "id": "9494c5bb.9d4b58",
+        "type": "probe",
+        "probeid": "066AFF535155878281081727",
+        "probename": "ST-Link v2-1B (...81727)",
+        "protocol": "SWD",
+        "frequency": "1.8 MHz - Default",
+        "probeproperty": "{\"SWD\":[\"4.6 MHz\",\"1.8 MHz - Default\",\"950 kHz\",\"400 kHz\",\"150 kHz\"],\"JTAG\":[\"18 MHz\",\"9 MHz\",\"4.5 MHz\",\"2.25 MHz\",\"1.12 MHz - Default\",\"560 kHz\",\"280 kHz\",\"140 kHz\"]}",
+        "probeversion": "ST Link firmware version V2.J33",
+        "connectionType": "p2p"
     },
     {
         "id": "3c5ffe0d.9063b2",
@@ -3733,13 +3728,13 @@
         "type": "inject",
         "z": "2d126e47.f46862",
         "name": "AutoStart_true",
-        "topic": "",
-        "payload": "true",
-        "payloadType": "bool",
         "repeat": "",
         "crontab": "",
         "once": true,
         "onceDelay": "0.1",
+        "topic": "",
+        "payload": "true",
+        "payloadType": "bool",
         "x": 170,
         "y": 140,
         "wires": [
@@ -3747,7 +3742,7 @@
                 "52d96abf.806d94"
             ]
         ],
-        "info": "Injection 'true' au démarrage du flow.\nC'est donc un auto start"
+        "info": "Injection 'true' au dï¿½marrage du flow.\nC'est donc un auto start"
     },
     {
         "id": "1cfab1c1.8c386e",
@@ -3803,7 +3798,7 @@
         "name": "Acquisition Input",
         "info": "",
         "x": 150,
-        "y": 700,
+        "y": 630,
         "wires": []
     },
     {
@@ -3823,7 +3818,7 @@
         "name": "Processing",
         "info": "",
         "x": 370,
-        "y": 700,
+        "y": 630,
         "wires": []
     },
     {
@@ -3857,7 +3852,7 @@
         "type": "acquisition out",
         "z": "2d126e47.f46862",
         "name": "L476RG Out1",
-        "probeconfig": "b090ccaa.ab526",
+        "probeconfig": "9494c5bb.9d4b58",
         "x": 1040,
         "y": 140,
         "wires": [],
@@ -3868,9 +3863,9 @@
         "type": "acquisition in",
         "z": "2d126e47.f46862",
         "name": "L476RG In1",
-        "probeconfig": "b090ccaa.ab526",
+        "probeconfig": "9494c5bb.9d4b58",
         "x": 120,
-        "y": 740,
+        "y": 670,
         "wires": [
             [
                 "427e180d.c9ec78"
@@ -3889,7 +3884,7 @@
         "statistics": [],
         "logmode": "no",
         "x": 370,
-        "y": 730,
+        "y": 660,
         "wires": [
             [
                 "c2e2d3aa.af577",
@@ -3907,7 +3902,6 @@
                 "ed5699d4.56f808",
                 "424a55b0.9ad33c",
                 "99e8fb6d.4f6e78",
-                "2e267a91.50fc06",
                 "bca4e9b0.571aa8",
                 "ab9fd419.3aa2a8",
                 "a14852fc.983ba",
@@ -3915,7 +3909,8 @@
                 "a1bf4d0e.e80ee",
                 "1612bd24.64e0f3",
                 "5f2e3bc9.5c1244",
-                "42deb9a0.299e68"
+                "42deb9a0.299e68",
+                "7142d838.2e6518"
             ],
             []
         ]
@@ -3931,7 +3926,7 @@
         "tostatus": false,
         "complete": "false",
         "x": 660,
-        "y": 350,
+        "y": 280,
         "wires": []
     },
     {
@@ -3962,7 +3957,7 @@
             }
         ],
         "x": 670,
-        "y": 390,
+        "y": 320,
         "wires": [
             [
                 "d3c4176b.92cfc8",
@@ -3983,8 +3978,8 @@
         "label": "ymx_VRx_PV",
         "format": "{{msg.payload.toFixed(2)}}",
         "layout": "col-center",
-        "x": 860,
-        "y": 390,
+        "x": 880,
+        "y": 300,
         "wires": []
     },
     {
@@ -4000,7 +3995,7 @@
             }
         ],
         "x": 670,
-        "y": 460,
+        "y": 390,
         "wires": [
             [
                 "7a49753a.85b76c",
@@ -4021,8 +4016,8 @@
         "label": "ymx_VRy_PV",
         "format": "{{msg.payload.toFixed(2)}}",
         "layout": "col-center",
-        "x": 860,
-        "y": 460,
+        "x": 880,
+        "y": 380,
         "wires": []
     },
     {
@@ -4042,8 +4037,8 @@
         "min": "-100.0",
         "max": "100.0",
         "step": 1,
-        "x": 840,
-        "y": 420,
+        "x": 850,
+        "y": 330,
         "wires": [
             []
         ]
@@ -4065,8 +4060,8 @@
         "min": "-100.0",
         "max": "100.0",
         "step": 1,
-        "x": 840,
-        "y": 490,
+        "x": 850,
+        "y": 410,
         "wires": [
             []
         ]
@@ -4120,7 +4115,7 @@
         "type": "acquisition out",
         "z": "8b8d2438.d4fab8",
         "name": "L476RG Out2",
-        "probeconfig": "b090ccaa.ab526",
+        "probeconfig": "9494c5bb.9d4b58",
         "x": 830,
         "y": 80,
         "wires": []
@@ -4129,7 +4124,7 @@
         "id": "f68361db.9d3f5",
         "type": "comment",
         "z": "8b8d2438.d4fab8",
-        "name": "Liste d'écritures",
+        "name": "Liste d'Ã©critures",
         "info": "",
         "x": 340,
         "y": 40,
@@ -4140,7 +4135,7 @@
         "type": "acquisition in",
         "z": "8b8d2438.d4fab8",
         "name": "L476RG In2",
-        "probeconfig": "b090ccaa.ab526",
+        "probeconfig": "9494c5bb.9d4b58",
         "x": 290,
         "y": 390,
         "wires": [
@@ -4481,7 +4476,7 @@
             "Name",
             "Address"
         ],
-        "info": "Recuperer l'address d'une variable.\n\nRenvoi le nom défini sur Out1.\n\nRenvoi son address sur Out2.\n\nLes Inputs/Outputs sont nommés.\n"
+        "info": "Recuperer l'address d'une variable.\n\nRenvoi le nom dï¿½fini sur Out1.\n\nRenvoi son address sur Out2.\n\nLes Inputs/Outputs sont nommï¿½s.\n"
     },
     {
         "id": "d907ba51.47f7d8",
@@ -4583,7 +4578,7 @@
         "type": "function",
         "z": "8b8d2438.d4fab8",
         "name": "Func_2inputs_objectOut",
-        "func": "/*\n* En fonction du topic d'un flow sauver payload ds un contexte.\n* Creer new msg avec object payload contenant 2 valeur nomées.\n*/\n\nswitch (msg.topic) {\n    case \"string2ascii\":\n        context.set(\"Code\",msg.payload);\n        break;\n    case \"Address\":\n        context.set(\"Address\", msg.payload);\n        break;\n    default:\n        msg = null;\n        break;\n}\n\nvar msg1 = {};\n//msg1.payload = {code:120, add:0x200ff};\nvar temp1 = context.get(\"Code\");\nvar temp2 = context.get(\"Address\");\nmsg1.payload = {code:temp1, add:temp2}; \n\nreturn msg1;",
+        "func": "/*\n* En fonction du topic d'un flow sauver payload ds un contexte.\n* Creer new msg avec object payload contenant 2 valeur nomï¿½es.\n*/\n\nswitch (msg.topic) {\n    case \"string2ascii\":\n        context.set(\"Code\",msg.payload);\n        break;\n    case \"Address\":\n        context.set(\"Address\", msg.payload);\n        break;\n    default:\n        msg = null;\n        break;\n}\n\nvar msg1 = {};\n//msg1.payload = {code:120, add:0x200ff};\nvar temp1 = context.get(\"Code\");\nvar temp2 = context.get(\"Address\");\nmsg1.payload = {code:temp1, add:temp2}; \n\nreturn msg1;",
         "outputs": 1,
         "noerr": 0,
         "x": 650,
@@ -4593,13 +4588,13 @@
                 "39e972a1.89f39e"
             ]
         ],
-        "info": "En fonction du topic d'un flow sauver payload ds un contexte.\n\nCreer new msg avec object payload contenant 2 valeur nommées.\n\n"
+        "info": "En fonction du topic d'un flow sauver payload ds un contexte.\n\nCreer new msg avec object payload contenant 2 valeur nommï¿½es.\n\n"
     },
     {
         "id": "731a52d7.3b2b1c",
         "type": "comment",
         "z": "8b8d2438.d4fab8",
-        "name": "Un caractere \"\" envoyé apres delai.",
+        "name": "Un caractere \"\" envoyÃ© apres delai.",
         "info": "",
         "x": 290,
         "y": 770,
@@ -4624,7 +4619,7 @@
         "payloadType": "str",
         "topic": "clear",
         "x": 680,
-        "y": 670,
+        "y": 630,
         "wires": [
             [
                 "b2c348bb.3d9668"
@@ -4646,7 +4641,7 @@
         "ymin": "",
         "ymax": "",
         "x": 1070,
-        "y": 700,
+        "y": 680,
         "wires": []
     },
     {
@@ -4662,7 +4657,7 @@
             }
         ],
         "x": 670,
-        "y": 530,
+        "y": 460,
         "wires": [
             [
                 "c937856d.2189f8"
@@ -4682,8 +4677,8 @@
         "label": "ymx_Coef",
         "format": "{{msg.payload.toFixed(2)}}",
         "layout": "col-center",
-        "x": 840,
-        "y": 530,
+        "x": 860,
+        "y": 460,
         "wires": []
     },
     {
@@ -4704,7 +4699,7 @@
         "repair": true,
         "outputs": 1,
         "x": 660,
-        "y": 700,
+        "y": 660,
         "wires": [
             [
                 "b2c348bb.3d9668"
@@ -4729,7 +4724,7 @@
         "repair": true,
         "outputs": 1,
         "x": 660,
-        "y": 760,
+        "y": 720,
         "wires": [
             [
                 "b2c348bb.3d9668"
@@ -4749,8 +4744,8 @@
         "label": "ymx_Ri",
         "format": "{{msg.payload}}",
         "layout": "col-center",
-        "x": 840,
-        "y": 560,
+        "x": 860,
+        "y": 490,
         "wires": []
     },
     {
@@ -4766,8 +4761,8 @@
         "label": "ymx_VRx_Ro",
         "format": "{{msg.payload}}",
         "layout": "col-center",
-        "x": 860,
-        "y": 590,
+        "x": 880,
+        "y": 520,
         "wires": []
     },
     {
@@ -4783,7 +4778,7 @@
             }
         ],
         "x": 660,
-        "y": 560,
+        "y": 490,
         "wires": [
             [
                 "69cc0882.b018a8"
@@ -4808,7 +4803,7 @@
         "repair": true,
         "outputs": 1,
         "x": 660,
-        "y": 730,
+        "y": 690,
         "wires": [
             [
                 "b2c348bb.3d9668"
@@ -4833,7 +4828,7 @@
         "repair": true,
         "outputs": 1,
         "x": 660,
-        "y": 790,
+        "y": 750,
         "wires": [
             [
                 "b2c348bb.3d9668"
@@ -4853,7 +4848,7 @@
             }
         ],
         "x": 670,
-        "y": 590,
+        "y": 520,
         "wires": [
             [
                 "bd91226b.a58df"
@@ -4873,7 +4868,7 @@
             }
         ],
         "x": 670,
-        "y": 620,
+        "y": 550,
         "wires": [
             [
                 "d412921c.99838"
@@ -4892,8 +4887,8 @@
         "label": "ymx_VRy_Ro",
         "format": "{{msg.payload}}",
         "layout": "col-center",
-        "x": 860,
-        "y": 620,
+        "x": 880,
+        "y": 550,
         "wires": []
     },
     {
@@ -4985,8 +4980,8 @@
                 "type": "str"
             }
         ],
-        "x": 660,
-        "y": 1020,
+        "x": 680,
+        "y": 940,
         "wires": [
             [
                 "9eec60a.6e882a"
@@ -5005,8 +5000,8 @@
         "label": "MarArr",
         "format": "{{msg.payload}}",
         "layout": "col-center",
-        "x": 860,
-        "y": 1020,
+        "x": 880,
+        "y": 940,
         "wires": []
     },
     {
@@ -5021,8 +5016,8 @@
                 "type": "str"
             }
         ],
-        "x": 660,
-        "y": 1050,
+        "x": 680,
+        "y": 970,
         "wires": [
             [
                 "78f2087f.daf078"
@@ -5041,8 +5036,8 @@
         "label": "inRun",
         "format": "{{msg.payload}}",
         "layout": "col-center",
-        "x": 860,
-        "y": 1050,
+        "x": 880,
+        "y": 970,
         "wires": []
     },
     {
@@ -5057,8 +5052,8 @@
                 "type": "str"
             }
         ],
-        "x": 670,
-        "y": 1080,
+        "x": 690,
+        "y": 1000,
         "wires": [
             [
                 "6dd612af.6ece4c"
@@ -5077,8 +5072,8 @@
         "label": "Speed_SP",
         "format": "{{msg.payload.toFixed(2)}}",
         "layout": "col-center",
-        "x": 880,
-        "y": 1080,
+        "x": 900,
+        "y": 1000,
         "wires": []
     },
     {
@@ -5093,8 +5088,8 @@
                 "type": "str"
             }
         ],
-        "x": 670,
-        "y": 1110,
+        "x": 690,
+        "y": 1030,
         "wires": [
             [
                 "1a9fcbde.281074"
@@ -5113,8 +5108,8 @@
         "label": "Speed_MV",
         "format": "{{msg.payload.toFixed(2)}}",
         "layout": "col-center",
-        "x": 880,
-        "y": 1110,
+        "x": 900,
+        "y": 1030,
         "wires": []
     },
     {
@@ -5122,13 +5117,13 @@
         "type": "inject",
         "z": "c38b0ce6.66e1c",
         "name": "Go",
-        "topic": "",
-        "payload": "1",
-        "payloadType": "str",
         "repeat": "",
         "crontab": "",
         "once": false,
         "onceDelay": "",
+        "topic": "",
+        "payload": "1",
+        "payloadType": "str",
         "x": 250,
         "y": 290,
         "wires": [
@@ -5161,7 +5156,7 @@
         "console": false,
         "tostatus": false,
         "complete": "false",
-        "x": 830,
+        "x": 990,
         "y": 130,
         "wires": []
     },
@@ -5179,7 +5174,7 @@
         "fwdInMessages": true,
         "resendOnRefresh": false,
         "templateScope": "local",
-        "x": 560,
+        "x": 740,
         "y": 130,
         "wires": [
             [
@@ -5188,60 +5183,16 @@
         ]
     },
     {
-        "id": "2e267a91.50fc06",
-        "type": "join",
-        "z": "2d126e47.f46862",
-        "name": "joinProcessing",
-        "mode": "custom",
-        "build": "array",
-        "property": "payload",
-        "propertyType": "msg",
-        "key": "topic",
-        "joiner": "\\n",
-        "joinerType": "str",
-        "accumulate": false,
-        "timeout": "1",
-        "count": "",
-        "reduceRight": false,
-        "reduceExp": "",
-        "reduceInit": "",
-        "reduceInitType": "num",
-        "reduceFixup": "",
-        "x": 640,
-        "y": 300,
-        "wires": [
-            [
-                "7142d838.2e6518"
-            ]
-        ]
-    },
-    {
         "id": "7142d838.2e6518",
         "type": "link out",
         "z": "2d126e47.f46862",
-        "name": "link_joinProcRead",
+        "name": "link_ProcessingRead",
         "links": [
-            "5476459b.84c50c"
+            "bbd102d1.cadc1"
         ],
-        "x": 815,
-        "y": 300,
+        "x": 645,
+        "y": 590,
         "wires": []
-    },
-    {
-        "id": "5476459b.84c50c",
-        "type": "link in",
-        "z": "c38b0ce6.66e1c",
-        "name": "",
-        "links": [
-            "7142d838.2e6518"
-        ],
-        "x": 285,
-        "y": 130,
-        "wires": [
-            [
-                "fa181033.65fb7"
-            ]
-        ]
     },
     {
         "id": "a82a67d6.b84e78",
@@ -5284,30 +5235,6 @@
         "wires": []
     },
     {
-        "id": "a76394a5.41bea8",
-        "type": "link in",
-        "z": "c38b0ce6.66e1c",
-        "name": "",
-        "links": [
-            "26e46fa.620559"
-        ],
-        "x": 285,
-        "y": 80,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "e3115f2a.d727e",
-        "type": "comment",
-        "z": "2d126e47.f46862",
-        "name": "Faire array des data lues. Pour onglet Data Read",
-        "info": "",
-        "x": 740,
-        "y": 270,
-        "wires": []
-    },
-    {
         "id": "df2712b9.30f8d",
         "type": "comment",
         "z": "c38b0ce6.66e1c",
@@ -5323,8 +5250,8 @@
         "z": "c38b0ce6.66e1c",
         "name": "Constitution du tableau",
         "info": "",
-        "x": 540,
-        "y": 80,
+        "x": 740,
+        "y": 100,
         "wires": []
     },
     {
@@ -5339,8 +5266,8 @@
                 "type": "str"
             }
         ],
-        "x": 660,
-        "y": 860,
+        "x": 670,
+        "y": 800,
         "wires": [
             [
                 "7b1d668e.19b5e8"
@@ -5359,8 +5286,8 @@
         "label": "MaAr",
         "format": "{{msg.payload}}",
         "layout": "col-center",
-        "x": 890,
-        "y": 860,
+        "x": 900,
+        "y": 800,
         "wires": []
     },
     {
@@ -5375,8 +5302,8 @@
                 "type": "str"
             }
         ],
-        "x": 660,
-        "y": 890,
+        "x": 670,
+        "y": 830,
         "wires": [
             [
                 "27d4fafc.26d3b6"
@@ -5395,8 +5322,8 @@
         "label": "inRun",
         "format": "{{msg.payload}}",
         "layout": "col-center",
-        "x": 890,
-        "y": 890,
+        "x": 900,
+        "y": 830,
         "wires": []
     },
     {
@@ -5411,8 +5338,8 @@
                 "type": "str"
             }
         ],
-        "x": 660,
-        "y": 920,
+        "x": 670,
+        "y": 860,
         "wires": [
             [
                 "b08d86ba.075558"
@@ -5431,8 +5358,8 @@
         "label": "Vitesse",
         "format": "{{msg.payload.toFixed(2)}}",
         "layout": "col-center",
-        "x": 890,
-        "y": 920,
+        "x": 900,
+        "y": 860,
         "wires": []
     },
     {
@@ -5447,8 +5374,8 @@
                 "type": "str"
             }
         ],
-        "x": 670,
-        "y": 950,
+        "x": 680,
+        "y": 890,
         "wires": [
             [
                 "432e91c.927277"
@@ -5467,8 +5394,8 @@
         "label": "Direction",
         "format": "{{msg.payload.toFixed(2)}}",
         "layout": "col-center",
-        "x": 900,
-        "y": 950,
+        "x": 910,
+        "y": 890,
         "wires": []
     },
     {
@@ -5483,8 +5410,8 @@
                 "type": "str"
             }
         ],
-        "x": 670,
-        "y": 1180,
+        "x": 680,
+        "y": 1080,
         "wires": [
             [
                 "2610ca30.0ce016"
@@ -5503,8 +5430,8 @@
         "label": "MarArr",
         "format": "{{msg.payload}}",
         "layout": "col-center",
-        "x": 870,
-        "y": 1180,
+        "x": 880,
+        "y": 1080,
         "wires": []
     },
     {
@@ -5519,8 +5446,8 @@
                 "type": "str"
             }
         ],
-        "x": 670,
-        "y": 1210,
+        "x": 680,
+        "y": 1110,
         "wires": [
             [
                 "ad617b3b.18c6e8"
@@ -5539,8 +5466,8 @@
         "label": "inRun",
         "format": "{{msg.payload}}",
         "layout": "col-center",
-        "x": 870,
-        "y": 1210,
+        "x": 880,
+        "y": 1110,
         "wires": []
     },
     {
@@ -5555,8 +5482,8 @@
                 "type": "str"
             }
         ],
-        "x": 680,
-        "y": 1240,
+        "x": 690,
+        "y": 1140,
         "wires": [
             [
                 "d246fa40.414008"
@@ -5575,8 +5502,8 @@
         "label": "Speed_SP",
         "format": "{{msg.payload.toFixed(2)}}",
         "layout": "col-center",
-        "x": 890,
-        "y": 1240,
+        "x": 900,
+        "y": 1140,
         "wires": []
     },
     {
@@ -5591,8 +5518,8 @@
                 "type": "str"
             }
         ],
-        "x": 680,
-        "y": 1270,
+        "x": 690,
+        "y": 1170,
         "wires": [
             [
                 "3bad0157.2e689e"
@@ -5611,8 +5538,62 @@
         "label": "Speed_MV",
         "format": "{{msg.payload.toFixed(2)}}",
         "layout": "col-center",
-        "x": 890,
-        "y": 1270,
+        "x": 900,
+        "y": 1170,
         "wires": []
+    },
+    {
+        "id": "8d6a3b00.bad128",
+        "type": "comment",
+        "z": "c38b0ce6.66e1c",
+        "name": "Faire array des data lues. Pour onglet Data Read",
+        "info": "",
+        "x": 420,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "d23510c1.2f1b9",
+        "type": "join",
+        "z": "c38b0ce6.66e1c",
+        "name": "joinProcessing",
+        "mode": "custom",
+        "build": "array",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": false,
+        "timeout": "1",
+        "count": "",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "num",
+        "reduceFixup": "",
+        "x": 420,
+        "y": 130,
+        "wires": [
+            [
+                "fa181033.65fb7"
+            ]
+        ]
+    },
+    {
+        "id": "bbd102d1.cadc1",
+        "type": "link in",
+        "z": "c38b0ce6.66e1c",
+        "name": "",
+        "links": [
+            "7142d838.2e6518"
+        ],
+        "x": 225,
+        "y": 130,
+        "wires": [
+            [
+                "d23510c1.2f1b9"
+            ]
+        ]
     }
 ]

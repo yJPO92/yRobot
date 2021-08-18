@@ -1,6 +1,9 @@
 *** yRobot ***
 
+!!!!  renomer folder train en train_c
 
+le 18/08/2021: v3.5a (mx 6.4): update Node-red
+                update 'Readme.md'
 le 31/10/2020: v3.5a (mx 6.4): ajout tk_MoteurG & qMotG
                 update Node-Red, ebauche tk_Train
                 move task robot in separate file 'yTaskFncRobot.c'
@@ -18,7 +21,7 @@ le 23/10/2020: v3.2 (mx 6.2): ajout task 'tk_Train' & queue 'qTrain' & module 'y
                 squelettes de 'tk_Train' & 'tk_MotD' = OK
                 ajout fichier 'VTaffichage.txt' indiquant les lignes d'affiichage de debug
                 modif 'yMENU'
-le 21/10/2020: v3.1 (mx 6.1): qq additions pour préparer transformation gestio yMOTOR into a task
+le 21/10/2020: v3.1 (mx 6.1): qq additions pour préparer transformation gestion yMOTOR into a task
                 envoie d'un msg a tk_MoteurD via qMotD depuis tk_Process = OK
                 envoie msg VT depuis tk_MoteurD après traitement du Topic = OK
 le 18/10/2020: v3.0 (mx 6.0): new branch 'tkMotD', creation task de gestion du moteur Droit
