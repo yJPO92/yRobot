@@ -3309,17 +3309,6 @@
         "configLastUpdate": 1604346611405
     },
     {
-        "id": "b090ccaa.ab526",
-        "type": "probe",
-        "probeid": "066DFF535752877167095728",
-        "probename": "ST-Link v2-1B (...95728)",
-        "protocol": "SWD",
-        "frequency": "1.8 MHz - Default",
-        "probeproperty": "{\"SWD\":[\"4.6 MHz\",\"1.8 MHz - Default\",\"950 kHz\",\"400 kHz\",\"150 kHz\"],\"JTAG\":[\"18 MHz\",\"9 MHz\",\"4.5 MHz\",\"2.25 MHz\",\"1.12 MHz - Default\",\"560 kHz\",\"280 kHz\",\"140 kHz\"]}",
-        "probeversion": "ST Link firmware version V2.J31",
-        "connectionType": "p2p"
-    },
-    {
         "id": "3eac6833.ef73e8",
         "type": "ui_tab",
         "name": "Base",
@@ -3435,96 +3424,6 @@
         "collapse": false
     },
     {
-        "id": "f64a2248.873ab",
-        "type": "ui_spacer",
-        "name": "spacer",
-        "group": "95ad7962.75a0a8",
-        "order": 2,
-        "width": 1,
-        "height": 1
-    },
-    {
-        "id": "3d3082f1.18235e",
-        "type": "ui_spacer",
-        "name": "spacer",
-        "group": "95ad7962.75a0a8",
-        "order": 5,
-        "width": 2,
-        "height": 1
-    },
-    {
-        "id": "eeb5bc4b.b03cc",
-        "type": "ui_spacer",
-        "name": "spacer",
-        "group": "95ad7962.75a0a8",
-        "order": 7,
-        "width": 1,
-        "height": 1
-    },
-    {
-        "id": "b6e7e0cb.0e873",
-        "type": "ui_spacer",
-        "name": "spacer",
-        "group": "3dfdb3a5.11521c",
-        "order": 2,
-        "width": 5,
-        "height": 1
-    },
-    {
-        "id": "c99fa323.d207a",
-        "type": "ui_spacer",
-        "name": "spacer",
-        "group": "3dfdb3a5.11521c",
-        "order": 3,
-        "width": 5,
-        "height": 1
-    },
-    {
-        "id": "8904f5ed.700e18",
-        "type": "ui_spacer",
-        "name": "spacer",
-        "group": "3dfdb3a5.11521c",
-        "order": 5,
-        "width": 5,
-        "height": 1
-    },
-    {
-        "id": "b1b7d7a2.375a98",
-        "type": "ui_spacer",
-        "name": "spacer",
-        "group": "3dfdb3a5.11521c",
-        "order": 6,
-        "width": 5,
-        "height": 1
-    },
-    {
-        "id": "96f708ae.132ba8",
-        "type": "ui_spacer",
-        "name": "spacer",
-        "group": "1326d3e9.6d4ebc",
-        "order": 5,
-        "width": 2,
-        "height": 1
-    },
-    {
-        "id": "e98ed79d.b2a748",
-        "type": "ui_spacer",
-        "name": "spacer",
-        "group": "81b688ed.ba6248",
-        "order": 5,
-        "width": 2,
-        "height": 1
-    },
-    {
-        "id": "ad415da4.c438c",
-        "type": "ui_spacer",
-        "name": "spacer",
-        "group": "f1b308fe.edae38",
-        "order": 5,
-        "width": 2,
-        "height": 1
-    },
-    {
         "id": "9494c5bb.9d4b58",
         "type": "probe",
         "probeid": "066AFF535155878281081727",
@@ -3534,6 +3433,124 @@
         "probeproperty": "{\"SWD\":[\"4.6 MHz\",\"1.8 MHz - Default\",\"950 kHz\",\"400 kHz\",\"150 kHz\"],\"JTAG\":[\"18 MHz\",\"9 MHz\",\"4.5 MHz\",\"2.25 MHz\",\"1.12 MHz - Default\",\"560 kHz\",\"280 kHz\",\"140 kHz\"]}",
         "probeversion": "ST Link firmware version V2.J33",
         "connectionType": "p2p"
+    },
+    {
+        "id": "edb70a2a.270ff8",
+        "type": "ui_group",
+        "name": "TrainDG Orders",
+        "tab": "da9b2906.8948c8",
+        "order": 6,
+        "disp": true,
+        "width": "4",
+        "collapse": false
+    },
+    {
+        "id": "5d9fb517.f5bbac",
+        "type": "ui_spacer",
+        "name": "spacer",
+        "group": "95ad7962.75a0a8",
+        "order": 2,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "3110ad48.771652",
+        "type": "ui_spacer",
+        "name": "spacer",
+        "group": "95ad7962.75a0a8",
+        "order": 5,
+        "width": 2,
+        "height": 1
+    },
+    {
+        "id": "cadd434c.d9fd6",
+        "type": "ui_spacer",
+        "name": "spacer",
+        "group": "95ad7962.75a0a8",
+        "order": 7,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "a74af2b9.6777d",
+        "type": "ui_spacer",
+        "name": "spacer",
+        "group": "3dfdb3a5.11521c",
+        "order": 2,
+        "width": 5,
+        "height": 1
+    },
+    {
+        "id": "224710a0.7ee8",
+        "type": "ui_spacer",
+        "name": "spacer",
+        "group": "3dfdb3a5.11521c",
+        "order": 3,
+        "width": 5,
+        "height": 1
+    },
+    {
+        "id": "b27c5e6f.31812",
+        "type": "ui_spacer",
+        "name": "spacer",
+        "group": "3dfdb3a5.11521c",
+        "order": 5,
+        "width": 5,
+        "height": 1
+    },
+    {
+        "id": "f03be490.ead768",
+        "type": "ui_spacer",
+        "name": "spacer",
+        "group": "3dfdb3a5.11521c",
+        "order": 6,
+        "width": 5,
+        "height": 1
+    },
+    {
+        "id": "d18d0c25.b0bc1",
+        "type": "ui_spacer",
+        "name": "spacer",
+        "group": "1326d3e9.6d4ebc",
+        "order": 5,
+        "width": 2,
+        "height": 1
+    },
+    {
+        "id": "18386274.04fbee",
+        "type": "ui_spacer",
+        "name": "spacer",
+        "group": "81b688ed.ba6248",
+        "order": 5,
+        "width": 2,
+        "height": 1
+    },
+    {
+        "id": "b78d5afc.b91388",
+        "type": "ui_spacer",
+        "name": "spacer",
+        "group": "f1b308fe.edae38",
+        "order": 5,
+        "width": 2,
+        "height": 1
+    },
+    {
+        "id": "94ded077.429f4",
+        "type": "ui_spacer",
+        "name": "spacer",
+        "group": "edb70a2a.270ff8",
+        "order": 2,
+        "width": 2,
+        "height": 1
+    },
+    {
+        "id": "d0e86fe7.a7015",
+        "type": "ui_spacer",
+        "name": "spacer",
+        "group": "edb70a2a.270ff8",
+        "order": 4,
+        "width": 2,
+        "height": 1
     },
     {
         "id": "3c5ffe0d.9063b2",
@@ -3934,7 +3951,7 @@
         "type": "debug",
         "z": "2d126e47.f46862",
         "name": "",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": true,
@@ -4081,7 +4098,7 @@
         "frequencyType": "1",
         "snapshotheader": "",
         "mode": "direct",
-        "lastImportedTime": 1603907568792,
+        "lastImportedTime": 1629273873604,
         "openStatus": true,
         "x": 320,
         "y": 80,
@@ -4102,8 +4119,8 @@
         "order": 1,
         "width": 6,
         "height": 6,
-        "x": 550,
-        "y": 130,
+        "x": 690,
+        "y": 120,
         "wires": [
             [
                 "7c44c82.f534038"
@@ -4116,7 +4133,7 @@
         "z": "8b8d2438.d4fab8",
         "name": "L476RG Out2",
         "probeconfig": "9494c5bb.9d4b58",
-        "x": 830,
+        "x": 1160,
         "y": 80,
         "wires": []
     },
@@ -4136,8 +4153,8 @@
         "z": "8b8d2438.d4fab8",
         "name": "L476RG In2",
         "probeconfig": "9494c5bb.9d4b58",
-        "x": 290,
-        "y": 390,
+        "x": 130,
+        "y": 700,
         "wires": [
             [
                 "a9e7d4cc.eba6d8"
@@ -4154,15 +4171,13 @@
         "expressions": [],
         "statistics": [],
         "logmode": "no",
-        "x": 530,
-        "y": 390,
+        "x": 370,
+        "y": 700,
         "wires": [
             [
                 "2ea9900e.3f705",
                 "b16afe21.f9a9c",
-                "2ae1ac83.7c5984",
-                "17807e71.251752",
-                "a82a67d6.b84e78"
+                "2ae1ac83.7c5984"
             ],
             []
         ]
@@ -4235,8 +4250,8 @@
                 "type": "str"
             }
         ],
-        "x": 750,
-        "y": 390,
+        "x": 590,
+        "y": 700,
         "wires": [
             [
                 "1d7e416d.357ecf"
@@ -4255,8 +4270,8 @@
                 "type": "str"
             }
         ],
-        "x": 740,
-        "y": 350,
+        "x": 580,
+        "y": 660,
         "wires": [
             [
                 "76cc45b6.3a8d9c"
@@ -4275,8 +4290,8 @@
         "label": "VRy_Ro",
         "format": "{{msg.payload}}",
         "layout": "row-center",
-        "x": 930,
-        "y": 390,
+        "x": 770,
+        "y": 700,
         "wires": []
     },
     {
@@ -4291,8 +4306,8 @@
         "label": "VRy_Ri",
         "format": "{{msg.payload}}",
         "layout": "row-center",
-        "x": 930,
-        "y": 350,
+        "x": 770,
+        "y": 660,
         "wires": []
     },
     {
@@ -4307,11 +4322,12 @@
                 "type": "str"
             }
         ],
-        "x": 740,
-        "y": 440,
+        "x": 580,
+        "y": 750,
         "wires": [
             [
-                "dd548903.1547c8"
+                "dd548903.1547c8",
+                "38be9026.5fc9b"
             ]
         ]
     },
@@ -4327,8 +4343,8 @@
         "label": "aRxBuffer[0]",
         "format": "{{msg.payload}}",
         "layout": "row-center",
-        "x": 940,
-        "y": 440,
+        "x": 780,
+        "y": 750,
         "wires": []
     },
     {
@@ -4346,8 +4362,8 @@
         "mode": "text",
         "delay": 300,
         "topic": "Cde",
-        "x": 170,
-        "y": 690,
+        "x": 160,
+        "y": 350,
         "wires": [
             [
                 "561b6f6a.6285b"
@@ -4362,8 +4378,10 @@
         "func": "/*\n* Converti un caractere en son code ASCII -1er sortie\n* puis charactere vide sur 2e sortie\n*/\n//sortie 1\nvar msg1 = {topic: \"string2ascii\"};\nmsg1.payload=msg.payload.charCodeAt(0);\n//sortie 2\nvar msg2 = {topic: \"toRAZorigin\"};\nmsg2.payload=\"\";\nreturn [msg1, msg2];\n",
         "outputs": 2,
         "noerr": 0,
+        "initialize": "",
+        "finalize": "",
         "x": 370,
-        "y": 690,
+        "y": 350,
         "wires": [
             [
                 "46fabebe.05836"
@@ -4391,8 +4409,8 @@
         "syntax": "mustache",
         "template": "{\n    \"variablelist\": [\n        {\n            \"address\": \"{{payload.add}}\",\n            \"type\": 1,\n            \"value\": \"{{payload.code}}\"\n        }\n    ],\n    \"accesspoint\": 0\n}\n",
         "output": "json",
-        "x": 870,
-        "y": 680,
+        "x": 1050,
+        "y": 350,
         "wires": [
             [
                 "97b2b5f0.e98cd8"
@@ -4419,8 +4437,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1040,
-        "y": 680,
+        "x": 1210,
+        "y": 350,
         "wires": [
             [
                 "7c44c82.f534038"
@@ -4443,7 +4461,7 @@
         "randomUnits": "seconds",
         "drop": false,
         "x": 540,
-        "y": 780,
+        "y": 450,
         "wires": [
             [
                 "3f93c791.0da028"
@@ -4458,8 +4476,10 @@
         "func": "/* \n* Recuperer l'address d'une variable\n* linked from 'variable node'\n*/\n// extract address & prepare msg\nfunction myFunction(item) {\n  if (item.name == \"aRxBuffer[0]\") {\n    msg2 = {topic:\"Address\", payload: item.address};\n    msg1 = {topic:\"Name\", payload:item.name};\n  }  \n}\nvar msg1 = {};\nvar msg2 = {};\n// apply to variable list\nmsg.payload.variablelist.forEach(myFunction);\n\nreturn [msg1, msg2];\n",
         "outputs": 2,
         "noerr": 0,
-        "x": 510,
-        "y": 540,
+        "initialize": "",
+        "finalize": "",
+        "x": 540,
+        "y": 230,
         "wires": [
             [
                 "d907ba51.47f7d8"
@@ -4489,8 +4509,8 @@
         "tostatus": true,
         "complete": "payload",
         "targetType": "msg",
-        "x": 720,
-        "y": 530,
+        "x": 770,
+        "y": 220,
         "wires": []
     },
     {
@@ -4499,8 +4519,8 @@
         "z": "8b8d2438.d4fab8",
         "name": "Envoyer une commande (1 car) via dashboard",
         "info": "",
-        "x": 230,
-        "y": 600,
+        "x": 250,
+        "y": 270,
         "wires": []
     },
     {
@@ -4516,8 +4536,8 @@
         "storeOutMessages": true,
         "fwdInMessages": true,
         "templateScope": "local",
-        "x": 170,
-        "y": 650,
+        "x": 160,
+        "y": 310,
         "wires": [
             []
         ]
@@ -4533,29 +4553,9 @@
         "tostatus": true,
         "complete": "payload",
         "targetType": "msg",
-        "x": 720,
-        "y": 580,
+        "x": 770,
+        "y": 270,
         "wires": []
-    },
-    {
-        "id": "17807e71.251752",
-        "type": "subflow:8381c865.236028",
-        "z": "8b8d2438.d4fab8",
-        "name": "aRxBuffer[2]",
-        "env": [
-            {
-                "name": "varfilter",
-                "value": "aRxBuffer[2]",
-                "type": "str"
-            }
-        ],
-        "x": 740,
-        "y": 480,
-        "wires": [
-            [
-                "a8a19ed4.f6ee8"
-            ]
-        ]
     },
     {
         "id": "a8a19ed4.f6ee8",
@@ -4566,23 +4566,26 @@
         "width": 3,
         "height": 1,
         "name": "",
-        "label": "aRxBuffer[2]",
+        "label": "en ascii",
         "format": "{{msg.payload}}",
         "layout": "row-center",
-        "x": 940,
-        "y": 480,
-        "wires": []
+        "x": 1020,
+        "y": 790,
+        "wires": [],
+        "info": "{{msg.payload.fromCharCode(0)}}\n{{msg.payload.toString().fromCharCode(0)}}\ncharAt()\n\n{{String.fromCharCode(msg.payload)}}\n"
     },
     {
         "id": "46fabebe.05836",
         "type": "function",
         "z": "8b8d2438.d4fab8",
         "name": "Func_2inputs_objectOut",
-        "func": "/*\n* En fonction du topic d'un flow sauver payload ds un contexte.\n* Creer new msg avec object payload contenant 2 valeur nom�es.\n*/\n\nswitch (msg.topic) {\n    case \"string2ascii\":\n        context.set(\"Code\",msg.payload);\n        break;\n    case \"Address\":\n        context.set(\"Address\", msg.payload);\n        break;\n    default:\n        msg = null;\n        break;\n}\n\nvar msg1 = {};\n//msg1.payload = {code:120, add:0x200ff};\nvar temp1 = context.get(\"Code\");\nvar temp2 = context.get(\"Address\");\nmsg1.payload = {code:temp1, add:temp2}; \n\nreturn msg1;",
+        "func": "/*\n* En fonction du topic d'un flow sauver payload ds un contexte.\n* Creer new msg avec object payload contenant 2 valeur nom�es.\n*/\n\nswitch (msg.topic) {\n    case \"Address\":\n        context.set(\"Address\", msg.payload);\n        break;\n    case \"string2ascii\":\n        context.set(\"Code\",msg.payload);\n        break;\n    case \"TrainMar\":\n        context.set(\"Code\",msg.payload);\n        break;\n    case \"TrainArr\":\n        context.set(\"Code\",msg.payload);\n        break;\n    default:\n        msg = null;\n        break;\n}\n\nvar msg1 = {};\n//msg1.payload = {code:120, add:0x200ff};\nvar temp1 = context.get(\"Code\");\nvar temp2 = context.get(\"Address\");\nmsg1.payload = {code:temp1, add:temp2}; \n\nreturn msg1;",
         "outputs": 1,
         "noerr": 0,
-        "x": 650,
-        "y": 680,
+        "initialize": "",
+        "finalize": "",
+        "x": 840,
+        "y": 350,
         "wires": [
             [
                 "39e972a1.89f39e"
@@ -4596,8 +4599,8 @@
         "z": "8b8d2438.d4fab8",
         "name": "Un caractere \"\" envoyé apres delai.",
         "info": "",
-        "x": 290,
-        "y": 770,
+        "x": 270,
+        "y": 450,
         "wires": []
     },
     {
@@ -5195,46 +5198,6 @@
         "wires": []
     },
     {
-        "id": "a82a67d6.b84e78",
-        "type": "join",
-        "z": "8b8d2438.d4fab8",
-        "name": "joinWrite",
-        "mode": "custom",
-        "build": "array",
-        "property": "payload",
-        "propertyType": "msg",
-        "key": "topic",
-        "joiner": "\\n",
-        "joinerType": "str",
-        "accumulate": false,
-        "timeout": "1",
-        "count": "",
-        "reduceRight": false,
-        "reduceExp": "",
-        "reduceInit": "",
-        "reduceInitType": "",
-        "reduceFixup": "",
-        "x": 720,
-        "y": 270,
-        "wires": [
-            [
-                "26e46fa.620559"
-            ]
-        ]
-    },
-    {
-        "id": "26e46fa.620559",
-        "type": "link out",
-        "z": "8b8d2438.d4fab8",
-        "name": "link_ProcWrite",
-        "links": [
-            "a76394a5.41bea8"
-        ],
-        "x": 940,
-        "y": 270,
-        "wires": []
-    },
-    {
         "id": "df2712b9.30f8d",
         "type": "comment",
         "z": "c38b0ce6.66e1c",
@@ -5593,6 +5556,107 @@
         "wires": [
             [
                 "d23510c1.2f1b9"
+            ]
+        ]
+    },
+    {
+        "id": "403dfd39.a17dd4",
+        "type": "comment",
+        "z": "8b8d2438.d4fab8",
+        "name": "Afficher les data écrites",
+        "info": "",
+        "x": 590,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "7d9137b1.10c8d8",
+        "type": "comment",
+        "z": "8b8d2438.d4fab8",
+        "name": "Récupérer @ de la variable 'saisie clavier en VT'",
+        "info": "",
+        "x": 640,
+        "y": 190,
+        "wires": []
+    },
+    {
+        "id": "250a435.3a474bc",
+        "type": "comment",
+        "z": "8b8d2438.d4fab8",
+        "name": "Simuler saisie clavier de la VT de TeraTerm",
+        "info": "",
+        "x": 410,
+        "y": 310,
+        "wires": []
+    },
+    {
+        "id": "38be9026.5fc9b",
+        "type": "function",
+        "z": "8b8d2438.d4fab8",
+        "name": "ASCII Code to Character",
+        "func": "/*\nCode caractere converti en caractere\nA=65, B=66, a=97, b=98 ...\n*/\nvar msg1={};\nmsg1.payload = String.fromCharCode(msg.payload);\nreturn msg1;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 800,
+        "y": 790,
+        "wires": [
+            [
+                "a8a19ed4.f6ee8"
+            ]
+        ],
+        "info": "// qq essai!!!\n{{msg.payload.fromCharCode(0)}}\n{{msg.payload.toString().fromCharCode(0)}}\ncharAt()\nString.fromCharCode(8212);\n"
+    },
+    {
+        "id": "34f41ab4.7af296",
+        "type": "ui_button",
+        "z": "8b8d2438.d4fab8",
+        "name": "Train Marche",
+        "group": "edb70a2a.270ff8",
+        "order": 1,
+        "width": 2,
+        "height": 1,
+        "passthru": false,
+        "label": "Marche",
+        "tooltip": "Send '98' as 'B' for 'Marche order'",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "98",
+        "payloadType": "str",
+        "topic": "TrainMar",
+        "x": 560,
+        "y": 500,
+        "wires": [
+            [
+                "46fabebe.05836"
+            ]
+        ]
+    },
+    {
+        "id": "7346c5ab.f1bb9c",
+        "type": "ui_button",
+        "z": "8b8d2438.d4fab8",
+        "name": "Train Arret",
+        "group": "edb70a2a.270ff8",
+        "order": 3,
+        "width": 2,
+        "height": 1,
+        "passthru": false,
+        "label": "Arret",
+        "tooltip": "Send '97' as 'A' for 'Arret order'",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "97",
+        "payloadType": "str",
+        "topic": "TrainArr",
+        "x": 580,
+        "y": 530,
+        "wires": [
+            [
+                "46fabebe.05836"
             ]
         ]
     }

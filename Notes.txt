@@ -2,6 +2,7 @@
 
 !!!!  renomer folder train en train_c
 
+le 18/08/2021: v3.5b (mx 6.4): finalisation Node-red. Commande idem saisie VT et par bouton.
 le 18/08/2021: v3.5a (mx 6.4): update Node-red
                 update 'Readme.md'
 le 31/10/2020: v3.5a (mx 6.4): ajout tk_MoteurG & qMotG
