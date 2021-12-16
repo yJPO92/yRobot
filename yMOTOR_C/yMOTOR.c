@@ -77,8 +77,8 @@ void yMOTOR_MarArr(yMOTOR* this, uint8_t mararr) {
 }
 
 /** Speed_SP request */
+/** @todo check speed @limits! .c */
 void yMOTOR_Speed(yMOTOR* this, float speed) {
-	//TODO check speed limits!
 	//-- take it only if motor requested to run
 	if (this->MarArr == 1) {
 		this->Speed_SP = speed;
@@ -162,7 +162,7 @@ void yMOTOR_Exec(yMOTOR* this) {
 		this->FeeWheel = 1U;
 		yMOTOR_RealOutputs(this);
 		//osDelay(pdMS_TO_TICKS(2000));	//laisser le temps au courant de s'inverser
-		osDelay(pdMS_TO_TICKS(2));	//TODO v3.4a DBG a supprimer
+		osDelay(pdMS_TO_TICKS(2));	/** @todo v3.4a DBG a supprimer*/
 		this->FeeWheel = 0U;
 		yMOTOR_VirtualOutputs(this);
 		yMOTOR_RealOutputs(this);

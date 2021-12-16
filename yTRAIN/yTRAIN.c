@@ -34,7 +34,7 @@ void yTRAIN_Init(yTRAIN* this) {
 	this->MaAr_G = 0U;
 	this->Vitesse_G = 0.0;
 	//--- Parameters
-	this->Dir_HH = 90.0;	//TODO verifier limite
+	this->Dir_HH = 90.0;	/** @todo verifier limite */
 	this->Dir_LL = -90.0;
 	//--- memories
 	this->Vitesse_memo = 0.0;

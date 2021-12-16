@@ -69,7 +69,7 @@ void yANALOG_Init(yANALOG* this){
 void yANALOG_Exec(yANALOG* this)
 {
 
-//TODO Ri/Ro schedule
+// /** @todo Ri/Ro schedule */
 //    //this->m_ValeurN = _ai.read();    // lire la valeur normée de l'entree (la pin)
 //    if (m_Ri == 1U) {
 //    	CalulerMesure();
@@ -114,7 +114,7 @@ void yANALOG_CalulerPV(yANALOG* this)
 /* check variation around hysteresis */
 uint8_t yANALOG_Variation(yANALOG* this)
 {
-	//TODO verifier Ro
+	/** @todo verifier Ro */
 	static float tmp;
 	tmp = this->PV - this->PVhyst;
 	(tmp >= 0) ? (tmp = tmp) : (tmp = -tmp);	//abs!
@@ -140,7 +140,7 @@ void yANALOG_SetTrimRaw(yANALOG* this, float trimr)
 }
 
 ///** Changer le coefficient de filtrage */
-//TODO maj filtrage
+/** @todo maj filtrage */
 //void yANALOG_FLT::majFiltre(float Coef_Filtre)
 //{
 //    this->m_Coef_Filtre = Coef_Filtre;   // filtre

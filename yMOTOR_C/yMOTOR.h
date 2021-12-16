@@ -79,7 +79,7 @@ typedef struct {
 // Methodes
 //------------------------
 
-/*
+/**
  * @brief  Initialisation data pour un moteur
  * @param  pointeur sur structure du moteur
  * @params gpioPort/Pin de ...
@@ -90,7 +90,7 @@ void yMOTOR_Init(yMOTOR* this,
 		    	uint32_t gpioPortIN2, uint16_t gpioPinIN2,
 				TIM_HandleTypeDef htimpwm);
 
-/*
+/**
  * @brief  Marche/Arret request
  * @param  pointeur sur structure du moteur
  * @param  request order
@@ -98,7 +98,7 @@ void yMOTOR_Init(yMOTOR* this,
 */
 void yMOTOR_MarArr(yMOTOR* this, uint8_t mararr);
 
-/*
+/**
  * @brief  Speed_SP request
  * @param  pointeur sur structure du moteur
  * @param  request value
@@ -106,21 +106,21 @@ void yMOTOR_MarArr(yMOTOR* this, uint8_t mararr);
 */
 void yMOTOR_Speed(yMOTOR* this, float speed);
 
-/*
+/**
  * @brief  calcul moteur
  * @param  pointeur sur structure du moteur
  * @retval status
 */
 void yMOTOR_Exec(yMOTOR* this);
 
-/*
+/**
   * @brief  calcul Virtuals Outputs
   * @param  pointeur sur structure du moteur
   * @retval none
 */
 void yMOTOR_VirtualOutputs(yMOTOR* this);
 
-/*
+/**
   * @brief  calcul Real Outputs
   * @param  pointeur sur structure du moteur
   * @retval none
@@ -148,7 +148,7 @@ void yMOTOR_RealOutputs(yMOTOR* this);
 
 #endif	//_yMOTOR_H
 
-/**
+/*
  * @note \n
  * That's all folks!
  */

@@ -80,7 +80,7 @@ yMENU_t mnuSTM;		// pour Menu VT100
 yANALOG VRx, VRy;	// pour Joystick
 
 ////-- global data to view by STM32CubeMonitor
-//// TODO v34a DBG a supprimer
+////** @todo v34a DBG a supprimer */
 //yMOTOR Moteur_D;
 //yMOTOR Moteur_G;
 //yTRAIN TrainDG;
@@ -391,7 +391,7 @@ void StartDefaultTask(void *argument)
 	osSemaphoreRelease(semUARTHandle);
 
     /* Start PWM signals generation TIM4 channel 2 */
-	//TODO to move to tk moteur
+	/** @todo to move to tk moteur */
     if (HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_2) != HAL_OK)
     {
     	Error_Handler();	//PWM Generation Error

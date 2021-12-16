@@ -48,7 +48,7 @@ extern osMessageQueueId_t qTrainHandle;
 extern osMessageQueueId_t qMotDHandle;
 extern osMessageQueueId_t qMotGHandle;
 
-// TODO v34a DBG a supprimer
+// /** @todo v34a DBG a supprimer */
 yMOTOR Moteur_D;
 yMOTOR Moteur_G;
 yTRAIN TrainDG;
@@ -115,7 +115,7 @@ void tk_Process_Fnc(void *argument)
 				__NOP();
 				yEvent_t yEvent = {.Topic = MarArr, .PayLoadF = 0.0, .PayloadI = EvtRecu.PayloadI};
 				osMessageQueuePut(qTrainHandle,&yEvent, 0U, portMAX_DELAY);
-				//TODO v3.4a DBG debug test
+				/** @todo v3.4a DBG debug test */
 				__NOP();
 				yEvent.Topic = VRY;
 				yEvent.PayLoadF = 15.0;
@@ -128,7 +128,7 @@ void tk_Process_Fnc(void *argument)
 //				break;
 //			case VRY:	//Vitesse
 //				//-- request moteur consigne vitesse
-//				//TODO futur
+//				/** @todo futur */
 //				//use queue to send to tk_Train
 //				break;
 			default:
@@ -163,7 +163,7 @@ void tk_Train_Fnc(void *argument)
 	yEvent_t EvtRecu;
 	osStatus_t status;
 	//-- Declare structure du Train
-	//TODO v3.4a global for debug
+	/** @todo v3.4a global for debug */
 	//yTRAIN TrainDG;
 	//-- Is it to me to start?
 	while (TkToStart != TkTrain) {
@@ -194,7 +194,7 @@ void tk_Train_Fnc(void *argument)
 //			case BP1:
 //				//-- action?
 //				__NOP();
-//				//TODO traiter les Topic pour faire action yTRAIN
+			    /** @todo traiter les Topic pour faire action yMAIN */
 //				//-- debug envoyer msg à tk_MoteurD via qMotD
 //				//yEvent_t yEvent = {.Topic= BP1, .PayLoadF = 0.0, .PayloadI = 0};
 //				yEvent_t yEvent = {.Topic = BP1, .PayLoadF = 0.0, .PayloadI = 0};
@@ -271,7 +271,7 @@ void tk_Train_Fnc(void *argument)
 			osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
 
 //			//--- trace via LD2
-//			//TODO LD2 as running motors how???
+//			/** @todo LD2 as running motors how??? */
 //			HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, TrainDG.inRun);
 
 		} else {
@@ -298,7 +298,7 @@ void tk_MoteurD_Fnc(void *argument)
 	yEvent_t EvtRecu;
 	osStatus_t status;
 	//-- Declare structure du Moteur_D
-	//TODO v3.4a global for debug
+	/** @todo v3.4a global for debug */
 	//yMOTOR Moteur_D;
 	//-- Is it to me to start?
 	while (TkToStart != TkMoteurD) {
@@ -326,7 +326,7 @@ void tk_MoteurD_Fnc(void *argument)
 //								EvtRecu.Topic, EvtRecu.PayLoadF, EvtRecu.PayloadI);
 //			osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
 			//-- en fonction du Topic faire...
-			//TODO traiter les Topic pour faire action yMOTOR
+			/** @todo traiter les Topic pour faire action yMOTOR */
 			switch (EvtRecu.Topic) {
 			case Mar:
 				//-- action?
@@ -363,7 +363,7 @@ void tk_MoteurD_Fnc(void *argument)
 			osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
 
 			//--- trace via LD2
-			//TODO LD2 as running motors how???
+			/** @todo LD2 as running motors how??? */
 			HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, Moteur_D.inRun);
 
 		} else {
@@ -393,7 +393,7 @@ void tk_MoteurG_Fnc(void *argument)
 	yEvent_t EvtRecu;
 	osStatus_t status;
 	//-- Declare structure du Moteur_G
-	//TODO v3.4a global for debug
+	/** @todo v3.4a global for debug */
 	//yMOTOR Moteur_G;
 	//-- Is it to me to start?
 	while (TkToStart != TkMoteurG) {
@@ -422,7 +422,7 @@ void tk_MoteurG_Fnc(void *argument)
 //								EvtRecu.Topic, EvtRecu.PayLoadF, EvtRecu.PayloadI);
 //			osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
 			//-- en fonction du Topic faire...
-			//TODO traiter les Topic pour faire action yMOTOR
+			/** @todo traiter les Topic pour faire action yMOTOR */
 			switch (EvtRecu.Topic) {
 			case Mar:
 				//-- action?
@@ -452,7 +452,7 @@ void tk_MoteurG_Fnc(void *argument)
 			osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);
 
 			//--- trace via LD2
-			//TODO LD2 as running motors how???
+			/** @todo LD2 as running motors how??? */
 			//HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, Moteur_G.inRun);
 
 		} else {

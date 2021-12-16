@@ -78,7 +78,7 @@ void Infos_fnc(struct yMENU_t *self) {
   * @retval none (ecrit ds la structure elle meme)
 */
 void GetTouche_fnc(struct yMENU_t *self) {
-	//TODO: menu get touche, mettre un flag cde erronée!!
+	/** @todo menu get touche, mettre un flag cde erronée!! */
 //	extern yEvent_t yEvent;				//queue des events
 //	extern osMessageQueueId_t qEventsHandle;
 	if(uart2NbCar == 1) {		/* on attend 1 seule touche */
