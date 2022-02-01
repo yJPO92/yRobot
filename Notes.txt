@@ -2,6 +2,7 @@
 
 !!!!  renomer folder train en train_c
 
+le 17/12/2021: v3.5b (mx 6.4): modif '//TODO' en /** @todo blabla */ pour doxygen
 le 18/08/2021: v3.5b (mx 6.4): finalisation Node-red. Commande idem saisie VT et par bouton.
 le 18/08/2021: v3.5a (mx 6.4): update Node-red
                 update 'Readme.md'
