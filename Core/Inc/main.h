@@ -68,7 +68,7 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define yCubeMX "RTOS v6.4"
+#define yCubeMX 6.5
 #define B1_Pin GPIO_PIN_13
 #define B1_GPIO_Port GPIOC
 #define B1_EXTI_IRQn EXTI15_10_IRQn
@@ -97,10 +97,11 @@ void Error_Handler(void);
 #define SWO_GPIO_Port GPIOB
 #define MotDpwm_Pin GPIO_PIN_7
 #define MotDpwm_GPIO_Port GPIOB
+
 /* USER CODE BEGIN Private defines */
 #define yPROG "*** yRobot ***"
-#define yVER  "v3.5a"
-#define yDATE "xx-Oct-2020"
+#define yVER  "v3.6"
+#define yDATE "16-Sep-2023"
 //#define yDBG_tk 1        //debug display on terminal (ou commenter ligne)
 
 
@@ -111,5 +112,3 @@ void Error_Handler(void);
 #endif
 
 #endif /* __MAIN_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

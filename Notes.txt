@@ -1,7 +1,15 @@
 *** yRobot ***
+*
+* STM32CubeIDE v1.13.1
+* CubeMX V6.9.1
+* STM32CubeL4 Firmware Package v1.18.0
+* 
+*******
+
 
 !!!!  renomer folder train en train_c
 
+le 16/09/2023: v3.6  (mx 6.5): update IDE
 le 17/12/2021: v3.5b (mx 6.4): modif '//TODO' en /** @todo blabla */ pour doxygen
 le 18/08/2021: v3.5b (mx 6.4): finalisation Node-red. Commande idem saisie VT et par bouton.
 le 18/08/2021: v3.5a (mx 6.4): update Node-red

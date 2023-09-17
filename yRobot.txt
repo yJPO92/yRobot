@@ -1,6 +1,6 @@
 Configuration	yRobot
-STM32CubeMX 	5.6.0
-Date	10/31/2020
+STM32CubeMX 	6.9.1
+Date	09/17/2023
 MCU	STM32L476RGTx
 
 
@@ -73,14 +73,14 @@ SOFTWARE PROJECT
 Project Settings : 
 Project Name : yRobot
 Project Folder : D:\GitDepots\yRobot
-Toolchain / IDE : TrueSTUDIO
-Firmware Package Name and Version : STM32Cube FW_L4 V1.15.1
+Toolchain / IDE : STM32CubeIDE
+Firmware Package Name and Version : STM32Cube FW_L4 V1.18.0
 
 
 Code Generation Settings : 
 STM32Cube MCU packages and embedded software packs : Copy only the necessary library files
 Generate peripheral initialization as a pair of '.c/.h' files per peripheral : Yes
-Backup previously generated files when re-generating : Yes
+Backup previously generated files when re-generating : No
 Delete previously generated files when not re-generated : Yes
 Set all free pins as analog (to optimize the power consumption) : Yes
 

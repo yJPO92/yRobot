@@ -70,11 +70,4 @@
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>TERATERM-STM32 com7.INI</name>
-			<type>1</type>
-			<location>C:/Users/Jean/Documents/mbed/TERATERM-STM32 com7.INI</location>
-		</link>
-	</linkedResources>
 </projectDescription>

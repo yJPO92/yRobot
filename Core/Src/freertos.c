@@ -25,7 +25,7 @@
 #include "cmsis_os.h"
 
 /* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */     
+/* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
@@ -96,57 +96,57 @@ yEvent_t yEvent = {.Topic = TopicNone, .PayLoadF = 0.0, .PayloadI = 0};
 osThreadId_t defaultTaskHandle;
 const osThreadAttr_t defaultTask_attributes = {
   .name = "defaultTask",
+  .stack_size = 1024 * 4,
   .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 1024 * 4
 };
 /* Definitions for tk_Init */
 osThreadId_t tk_InitHandle;
 const osThreadAttr_t tk_Init_attributes = {
   .name = "tk_Init",
+  .stack_size = 1024 * 4,
   .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 1024 * 4
 };
 /* Definitions for tk_CheckVR */
 osThreadId_t tk_CheckVRHandle;
 const osThreadAttr_t tk_CheckVR_attributes = {
   .name = "tk_CheckVR",
+  .stack_size = 1024 * 4,
   .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 1024 * 4
 };
 /* Definitions for tk_Process */
 osThreadId_t tk_ProcessHandle;
 const osThreadAttr_t tk_Process_attributes = {
   .name = "tk_Process",
+  .stack_size = 1024 * 4,
   .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 1024 * 4
 };
 /* Definitions for tk_VTaffiche */
 osThreadId_t tk_VTafficheHandle;
 const osThreadAttr_t tk_VTaffiche_attributes = {
   .name = "tk_VTaffiche",
+  .stack_size = 1024 * 4,
   .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 1024 * 4
 };
 /* Definitions for tk_MoteurD */
 osThreadId_t tk_MoteurDHandle;
 const osThreadAttr_t tk_MoteurD_attributes = {
   .name = "tk_MoteurD",
+  .stack_size = 1024 * 4,
   .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 1024 * 4
 };
 /* Definitions for tk_Train */
 osThreadId_t tk_TrainHandle;
 const osThreadAttr_t tk_Train_attributes = {
   .name = "tk_Train",
+  .stack_size = 1024 * 4,
   .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 1024 * 4
 };
 /* Definitions for tk_MoteurG */
 osThreadId_t tk_MoteurGHandle;
 const osThreadAttr_t tk_MoteurG_attributes = {
   .name = "tk_MoteurG",
+  .stack_size = 1024 * 4,
   .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 1024 * 4
 };
 /* Definitions for qEvents */
 osMessageQueueId_t qEventsHandle;
@@ -208,10 +208,6 @@ void t250ms_Callback(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
-/* Pre/Post sleep processing prototypes */
-void PreSleepProcessing(uint32_t *ulExpectedIdleTime);
-void PostSleepProcessing(uint32_t *ulExpectedIdleTime);
-
 /* Hook prototypes */
 void configureTimerForRunTimeStats(void);
 unsigned long getRunTimeCounterValue(void);
@@ -263,15 +259,15 @@ void vApplicationDaemonTaskStartupHook(void)
 /* USER CODE END DAEMON_TASK_STARTUP_HOOK */
 
 /* USER CODE BEGIN PREPOSTSLEEP */
-__weak void PreSleepProcessing(uint32_t *ulExpectedIdleTime)
-{
-	/* place for user code */
-}
+//__weak void PreSleepProcessing(uint32_t *ulExpectedIdleTime)
+//{
+//	/* place for user code */
+//}
 
-__weak void PostSleepProcessing(uint32_t *ulExpectedIdleTime)
-{
-	/* place for user code */
-}
+//__weak void PostSleepProcessing(uint32_t *ulExpectedIdleTime)
+//{
+//	/* place for user code */
+//}
 /* USER CODE END PREPOSTSLEEP */
 
 /**
@@ -368,6 +364,10 @@ void MX_FREERTOS_Init(void) {
 	TkToStart = TkInit;
   /* USER CODE END RTOS_THREADS */
 
+  /* USER CODE BEGIN RTOS_EVENTS */
+  /* add events, ... */
+  /* USER CODE END RTOS_EVENTS */
+
 }
 
 /* USER CODE BEGIN Header_StartDefaultTask */
@@ -409,7 +409,7 @@ void StartDefaultTask(void *argument)
 		//--- Clear Status Bar & traces
 		if (RTC_AlarmA_flag == 1) {
 			mnuSTM.ClearStatusBar(&mnuSTM);	//CLS Bar
-			snprintf(VTbuffer.VTbuff, 50, "%s", mnuSTM.Buffer);
+			snprintf(VTbuffer.VTbuff, 200, "%s", mnuSTM.Buffer);
 			osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);	//envoi vers task afficahge
 			RTC_AlarmModify();	//relancer alarme ds qq sec
 		}
@@ -454,8 +454,7 @@ void tk_Init_Fnc(void *argument)
 	while (TkToStart != TkAll) {		//wait here!
 		osDelay(pdMS_TO_TICKS(WaitInTk));
 	}
-	snprintf(aTxBuffer, 1024, DECRC "\n tk_Init\t All task initialised %d\n"
-									yPROG " " yVER " " yCubeMX "\n\n" DECSC, TkToStart);
+//	snprintf(aTxBuffer, 1024, DECRC "\n tk_Init\t All task initialised %d\n" yPROG " " yVER " " yCubeMX "\n\n" DECSC, TkToStart);
 	osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
 	HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 	osSemaphoreRelease(semUARTHandle);
@@ -557,8 +556,7 @@ void tk_CheckVR_Fnc(void *argument)
 			osMessageQueuePut(qEventsHandle, &yEvent, 0U, portMAX_DELAY);
 		}
 
-		snprintf(VTbuffer.VTbuff, 50, CUP(12,50) "--VR   : (%d) %6.2f \t (%d) %6.2f",
-														VRx.sens, VRx.PVa, VRy.sens, VRy.PVa);	// 'IMPRECISERR' corrigé par modif syscall.c & .ld (v1.3)
+		snprintf(VTbuffer.VTbuff, 50, CUP(12,50) "--VR   : (%d) %6.2f \t (%d) %6.2f", VRx.sens, VRx.PVa, VRy.sens, VRy.PVa);	// 'IMPRECISERR' corrigé par modif syscall.c & .ld (v1.3)
 		osMessageQueuePut(qVTafficheHandle, &VTbuffer, 0U, portMAX_DELAY);	//envoi vers task afficahge
 
 	}
@@ -587,4 +585,3 @@ __weak void t250ms_Callback(void *argument)
 
 /* USER CODE END Application */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
