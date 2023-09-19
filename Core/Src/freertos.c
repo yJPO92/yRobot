@@ -454,7 +454,9 @@ void tk_Init_Fnc(void *argument)
 	while (TkToStart != TkAll) {		//wait here!
 		osDelay(pdMS_TO_TICKS(WaitInTk));
 	}
-//	snprintf(aTxBuffer, 1024, DECRC "\n tk_Init\t All task initialised %d\n" yPROG " " yVER " " yCubeMX "\n\n" DECSC, TkToStart);
+	/** @TODO v3.6 pb with snprintf */
+	snprintf(aTxBuffer, 1023, DECRC "\n tk_Init\t All task initialised %d\n" yPROG " " yVER " " yCubeMX "\n\n" DECSC, TkToStart);
+
 	osSemaphoreAcquire(semUARTHandle, portMAX_DELAY);  //timeout 0 if from ISR, else portmax
 	HAL_UART_Transmit(&huart2,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 	osSemaphoreRelease(semUARTHandle);

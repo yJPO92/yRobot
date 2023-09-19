@@ -43,7 +43,8 @@
 #define BLINK		"\x1B[5m"
 #define REVERSE		"\x1B[7m"
 
-#define DECSC		"\x1B" "7"		//Sauve cursor
 #define DECRC		"\x1B" "8"		//Restore cursor
+#define DECSC		"\x1B" "7"		//Sauve cursor
+
 
 #endif /* INC_SCREEN_H_ */
